@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DatabaseHandler {
 	
@@ -72,7 +73,37 @@ public class DatabaseHandler {
 	
 	// END - LOGIN HANDLER
 	
-	
+	public String[][] getEquipmentList() {
+		
+		
+		try(Connection conn = ConnectionHandler.getAsCustodian();
+			PreparedStatement st = conn.prepareStatement("SELECT * from equipment_items")) {
+			ArrayList<String[]> list = new ArrayList<>();
+			
+			ResultSet rs = st.executeQuery();
+			
+			while(rs.next()) {
+				String[] temp = new String[13];
+				
+				for(int i = 1; i <= 13; i++) {
+				temp[i - 1] = rs.getString(i);
+			
+				}
+				
+				list.add(temp);
+				
+			}
+			String[][] array = list.toArray(new String[0][]);
+			return array;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+			return null;
+		}
+		
+		
+	}
 	
 	
 }

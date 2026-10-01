@@ -4,22 +4,28 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.CharArrayReader;
 import java.io.Reader;
 import java.time.LocalTime;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.JMenu;
-import javax.swing.JMenuItem;
+import javax.swing.table.DefaultTableModel;
 
 public class Client {
 
@@ -37,6 +43,9 @@ public class Client {
 	private String sessionUser;
 	
 	private JMenuItem menuOptLogout;
+	private JTextField searchBar;
+	private JTable searchResult;
+	private DefaultTableModel queryResults;
 	
 	/**
 	 * Launch the application.
@@ -68,17 +77,17 @@ public class Client {
 		backend = new DatabaseHandler();
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1080, 920);
+		frame.setBounds(100, 100, 1450, 920);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JPanel mainPane = new JPanel();
-		mainPane.setBounds(10, 21, 1044, 849);
+		mainPane.setBounds(10, 21, 1414, 849);
 		frame.getContentPane().add(mainPane);
 		mainPane.setLayout(null);
 		
 		userArea = new JPanel();
-		userArea.setBounds(10, 11, 1024, 601);
+		userArea.setBounds(10, 11, 1394, 601);
 		mainPane.add(userArea);
 		userArea.setLayout(card);
 		
@@ -89,31 +98,31 @@ public class Client {
 		JLabel labelLogin = new JLabel("S.P.E.A.R System");
 		labelLogin.setFont(new Font("Trebuchet MS", Font.PLAIN, 34));
 		labelLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		labelLogin.setBounds(355, 11, 302, 117);
+		labelLogin.setBounds(500, 11, 302, 117);
 		loginScreen.add(labelLogin);
 		
 		JLabel lblUsername = new JLabel("Username");
 		lblUsername.setHorizontalAlignment(SwingConstants.CENTER);
-		lblUsername.setBounds(365, 139, 85, 14);
+		lblUsername.setBounds(510, 139, 85, 14);
 		loginScreen.add(lblUsername);
 		
 		authUsername = new JTextField();
-		authUsername.setBounds(460, 136, 197, 20);
+		authUsername.setBounds(605, 136, 197, 20);
 		loginScreen.add(authUsername);
 		authUsername.setColumns(10);
 		
 		JLabel lblPassword = new JLabel("Password");
 		lblPassword.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPassword.setBounds(365, 167, 85, 14);
+		lblPassword.setBounds(510, 167, 85, 14);
 		loginScreen.add(lblPassword);
 		
 		authPassword = new JPasswordField();
-		authPassword.setBounds(460, 164, 197, 20);
+		authPassword.setBounds(605, 164, 197, 20);
 		loginScreen.add(authPassword);
 		
 		JButton btnAuthenticate = new JButton("Log In");
 		btnAuthenticate.addActionListener(e -> { tryAuthenticate(); });
-		btnAuthenticate.setBounds(424, 225, 135, 23);
+		btnAuthenticate.setBounds(569, 225, 135, 23);
 		loginScreen.add(btnAuthenticate);
 		
 		lblLoginState = new JLabel("-");
@@ -125,7 +134,7 @@ public class Client {
 		custodianDashboard.setLayout(null);
 		
 		JTabbedPane custodianWorkArea = new JTabbedPane(JTabbedPane.TOP);
-		custodianWorkArea.setBounds(10, 54, 1004, 540);
+		custodianWorkArea.setBounds(10, 54, 502, 540);
 		custodianDashboard.add(custodianWorkArea);
 		
 		JPanel BorrowSystem = new JPanel();
@@ -141,12 +150,29 @@ public class Client {
 		lblCustodian.setBounds(10, 11, 343, 32);
 		custodianDashboard.add(lblCustodian);
 		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(522, 79, 862, 515);
+		custodianDashboard.add(scrollPane);
+		
+		searchResult = new JTable();
+		scrollPane.setViewportView(searchResult);
+		
+		searchBar = new JTextField();
+		searchBar.setBounds(522, 54, 115, 20);
+		custodianDashboard.add(searchBar);
+		searchBar.setColumns(10);
+		
+		JButton btnRefresh = new JButton("Refresh");
+		btnRefresh.addActionListener(e -> {displayValues();});
+		btnRefresh.setBounds(647, 54, 89, 23);
+		custodianDashboard.add(btnRefresh);
+		
 		JPanel adminDashboard = new JPanel();
 		adminDashboard.setLayout(null);
 		userArea.add(adminDashboard, "adminDash");
 		
 		JTabbedPane adminWorkArea = new JTabbedPane(JTabbedPane.TOP);
-		adminWorkArea.setBounds(10, 50, 1004, 540);
+		adminWorkArea.setBounds(10, 50, 1374, 540);
 		adminDashboard.add(adminWorkArea);
 		
 		JPanel equipManagement = new JPanel();
@@ -163,11 +189,11 @@ public class Client {
 		
 		areaLog = new JTextArea();
 		areaLog.setEditable(false);
-		areaLog.setBounds(10, 623, 1024, 225);
+		areaLog.setBounds(10, 623, 1394, 225);
 		mainPane.add(areaLog);
 		
 		JMenuBar menuBar = new JMenuBar();
-		menuBar.setBounds(0, 0, 1064, 22);
+		menuBar.setBounds(0, 0, 1434, 22);
 		frame.getContentPane().add(menuBar);
 		
 		JMenu menuMain = new JMenu("SETTINGS");
@@ -243,6 +269,19 @@ public class Client {
 			lblLoginState.setText("Authentication Failed: " + msg);
 			
 		}
+		
+	}
+
+	void displayValues() {
+		
+		String[][] list = backend.getEquipmentList();
+		
+		DefaultTableModel model = new DefaultTableModel(list.length, 13);
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				model.setValueAt(list[r][c], r, c);
+		
+		searchResult.setModel(model);
 		
 	}
 }
