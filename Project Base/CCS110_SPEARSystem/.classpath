@@ -6,17 +6,17 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="lib" path="C:/Eclipse/c3p0-0.14.2.jar">
+	<classpathentry kind="lib" path="C:/Eclipse/Eclipse_Directory/CCS110_SPEARSystem/additionalResources/Dependencies/c3p0-0.14.2.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Eclipse/mchange-commons-java-0.6.1.jar">
+	<classpathentry kind="lib" path="C:/Eclipse/Eclipse_Directory/CCS110_SPEARSystem/additionalResources/Dependencies/mchange-commons-java-0.6.1.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Eclipse/mysql-connector-j-26.7.0/mysql-connector-j-26.7.0.jar">
+	<classpathentry kind="lib" path="C:/Eclipse/Eclipse_Directory/CCS110_SPEARSystem/additionalResources/Dependencies/mysql-connector-j-26.7.0.jar">
 		<attributes>
 			<attribute name="module" value="true"/>
 		</attributes>
