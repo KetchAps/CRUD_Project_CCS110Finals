@@ -24,8 +24,11 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.RowFilter.Entry;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 
 public class Client {
 
@@ -45,7 +48,20 @@ public class Client {
 	private JMenuItem menuOptLogout;
 	private JTextField searchBar;
 	private JTable searchResult;
-	private DefaultTableModel queryResults;
+	private DefaultTableModel query;
+	
+	private TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(query);
+	
+	private RowFilter<DefaultTableModel, Integer> rf = new RowFilter<>() {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean include( Entry entry) {
+			
+			return false;
+		}
+		
+		
+	};
 	
 	/**
 	 * Launch the application.
@@ -154,7 +170,10 @@ public class Client {
 		scrollPane.setBounds(522, 79, 862, 515);
 		custodianDashboard.add(scrollPane);
 		
+		query = new DefaultTableModel();
+		
 		searchResult = new JTable();
+		searchResult.setModel(query);
 		scrollPane.setViewportView(searchResult);
 		
 		searchBar = new JTextField();
@@ -162,9 +181,9 @@ public class Client {
 		custodianDashboard.add(searchBar);
 		searchBar.setColumns(10);
 		
-		JButton btnRefresh = new JButton("Refresh");
+		JButton btnRefresh = new JButton("⟳");
 		btnRefresh.addActionListener(e -> {displayValues();});
-		btnRefresh.setBounds(647, 54, 89, 23);
+		btnRefresh.setBounds(1322, 54, 62, 23);
 		custodianDashboard.add(btnRefresh);
 		
 		JPanel adminDashboard = new JPanel();
@@ -276,12 +295,12 @@ public class Client {
 		
 		String[][] list = backend.getEquipmentList();
 		
-		DefaultTableModel model = new DefaultTableModel(list.length, 13);
+		query = new DefaultTableModel(list.length, 13);
 		for(int r = 0; r < list.length; r++)
 			for (int c = 0; c < list[r].length; c++)
-				model.setValueAt(list[r][c], r, c);
+				query.setValueAt(list[r][c], r, c);
 		
-		searchResult.setModel(model);
+		searchResult.setModel(query);
 		
 	}
 }
