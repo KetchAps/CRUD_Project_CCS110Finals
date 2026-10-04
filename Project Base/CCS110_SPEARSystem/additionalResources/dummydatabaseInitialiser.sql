@@ -41,6 +41,8 @@ CREATE TABLE equipment_items(
     availability VARCHAR(50) DEFAULT 'Available'
 );
 
+select count(distinct category) from equipment_items;
+
 insert into equipment_items values
 (equipmentID, 'TV001', 'LG Widescreen TV', 'Electronics', 'LG', '098231', 'desc', '102', '1', '', '9000', 'Damaged', 'In Use'),
 (equipmentID, 'TV002', 'LG Widescreen TV', 'Electronics', 'LG', '098871', 'desc', '0', '1', '', '11200', 'Good', 'Available'),

@@ -4,12 +4,9 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.CharArrayReader;
 import java.io.Reader;
 import java.time.LocalTime;
-import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -29,6 +26,11 @@ import javax.swing.SwingConstants;
 import javax.swing.RowFilter.Entry;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.JComboBox;
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class Client {
 
@@ -46,22 +48,37 @@ public class Client {
 	private String sessionUser;
 	
 	private JMenuItem menuOptLogout;
-	private JTextField searchBar;
 	private JTable searchResult;
 	private DefaultTableModel query;
 	
-	private TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(query);
 	
-	private RowFilter<DefaultTableModel, Integer> rf = new RowFilter<>() {
+	private JComboBox<String> cmbCondition;
+	private JComboBox<String> cmbCategory;
+	private JComboBox<String> cmbAvailability;
+
+	private DefaultComboBoxModel<String> cmbCategoryModel;
+	
+	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
+	
+	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
 		@Override
 		@SuppressWarnings("rawtypes")
 		public boolean include( Entry entry) {
+			String categoryFilter = cmbCategory.getSelectedItem().toString();
+			String conditionFilter = cmbCondition.getSelectedItem().toString();
+			String availabilityFilter = cmbAvailability.getSelectedItem().toString();
 			
-			return false;
+			if(!categoryFilter.equals("[Category]") && !entry.getStringValue(3).equals(categoryFilter)) return false;
+			
+			if(!conditionFilter.equals("[Condition]") && !entry.getStringValue(11).equals(conditionFilter)) return false;
+			
+			if(!availabilityFilter.equals("[Availability]") && !entry.getStringValue(12).equals(availabilityFilter)) return false;
+			return true;
 		}
 		
 		
 	};
+	private JTextField textField;
 	
 	/**
 	 * Launch the application.
@@ -171,20 +188,59 @@ public class Client {
 		custodianDashboard.add(scrollPane);
 		
 		query = new DefaultTableModel();
-		
+		inventorySorter.setRowFilter(null);
 		searchResult = new JTable();
 		searchResult.setModel(query);
+		searchResult.setRowSorter(inventorySorter);
+		
 		scrollPane.setViewportView(searchResult);
 		
-		searchBar = new JTextField();
-		searchBar.setBounds(522, 54, 115, 20);
-		custodianDashboard.add(searchBar);
-		searchBar.setColumns(10);
+		JPanel tablePanels = new JPanel();
+		tablePanels.setBounds(510, 54, 884, 547);
+		custodianDashboard.add(tablePanels);
+		tablePanels.setLayout(new CardLayout(0, 0));
+		
+		JPanel inventoryTable = new JPanel();
+		tablePanels.add(inventoryTable, "inventory");
+		inventoryTable.setLayout(null);
+		
+		cmbCondition = new JComboBox<String>();
+		cmbCondition.setModel(new DefaultComboBoxModel<String>(new String[] {"[Condition]", "Good", "Damaged", "Worn"}));
+		cmbCondition.setBounds(321, 0, 97, 22);
+		inventoryTable.add(cmbCondition);
+		
+		cmbCategory = new JComboBox<String>();
+		
+		cmbCategoryModel = new DefaultComboBoxModel<String>();
+		cmbCategoryModel.addElement("[Category]");
+		cmbCategory.setModel(cmbCategoryModel);
+		cmbCategory.setBounds(214, 0, 97, 22);
+		inventoryTable.add(cmbCategory);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(10, 1, 115, 20);
+		inventoryTable.add(textField);
 		
 		JButton btnRefresh = new JButton("⟳");
 		btnRefresh.addActionListener(e -> {displayValues();});
-		btnRefresh.setBounds(1322, 54, 62, 23);
-		custodianDashboard.add(btnRefresh);
+		btnRefresh.setBounds(812, 0, 62, 23);
+		inventoryTable.add(btnRefresh);
+		
+		cmbAvailability = new JComboBox<String>();
+		cmbAvailability.setModel(new DefaultComboBoxModel<>(new String[] {"[Availability]", "Available", "In Use", "In Maintenance"}));
+		cmbAvailability.setBounds(428, 0, 97, 22);
+		inventoryTable.add(cmbAvailability);
+		
+		JButton btnFilter = new JButton("⌕");
+		btnFilter.addActionListener(e -> { inventorySorter.setRowFilter(inventoryRF); });
+		btnFilter.setBounds(535, 0, 62, 23);
+		inventoryTable.add(btnFilter);
+		
+		JButton btnClearFilter = new JButton("Clear");
+		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
+		btnClearFilter.setBounds(607, 0, 62, 23);
+		inventoryTable.add(btnClearFilter);
 		
 		JPanel adminDashboard = new JPanel();
 		adminDashboard.setLayout(null);
@@ -292,8 +348,10 @@ public class Client {
 	}
 
 	void displayValues() {
+		UpdateFilterBox();
 		
-		String[][] list = backend.getEquipmentList();
+		String[][] list;
+			list = backend.getEquipmentList();
 		
 		query = new DefaultTableModel(list.length, 13);
 		for(int r = 0; r < list.length; r++)
@@ -301,6 +359,23 @@ public class Client {
 				query.setValueAt(list[r][c], r, c);
 		
 		searchResult.setModel(query);
+		inventorySorter.setModel(query);
+		searchResult.setRowSorter(inventorySorter);
+	}
+	
+	
+	void UpdateFilterBox() {
+		
+		String[] values = backend.getInventoryFilters();
+		
+		cmbCategoryModel.removeAllElements();
+		cmbCategoryModel.addElement("[Category]");
+		for (int i = 0; i < values.length; i++)
+		{
+			cmbCategoryModel.addElement(values[i]);
+
+			System.out.print(values[i] + " ");
+		}
 		
 	}
 }

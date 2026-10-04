@@ -101,11 +101,42 @@ public class DatabaseHandler {
 			
 			return null;
 		}
-		
-		
 	}
 	
-	
+	public String[] getInventoryFilters() {
+		
+		try(Connection conn = ConnectionHandler.getAsCustodian();
+			PreparedStatement cat = conn.prepareStatement("select distinct category from equipment_items");
+			PreparedStatement catC = conn.prepareStatement("select count(distinct category) from equipment_items")) {
+			
+			String[] values;
+			int categorySize = 1;
+			
+			ResultSet cs = catC.executeQuery();
+			if(cs.next()) categorySize = cs.getInt(1);
+			
+			values = new String[categorySize];
+			ResultSet rs = cat.executeQuery();
+			
+			for (int i = 0; i < values.length; i++) {
+				if(rs.next()) 
+				values[i] = rs.getString(1);
+				
+				else break;
+			}
+			
+			cs.close();
+			rs.close();
+			return values;
+			
+		} catch(SQLException e) {
+			
+			e.printStackTrace();
+			return null;
+			
+		}
+		
+	}
 	
 	
 }
