@@ -2,6 +2,7 @@ package ui;
 
 import java.awt.EventQueue;
 import java.awt.Image;
+import controller.AppController;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -20,7 +21,8 @@ public class loginPanel extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
-	private JFrame frame;
+	private AppController controller;
+	
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
@@ -35,7 +37,6 @@ public class loginPanel extends JFrame {
 	private JPanel about;
 	private JPanel objectives;
 	private JLabel lblSchoolProperty;
-	private JLabel lblNewLabel_1;
 
 	/**
 	 * Launch the application.
@@ -57,7 +58,9 @@ public class loginPanel extends JFrame {
 	 * Create the frame.
 	 */
 	public loginPanel() {
-		frame = this;
+		// AppController
+		controller = new AppController(this);
+		
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1200, 840);
 
@@ -102,12 +105,13 @@ public class loginPanel extends JFrame {
 
 		JButton btnNewButton = new JButton("Login");
 		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				dashboard main = new dashboard();
-				main.setVisible(true);
-				frame.dispose();
-			}
+		    public void actionPerformed(ActionEvent e) {
+
+		        String username = textField.getText();
+		        String password = textField_1.getText();
+
+		        controller.login(username, password);
+		    }
 		});
 		btnNewButton.setForeground(new Color(255, 255, 255));
 		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 30));
