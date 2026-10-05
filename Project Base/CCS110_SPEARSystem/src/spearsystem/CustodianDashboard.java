@@ -16,6 +16,8 @@ import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.JSeparator;
+import java.awt.Color;
 
 
 public class CustodianDashboard {
@@ -26,14 +28,22 @@ public class CustodianDashboard {
 	private DatabaseHandler backend;
 	
 	private String sessionUser;
-	private JTable searchResult;
-	private DefaultTableModel query;
+	
+	private CardLayout card = new CardLayout(0,0);
 	
 	private JComboBox<String> cmbCondition;
 	private JComboBox<String> cmbCategory;
 	private JComboBox<String> cmbAvailability;
+	private JPanel cardContainer;
 
 	private DefaultComboBoxModel<String> cmbCategoryModel;
+	
+	private JTextField textField;
+	private JTable searchResult;
+	private JTable tblBorrowPreview;
+	
+	private DefaultTableModel query;
+	private DefaultTableModel borrowList;
 	
 	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	
@@ -56,8 +66,7 @@ public class CustodianDashboard {
 		
 	};
 	
-	private JTextField textField;
-
+	
 
 	/**
 	 * Create the application.
@@ -81,18 +90,8 @@ public class CustodianDashboard {
 		custodianDashboard = new JPanel();
 		custodianDashboard.setLayout(null);
 		custodianDashboard.setBounds(10, 54, 1400, 620);
-		//frame.getContentPane().add(custodianDashboard);
 		
-		JTabbedPane custodianWorkArea = new JTabbedPane(JTabbedPane.TOP);
-		custodianWorkArea.setBounds(10, 54, 502, 547);
-		custodianDashboard.add(custodianWorkArea);
 		
-		JPanel BorrowSystem = new JPanel();
-		custodianWorkArea.addTab("Equipment Borrowing", null, BorrowSystem, null);
-		BorrowSystem.setLayout(null);
-		
-		JPanel MaintenanceSystem = new JPanel();
-		custodianWorkArea.addTab("Equipment Maintenance", null, MaintenanceSystem, null);
 		
 		JLabel lblCustodian = new JLabel("Custodian");
 		lblCustodian.setFont(new Font("Tahoma", Font.PLAIN, 20));
@@ -100,25 +99,25 @@ public class CustodianDashboard {
 		lblCustodian.setBounds(10, 11, 343, 32);
 		custodianDashboard.add(lblCustodian);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(522, 79, 862, 522);
-		custodianDashboard.add(scrollPane);
-		
 		query = new DefaultTableModel();
 		inventorySorter.setRowFilter(null);
-		searchResult = new JTable();
-		searchResult.setModel(query);
-		searchResult.setRowSorter(inventorySorter);
 		
-		scrollPane.setViewportView(searchResult);
+		cardContainer = new JPanel();
+		cardContainer.setBounds(0, 54, 1400, 566);
+		custodianDashboard.add(cardContainer);
+		cardContainer.setLayout(card);
 		
-		JPanel tablePanels = new JPanel();
-		tablePanels.setBounds(510, 54, 884, 547);
-		custodianDashboard.add(tablePanels);
-		tablePanels.setLayout(new CardLayout(0, 0));
+		JPanel borrowFormCreation = new JPanel();
+		borrowFormCreation.setBounds(10, 54, 1384, 555);
+		cardContainer.add(borrowFormCreation);
+		borrowFormCreation.setLayout(null);
+		
+		cmbCategoryModel = new DefaultComboBoxModel<String>();
+		cmbCategoryModel.addElement("[Category]");
 		
 		JPanel inventoryTable = new JPanel();
-		tablePanels.add(inventoryTable, "inventory");
+		inventoryTable.setBounds(314, 11, 1076, 544);
+		borrowFormCreation.add(inventoryTable);
 		inventoryTable.setLayout(null);
 		
 		cmbCondition = new JComboBox<String>();
@@ -127,9 +126,6 @@ public class CustodianDashboard {
 		inventoryTable.add(cmbCondition);
 		
 		cmbCategory = new JComboBox<String>();
-		
-		cmbCategoryModel = new DefaultComboBoxModel<String>();
-		cmbCategoryModel.addElement("[Category]");
 		cmbCategory.setModel(cmbCategoryModel);
 		cmbCategory.setBounds(214, 0, 97, 22);
 		inventoryTable.add(cmbCategory);
@@ -158,6 +154,44 @@ public class CustodianDashboard {
 		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
 		btnClearFilter.setBounds(607, 0, 62, 23);
 		inventoryTable.add(btnClearFilter);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(0, 33, 1076, 500);
+		inventoryTable.add(scrollPane);
+		
+		searchResult = new JTable();
+		scrollPane.setViewportView(searchResult);
+		
+		JPanel main = new JPanel();
+		main.setBackground(new Color(255, 255, 255));
+		cardContainer.add(main, "dashboard");
+		main.setLayout(null);
+		
+		JPanel borrowTablePreview = new JPanel();
+		borrowTablePreview.setBounds(436, 11, 471, 544);
+		main.add(borrowTablePreview);
+		borrowTablePreview.setLayout(null);
+		
+		JScrollPane brwPreviewViewport = new JScrollPane();
+		brwPreviewViewport.setBounds(10, 93, 451, 440);
+		borrowTablePreview.add(brwPreviewViewport);
+		
+		tblBorrowPreview = new JTable();
+		brwPreviewViewport.setViewportView(tblBorrowPreview);
+		
+		JPanel panel = new JPanel();
+		panel.setBackground(new Color(0, 0, 255));
+		panel.setForeground(new Color(0, 0, 255));
+		panel.setBounds(0, 0, 371, 566);
+		main.add(panel);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(10, 41, 1380, 2);
+		custodianDashboard.add(separator);
+		
+		
+		
+		card.show(cardContainer, "dashboard");
 		
 		//frame.setVisible(true);
 		
@@ -219,5 +253,4 @@ public class CustodianDashboard {
 		parent.log(true, "Categories Updated successfully.");
 		
 	}
-
 }
