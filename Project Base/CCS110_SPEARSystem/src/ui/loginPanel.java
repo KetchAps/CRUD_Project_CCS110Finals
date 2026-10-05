@@ -20,6 +20,7 @@ public class loginPanel extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 
+	private JFrame frame;
 	private JPanel contentPane;
 	private JTextField textField;
 	private JTextField textField_1;
@@ -56,7 +57,7 @@ public class loginPanel extends JFrame {
 	 * Create the frame.
 	 */
 	public loginPanel() {
-
+		frame = this;
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 1200, 840);
 
@@ -100,6 +101,14 @@ public class loginPanel extends JFrame {
 		loginPane.add(textField_1);
 
 		JButton btnNewButton = new JButton("Login");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				dashboard main = new dashboard();
+				main.setVisible(true);
+				frame.dispose();
+			}
+		});
 		btnNewButton.setForeground(new Color(255, 255, 255));
 		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 30));
 		btnNewButton.setBackground(new Color(30, 144, 255));
