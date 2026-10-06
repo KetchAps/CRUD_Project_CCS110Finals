@@ -153,14 +153,16 @@ public class MainClient {
 
 	public void displayLogin() {
 		card.show(userArea, "login");
+		menuOptLogout.setEnabled(false);
 	}
 	
 	public void displayCustodian() {
 		card.show(userArea, "custodian");
+		menuOptLogout.setEnabled(true);
 		
 	}
 	public void displayAdmin() {
 		card.show(userArea, "admin");
-		
-	}
+		menuOptLogout.setEnabled(true);
+	 }
 }

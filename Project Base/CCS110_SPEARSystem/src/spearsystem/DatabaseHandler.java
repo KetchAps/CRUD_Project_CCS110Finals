@@ -76,5 +76,30 @@ public class DatabaseHandler {
 		
 	}
 	
-	
+	public String[] fetchEquipmentDetails(int id) {
+		
+		try (Connection conn = ConnectionHandler.getAsCustodian();
+			PreparedStatement st = conn.prepareStatement("select * from equipment_items WHERE equipmentID = ? LIMIT 1")) {
+			
+			st.setInt(1, id);
+			
+			ResultSet rs = st.executeQuery();
+			
+			ArrayList<String> list = new ArrayList<>();
+			if(rs.next()) {
+				
+				for ( int i = 1; i <= 13; i++)
+					list.add(rs.getString(i));			
+			}
+			
+			return list.toArray(new String[0]);
+			
+		}
+	 catch (SQLException e) {
+		
+		e.printStackTrace();
+		return null;
+	}
+		
+	}
 }
