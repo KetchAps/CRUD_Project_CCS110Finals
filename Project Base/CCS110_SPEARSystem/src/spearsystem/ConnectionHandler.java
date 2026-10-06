@@ -13,7 +13,6 @@ public class ConnectionHandler {
 	// CONNECTION POOL HANDLER (c3p0) - DO NOT TOUCH.
 	
     private static DataSource authenticatorConnectionSource;
-    private static DataSource employeeConnectionSource;
    
     static {
     	

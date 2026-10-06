@@ -11,6 +11,7 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 
 public class LoginScreen {
 
@@ -79,7 +80,6 @@ public class LoginScreen {
 	}
 	
 
-	
 	
 	
 	void tryAuthenticate() {

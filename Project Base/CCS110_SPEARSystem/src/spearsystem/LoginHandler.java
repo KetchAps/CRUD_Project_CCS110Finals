@@ -40,7 +40,7 @@ public class LoginHandler {
 	public boolean authenticate(String user, Reader pass) {
 		
 		try(Connection auth = ConnectionHandler.tryConnect();
-			PreparedStatement st = auth.prepareStatement("select * from userAccounts WHERE username = ? AND pass = password(?) LIMIT 1")) {
+			PreparedStatement st = auth.prepareStatement("select * from userAccounts WHERE username = ? AND password = password(?) LIMIT 1")) {
 			
 			st.setString(1, user);
 			st.setCharacterStream(2, pass);

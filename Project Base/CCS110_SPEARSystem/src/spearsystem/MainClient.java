@@ -23,6 +23,7 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
+import javax.swing.SwingWorker;
 import javax.swing.RowFilter.Entry;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
@@ -44,6 +45,7 @@ public class MainClient {
 	private JPanel userArea;
 	
 	private String sessionUser;
+	private int sessionID;
 	
 	private JMenuItem menuOptLogout;
 	private JLabel lblFeedback;
@@ -73,7 +75,7 @@ public class MainClient {
 	 */
 	public MainClient() {
 		initialize();
-		startupProcess();
+		testConnection();
 	}
 
 	
@@ -129,6 +131,21 @@ public class MainClient {
 	
 	}
 	
+	
+	void testConnection() {
+		
+		SwingWorker<?, ?> w = new SwingWorker<>() {
+
+			@Override
+			protected Object doInBackground() throws Exception {
+				startupProcess();
+				return null;
+			}
+		};
+		w.execute();
+	}
+	
+	
 	void startupProcess() {
 		
 		boolean result = authHandler.checkConnection();
@@ -136,6 +153,15 @@ public class MainClient {
 
 		log(result, connStatMsg);
 		
+	}
+	
+	String getSessionUser() {
+		return sessionUser;
+		
+	}
+	
+	int getSessionID() {
+		return sessionID;
 	}
 
 
