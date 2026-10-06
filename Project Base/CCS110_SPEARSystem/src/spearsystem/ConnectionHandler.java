@@ -18,18 +18,14 @@ public class ConnectionHandler {
     static {
     	
     	authenticatorConnectionSource = AuthenticatorSource();
-    	employeeConnectionSource = EmployeeSource();
     }
 
-    public static Connection getAsAuthenticator() throws SQLException {
+    public static Connection tryConnect() throws SQLException {
         return authenticatorConnectionSource.getConnection();
     
     }
     
-    public static Connection getAsCustodian() throws SQLException {
-    	return employeeConnectionSource.getConnection();
-    }
-
+   
     private static DataSource AuthenticatorSource() {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         try {
@@ -57,33 +53,6 @@ public class ConnectionHandler {
         return cpds;
     }
     
-    private static DataSource EmployeeSource() {
-    	ComboPooledDataSource cpds = new ComboPooledDataSource();
-        try {
-            cpds.setDriverClass("com.mysql.cj.jdbc.Driver");
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-        }
-        try {
-			cpds.setLoginTimeout(3);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-        cpds.setJdbcUrl("jdbc:mysql://localhost:3306/spearDatabase");
-        cpds.setUser("custodian");
-        cpds.setPassword("custodianAccess");
-        cpds.setMinPoolSize(3);
-        cpds.setAcquireIncrement(5);
-        cpds.setMaxPoolSize(20);
-        cpds.setCheckoutTimeout(9000);
-        cpds.setIdleConnectionTestPeriod(60);
-        cpds.setTestConnectionOnCheckin(true);
-        return cpds;
-    	
-    	
-    }
 	}
 	    
 

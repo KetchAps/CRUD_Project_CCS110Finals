@@ -14,7 +14,7 @@ public class DatabaseHandler {
 	public String[][] getEquipmentList() {
 		
 		
-		try(Connection conn = ConnectionHandler.getAsCustodian();
+		try(Connection conn = ConnectionHandler.tryConnect();
 			PreparedStatement st = conn.prepareStatement("SELECT * from equipment_items")) {
 			ArrayList<String[]> list = new ArrayList<>();
 			
@@ -43,7 +43,7 @@ public class DatabaseHandler {
 	
 	public String[] getInventoryFilters() {
 		
-		try(Connection conn = ConnectionHandler.getAsCustodian();
+		try(Connection conn = ConnectionHandler.tryConnect();
 			PreparedStatement cat = conn.prepareStatement("select distinct category from equipment_items");
 			PreparedStatement catC = conn.prepareStatement("select count(distinct category) from equipment_items")) {
 			
@@ -78,7 +78,7 @@ public class DatabaseHandler {
 	
 	public String[] fetchEquipmentDetails(int id) {
 		
-		try (Connection conn = ConnectionHandler.getAsCustodian();
+		try (Connection conn = ConnectionHandler.tryConnect();
 			PreparedStatement st = conn.prepareStatement("select * from equipment_items WHERE equipmentID = ? LIMIT 1")) {
 			
 			st.setInt(1, id);

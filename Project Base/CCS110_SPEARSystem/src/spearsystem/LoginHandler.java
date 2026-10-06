@@ -14,8 +14,7 @@ public class LoginHandler {
 	private String connectionStatus;
 	public boolean checkConnection() {
 		
-		try(Connection authC = ConnectionHandler.getAsAuthenticator();
-			Connection custoC = ConnectionHandler.getAsCustodian()) {
+		try(Connection authC = ConnectionHandler.tryConnect()) {
 			
 			connectionStatus = "Database Connection successfully established.";
 			return true;
@@ -40,7 +39,7 @@ public class LoginHandler {
 	private String authStatus;
 	public boolean authenticate(String user, Reader pass) {
 		
-		try(Connection auth = ConnectionHandler.getAsAuthenticator();
+		try(Connection auth = ConnectionHandler.tryConnect();
 			PreparedStatement st = auth.prepareStatement("select * from userAccounts WHERE username = ? AND pass = password(?) LIMIT 1")) {
 			
 			st.setString(1, user);
