@@ -33,41 +33,79 @@ import javax.swing.text.DocumentFilter;
 
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
+import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
 import spearsystem.CustodianDatabaseHandler.MaintenanceReport;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.JToggleButton;
+import javax.swing.event.ChangeListener;
+import javax.swing.event.ChangeEvent;
+import javax.swing.JCheckBox;
 
 
 public class CustodianDashboard {
-
+	
+	final String[] RECORDSTATUS = {"Returned", "Borrowed"};
+	
+	final String[] EQUIPCONDITIONS = {"Good", "Worn", "Damaged"};
+	final String[] EQUIPAVAILABILITY = {"Available", "Borrowed", "Maintenance"}; 
 	
 	private JPanel custodianDashboard;
 	private MainClient parent;
 	private CustodianHandler backend;
 	
-	private String sessionUser;
-	private int sessionID;
-	
 	private CardLayout card = new CardLayout(0,0);
 	private CardLayout formCard = new CardLayout(0,0);
+	
 	private JComboBox<String> cmbCondition;
 	private JComboBox<String> cmbCategory;
 	private JComboBox<String> cmbAvailability;
-	
+	private JComboBox<String> cmbMaintenanceStatus;
+	private JComboBox<String> cmbConditionOnReturn;
+	private JComboBox<String> cmbBorrowStatus;
+	private JComboBox<String> cmbReceivedBy;
+	private JComboBox<String> cmbStatus;	
 	private JComboBox<String> cmbBorrowerName;
+	private JComboBox<String> cmbCondOnReturn;
+	
 	private JPanel cardContainer;
-	JPanel formCreator; // JPanel of the Forms
+	private JPanel formCreator; // JPanel of the Forms
 
 	private DefaultComboBoxModel<String> cmbCategoryModel;
 	private DefaultComboBoxModel<String> cmbBorrowerModel;
 	
 	private JTextField searchBar;
 	private JTable searchResult;
+	
 	private JTable tblBorrowPreview;
+	private JTable tblborrowRecord;
 	
 	private DefaultTableModel query;
 	private DefaultTableModel borrowList;
 	
-	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
+	private JTextArea txtAMntIssue;
+	private JTextArea txtAMntActionTaken;
+	private JTextField txtBrwEquipID;
+	private JTextField txtBrwEquipName;
+	private JTextField txtBrwEquipTag;
+	private JTextField txtBrwReturnByDate;
+	private JTextField txtDateBorrowed;
+	private JTextField txtBrwEquipCondition;
 	
+	
+	private Integer[] borrowerIDs;
+	private JTextField txtMntEquipID;
+	private JTextField txtMntEquipName;
+	private JTextField txtMntEquipCondition;
+	private JTextField txtMntEquipTag;
+	private JTextField txtMntDateReported;
+	private JTextField txtMntCost;
+	private JTextField txtBrwDateReturned;
+	private JTextField txtbrwSearchBar;
+	private JToggleButton toggleUpdMarkAsReturned;
+	private JCheckBox checkUpdateItems;
+	
+	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
 		@Override
 		@SuppressWarnings("rawtypes")
@@ -97,24 +135,37 @@ public class CustodianDashboard {
 		
 	};
 	
-	private JTextArea txtAMntIssue;
-	private JTextArea txtAMntActionTaken;
-	private JTextField txtBrwEquipID;
-	private JTextField txtBrwEquipName;
-	private JTextField txtBrwEquipTag;
-	private JTextField txtReturnByDate;
-	private JTextField txtDateBorrowed;
-	private JTextField txtBrwEquipCondition;
+	private TableRowSorter<DefaultTableModel> borrowRecordSorter = new TableRowSorter<>(borrowList);
+	private RowFilter<DefaultTableModel, Integer> borrowRecordRF = new RowFilter<>() {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean include( Entry entry) {
+			
+			String searchFilter = txtbrwSearchBar.getText();
+			String receiverFilter = cmbReceivedBy.getSelectedItem().toString();
+			String statusFilter = cmbStatus.getSelectedItem().toString();
+			
+			// searchBar
+			String id = entry.getStringValue(0);
+			String tag = entry.getStringValue(1);
+			String name = entry.getStringValue(2);
+			
+			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
+				!(id.contains(searchFilter) || tag.contains(searchFilter) || name.contains(searchFilter))) return false;
+			
+			if(!receiverFilter.equals("[Custodian]") && !entry.getStringValue(11).equals(receiverFilter)) return false;
+			
+			if(!statusFilter.equals("[Status]") && !entry.getStringValue(12).equals(statusFilter)) return false;
+			return true;
+		}
+		
+		
+	};
 	
 	
-	private Integer[] borrowerIDs;
-	private JTextField txtMntEquipID;
-	private JTextField txtMntEquipName;
-	private JTextField txtMntEquipCondition;
-	private JTextField txtMntEquipTag;
-	private JTextField txtMntDateReported;
-	private JTextField txtMntCost;
-
+	
+	
+	
 	KeyAdapter numericalOnly = new KeyAdapter() {
 		@Override
 		public void keyTyped(KeyEvent e) {
@@ -142,6 +193,15 @@ public class CustodianDashboard {
             }
         }
     };
+	private JTextField txtTransactionID;
+	private JTextField txtUpdBorrowerID;
+	private JTextField txtUpdBorrowedEquip;
+	private JTextField txtBorrowDate;
+	private JTextField txtUpdCustodian;
+	private JTextField txtUpdCondOnBorrow;
+	private JTextField txtExpectedReturnDate;
+	private JTextField txtDateReturned;
+	
 	
 	/**
 	 * Create the application.
@@ -292,12 +352,12 @@ public class CustodianDashboard {
 		createBorrow.add(lblEquipDetails);
 		
 		JSeparator sprtrBrwTop_1 = new JSeparator();
-		sprtrBrwTop_1.setBounds(10, 240, 274, 6);
+		sprtrBrwTop_1.setBounds(10, 186, 274, 6);
 		createBorrow.add(sprtrBrwTop_1);
 		
 		JLabel lblBorrowerDetails = new JLabel("Borrower Details");
 		lblBorrowerDetails.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblBorrowerDetails.setBounds(10, 247, 113, 18);
+		lblBorrowerDetails.setBounds(10, 193, 113, 18);
 		createBorrow.add(lblBorrowerDetails);
 		
 		JButton btnBrwLoadID = new JButton("Select");
@@ -309,37 +369,37 @@ public class CustodianDashboard {
 		
 		cmbBorrowerName = new JComboBox<String>();
 		cmbBorrowerName.setModel(cmbBorrowerModel);
-		cmbBorrowerName.setBounds(10, 286, 274, 20);
+		cmbBorrowerName.setBounds(10, 232, 274, 20);
 		createBorrow.add(cmbBorrowerName);
 		
 		JLabel lblBorrowerName = new JLabel("Borrower");
-		lblBorrowerName.setBounds(10, 275, 82, 12);
+		lblBorrowerName.setBounds(10, 221, 82, 12);
 		createBorrow.add(lblBorrowerName);
 		
-		txtReturnByDate = new JTextField();
-		txtReturnByDate.setBounds(10, 367, 113, 20);
-		createBorrow.add(txtReturnByDate);
-		txtReturnByDate.setColumns(10);
+		txtBrwReturnByDate = new JTextField();
+		txtBrwReturnByDate.setBounds(10, 313, 113, 20);
+		createBorrow.add(txtBrwReturnByDate);
+		txtBrwReturnByDate.setColumns(10);
 		
 		txtDateBorrowed = new JTextField();
 		txtDateBorrowed.setText("2000-12-19");
 		txtDateBorrowed.setEditable(false);
 		txtDateBorrowed.setColumns(10);
-		txtDateBorrowed.setBounds(10, 327, 113, 20);
+		txtDateBorrowed.setBounds(10, 273, 113, 20);
 		createBorrow.add(txtDateBorrowed);
 		
 		JLabel lblDateBorrowed = new JLabel("Date Borrowed:");
-		lblDateBorrowed.setBounds(10, 313, 96, 14);
+		lblDateBorrowed.setBounds(10, 259, 96, 14);
 		createBorrow.add(lblDateBorrowed);
 		
-		JLabel lblRetunByDate = new JLabel("Return by Date:");
-		lblRetunByDate.setBounds(10, 355, 96, 14);
+		JLabel lblRetunByDate = new JLabel("Return by Date:*");
+		lblRetunByDate.setBounds(10, 301, 96, 14);
 		createBorrow.add(lblRetunByDate);
 		
 		txtBrwEquipCondition = new JTextField();
 		txtBrwEquipCondition.setEditable(false);
 		txtBrwEquipCondition.setColumns(10);
-		txtBrwEquipCondition.setBounds(10, 157, 82, 18);
+		txtBrwEquipCondition.setBounds(10, 157, 101, 18);
 		createBorrow.add(txtBrwEquipCondition);
 		
 		JLabel lblBrwEquipCondition = new JLabel("Condition");
@@ -348,18 +408,18 @@ public class CustodianDashboard {
 		
 		JButton btnBrwSubmit = new JButton("Create Record");
 		btnBrwSubmit.addActionListener(e -> { createBorrowRecord(); });
-		btnBrwSubmit.setBounds(10, 426, 151, 23);
+		btnBrwSubmit.setBounds(10, 510, 151, 23);
 		createBorrow.add(btnBrwSubmit);
 		
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(e -> { displayDashboard(); });
-		btnCancel.setBounds(171, 426, 113, 23);
+		btnCancel.setBounds(171, 510, 113, 23);
 		createBorrow.add(btnCancel);
 		
 		JLabel lblyyyymmdd = new JLabel("(YYYY-MM-DD)");
 		lblyyyymmdd.setHorizontalAlignment(SwingConstants.CENTER);
 		lblyyyymmdd.setForeground(new Color(192, 192, 192));
-		lblyyyymmdd.setBounds(10, 386, 96, 14);
+		lblyyyymmdd.setBounds(10, 332, 113, 14);
 		createBorrow.add(lblyyyymmdd);
 		
 		JPanel createMaintenance = new JPanel();
@@ -524,6 +584,7 @@ public class CustodianDashboard {
 		panel.add(btnCreateBorrow);
 		
 		JButton btnUpdateBorrow = new JButton("Update Borrow Record");
+		btnUpdateBorrow.addActionListener(e -> { displayUpdateBorrow(); });
 		btnUpdateBorrow.setForeground(Color.WHITE);
 		btnUpdateBorrow.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnUpdateBorrow.setFocusable(false);
@@ -559,12 +620,237 @@ public class CustodianDashboard {
 		cardContainer.add(borrowFormCreation, "creation");
 		
 		formCreator.add(createBorrow, "borrowForm");
+		
+		JLabel lblyyyymmdd_1 = new JLabel("(YYYY-MM-DD)");
+		lblyyyymmdd_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblyyyymmdd_1.setForeground(Color.LIGHT_GRAY);
+		lblyyyymmdd_1.setBounds(154, 332, 113, 14);
+		createBorrow.add(lblyyyymmdd_1);
+		
+		txtBrwDateReturned = new JTextField();
+		txtBrwDateReturned.setColumns(10);
+		txtBrwDateReturned.setBounds(154, 313, 113, 20);
+		createBorrow.add(txtBrwDateReturned);
+		
+		JLabel lblDateReturned = new JLabel("Date Returned:*");
+		lblDateReturned.setBounds(154, 301, 96, 14);
+		createBorrow.add(lblDateReturned);
+		
+		JLabel lblNote = new JLabel("* : If applicable");
+		lblNote.setForeground(new Color(128, 128, 128));
+		lblNote.setBounds(10, 485, 257, 14);
+		createBorrow.add(lblNote);
+		
+		cmbBorrowStatus = new JComboBox<String>();
+		cmbBorrowStatus.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
+		cmbBorrowStatus.setBounds(151, 272, 116, 22);
+		createBorrow.add(cmbBorrowStatus);
+		
+		JLabel lblBorrowStatus = new JLabel("Borrow Status:");
+		lblBorrowStatus.setBounds(154, 259, 96, 14);
+		createBorrow.add(lblBorrowStatus);
+		
+		JLabel lblBrwEquipCondOnReturn = new JLabel("Condition");
+		lblBrwEquipCondOnReturn.setBounds(154, 139, 82, 12);
+		createBorrow.add(lblBrwEquipCondOnReturn);
+		
+		cmbConditionOnReturn = new JComboBox<String>();
+		cmbConditionOnReturn.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
+		cmbConditionOnReturn.setBounds(151, 155, 133, 22);
+		createBorrow.add(cmbConditionOnReturn);
 		formCreator.add(createMaintenance, "maintenanceForm");
+		
+		JLabel lblMaintenanceStatus = new JLabel("Maintenance Status:");
+		lblMaintenanceStatus.setBounds(10, 471, 113, 14);
+		createMaintenance.add(lblMaintenanceStatus);
+		
+		cmbMaintenanceStatus = new JComboBox<>();
+		cmbMaintenanceStatus.setModel(new DefaultComboBoxModel<>(new String[] {"In Progress", "Resolved"}));
+		cmbMaintenanceStatus.setBounds(151, 467, 133, 22);
+		createMaintenance.add(cmbMaintenanceStatus);
 		
 		card.show(cardContainer, "dashboard");
 		
 		JPanel updateBorrow = new JPanel();
-		cardContainer.add(updateBorrow, "name_4628828223400");
+		cardContainer.add(updateBorrow, "updateBorrow");
+		updateBorrow.setLayout(null);
+		
+		JScrollPane updtBorrowViewport = new JScrollPane();
+		updtBorrowViewport.setBounds(314, 44, 1076, 511);
+		updateBorrow.add(updtBorrowViewport);
+		
+		borrowList = new DefaultTableModel();
+		
+		tblborrowRecord = new JTable();
+		tblborrowRecord.setFillsViewportHeight(true);
+		updtBorrowViewport.setViewportView(tblborrowRecord);
+		
+		JButton btnRefresh_1 = new JButton("⟳");
+		btnRefresh_1.addActionListener(e -> { displayBorrowRecords(); });
+		btnRefresh_1.setBounds(1328, 11, 62, 23);
+		updateBorrow.add(btnRefresh_1);
+		
+		JButton btnClearFilter_1 = new JButton("Clear");
+		btnClearFilter_1.setBounds(921, 11, 75, 23);
+		updateBorrow.add(btnClearFilter_1);
+		
+		JButton btnFilter_1 = new JButton("⌕");
+		btnFilter_1.setBounds(849, 11, 62, 23);
+		updateBorrow.add(btnFilter_1);
+		
+		cmbStatus = new JComboBox<String>();
+		cmbStatus.setBounds(742, 11, 97, 22);
+		updateBorrow.add(cmbStatus);
+		
+		cmbReceivedBy = new JComboBox<String>();
+		cmbReceivedBy.setBounds(635, 11, 97, 22);
+		updateBorrow.add(cmbReceivedBy);
+		
+		txtbrwSearchBar = new JTextField();
+		txtbrwSearchBar.setColumns(10);
+		txtbrwSearchBar.setBounds(324, 12, 115, 20);
+		updateBorrow.add(txtbrwSearchBar);
+		
+		JSeparator sprtrBrwTop_3 = new JSeparator();
+		sprtrBrwTop_3.setBounds(20, 41, 274, 6);
+		updateBorrow.add(sprtrBrwTop_3);
+		
+		JLabel lblUpdateBorrow = new JLabel("Update Borrow Form");
+		lblUpdateBorrow.setHorizontalAlignment(SwingConstants.CENTER);
+		lblUpdateBorrow.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblUpdateBorrow.setBounds(20, 11, 274, 30);
+		updateBorrow.add(lblUpdateBorrow);
+		
+		JLabel lblTransactionID = new JLabel("Transaction ID");
+		lblTransactionID.setBounds(53, 44, 97, 14);
+		updateBorrow.add(lblTransactionID);
+		
+		txtTransactionID = new JTextField();
+		txtTransactionID.setBounds(53, 57, 97, 20);
+		updateBorrow.add(txtTransactionID);
+		txtTransactionID.setColumns(10);
+		
+		JLabel lblBorrowID = new JLabel("Borrower ID");
+		lblBorrowID.setBounds(53, 88, 97, 14);
+		updateBorrow.add(lblBorrowID);
+		
+		txtUpdBorrowerID = new JTextField();
+		txtUpdBorrowerID.setEditable(false);
+		txtUpdBorrowerID.setColumns(10);
+		txtUpdBorrowerID.setBounds(53, 100, 97, 20);
+		updateBorrow.add(txtUpdBorrowerID);
+		
+		JLabel lblBorrowedEquipID = new JLabel("Equipment ID");
+		lblBorrowedEquipID.setBounds(160, 88, 97, 14);
+		updateBorrow.add(lblBorrowedEquipID);
+		
+		txtUpdBorrowedEquip = new JTextField();
+		txtUpdBorrowedEquip.setEditable(false);
+		txtUpdBorrowedEquip.setColumns(10);
+		txtUpdBorrowedEquip.setBounds(160, 100, 97, 20);
+		updateBorrow.add(txtUpdBorrowedEquip);
+		
+		JLabel lblUpdDateBorrowed = new JLabel("Date Borrowed");
+		lblUpdDateBorrowed.setBounds(53, 126, 97, 14);
+		updateBorrow.add(lblUpdDateBorrowed);
+		
+		txtBorrowDate = new JTextField();
+		txtBorrowDate.setEditable(false);
+		txtBorrowDate.setColumns(10);
+		txtBorrowDate.setBounds(53, 138, 97, 20);
+		updateBorrow.add(txtBorrowDate);
+		
+		JLabel lblUpdCustodian = new JLabel("Received By");
+		lblUpdCustodian.setBounds(160, 45, 97, 14);
+		updateBorrow.add(lblUpdCustodian);
+		
+		txtUpdCustodian = new JTextField();
+		txtUpdCustodian.setEditable(false);
+		txtUpdCustodian.setColumns(10);
+		txtUpdCustodian.setBounds(160, 57, 97, 20);
+		updateBorrow.add(txtUpdCustodian);
+		
+		JLabel lblUpdConditionOnBorrow = new JLabel("Condition on Borrow");
+		lblUpdConditionOnBorrow.setBounds(160, 126, 97, 14);
+		updateBorrow.add(lblUpdConditionOnBorrow);
+		
+		txtUpdCondOnBorrow = new JTextField();
+		txtUpdCondOnBorrow.setEditable(false);
+		txtUpdCondOnBorrow.setColumns(10);
+		txtUpdCondOnBorrow.setBounds(160, 138, 97, 20);
+		updateBorrow.add(txtUpdCondOnBorrow);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setBounds(20, 220, 284, 6);
+		updateBorrow.add(separator_1);
+		
+		JButton btnUpdSelect = new JButton("Selecct");
+		btnUpdSelect.addActionListener( e -> { LoadRecord(); });
+		btnUpdSelect.setBounds(111, 190, 89, 23);
+		updateBorrow.add(btnUpdSelect);
+		
+		txtExpectedReturnDate = new JTextField();
+		txtExpectedReturnDate.setBounds(20, 262, 274, 20);
+		updateBorrow.add(txtExpectedReturnDate);
+		txtExpectedReturnDate.setColumns(10);
+		
+		JLabel lblUpdReturnDateBy = new JLabel("Return by Date:");
+		lblUpdReturnDateBy.setBounds(20, 247, 130, 14);
+		updateBorrow.add(lblUpdReturnDateBy);
+		
+		txtDateReturned = new JTextField();
+		txtDateReturned.setEditable(false);
+		txtDateReturned.setColumns(10);
+		txtDateReturned.setBounds(20, 308, 138, 20);
+		updateBorrow.add(txtDateReturned);
+		
+		JLabel lblUpdDateReturned = new JLabel("Date Returned");
+		lblUpdDateReturned.setBounds(20, 293, 130, 14);
+		updateBorrow.add(lblUpdDateReturned);
+		
+		toggleUpdMarkAsReturned = new JToggleButton("Returned");
+		toggleUpdMarkAsReturned.addChangeListener(e -> { enableUPDButtons(); });
+		toggleUpdMarkAsReturned.setBounds(173, 307, 121, 23);
+		updateBorrow.add(toggleUpdMarkAsReturned);
+		
+		JLabel lblUpdConditionOnReturn = new JLabel("Condition On Return");
+		lblUpdConditionOnReturn.setBounds(20, 339, 130, 14);
+		updateBorrow.add(lblUpdConditionOnReturn);
+		
+		cmbCondOnReturn = new JComboBox<>();
+		cmbCondOnReturn.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
+		cmbCondOnReturn.setBounds(20, 353, 274, 22);
+		updateBorrow.add(cmbCondOnReturn);
+		
+		JLabel lbldateformat = new JLabel("(YYYY-MM-DD)");
+		lbldateformat.setHorizontalAlignment(SwingConstants.CENTER);
+		lbldateformat.setForeground(new Color(128, 128, 128));
+		lbldateformat.setBounds(20, 283, 274, 14);
+		updateBorrow.add(lbldateformat);
+		
+		JLabel lbldateformat_1 = new JLabel("(YYYY-MM-DD)");
+		lbldateformat_1.setFont(new Font("Tahoma", Font.PLAIN, 8));
+		lbldateformat_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lbldateformat_1.setForeground(Color.GRAY);
+		lbldateformat_1.setBounds(20, 328, 138, 14);
+		updateBorrow.add(lbldateformat_1);
+		
+		JButton btnMntCancel_1 = new JButton("Cancel");
+		btnMntCancel_1.setBounds(160, 503, 134, 23);
+		updateBorrow.add(btnMntCancel_1);
+		
+		JButton btnMntUpdate = new JButton("Update Record");
+		btnMntUpdate.addActionListener(e -> { updateBorrowRecord(); });
+		btnMntUpdate.setBounds(20, 478, 274, 23);
+		updateBorrow.add(btnMntUpdate);
+		
+		JButton btnDeleteRecord = new JButton("Delete");
+		btnDeleteRecord.setBounds(20, 503, 130, 23);
+		updateBorrow.add(btnDeleteRecord);
+		
+		checkUpdateItems = new JCheckBox("Update Equipment Condition");
+		checkUpdateItems.setBounds(20, 382, 274, 23);
+		updateBorrow.add(checkUpdateItems);
 		
 		//frame.setVisible(true);
 		
@@ -610,13 +896,53 @@ public class CustodianDashboard {
 		refreshBorrowCreator();
 	}
 	
+	void displayUpdateBorrow() {
+		card.show(cardContainer, "updateBorrow");
+		
+	}
+	
 	void displayNewMaintenance() {
 		card.show(cardContainer, "creation");
 		formCard.show(formCreator, "maintenanceForm");
 		refreshMaintenanceCreator();
 	}
 	
-	void displayValues() {
+	void displayBorrowRecords() {
+		
+parent.log(true, "Fetching Inventory from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getBorrowedRecordsList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		borrowList = new DefaultTableModel(list.length, 11) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       return false;
+			    }	
+		};
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				borrowList.setValueAt(list[r][c], r, c);
+		
+		tblborrowRecord.setModel(borrowList);
+		borrowRecordSorter.setModel(borrowList);
+		tblborrowRecord.setRowSorter(borrowRecordSorter);
+		
+		parent.log(true, "Record fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Borrow Record View Update completed successfully.");
+		
+		
+	}
+	
+	void displayInventoryValues() {
 		
 		parent.log(true, "Fetching Inventory from Database...");
 		
@@ -653,7 +979,7 @@ public class CustodianDashboard {
 	
 	void refreshBorrowCreator() {
 		
-		displayValues();
+		displayInventoryValues();
 		UpdateFilterBox();
 		loadBorrowers();
 		setCurrentDate(0);
@@ -661,7 +987,7 @@ public class CustodianDashboard {
 	}
 	
 	void refreshMaintenanceCreator() {
-		displayValues();
+		displayInventoryValues();
 		UpdateFilterBox();
 		setCurrentDate(1);
 	}
@@ -690,6 +1016,60 @@ public class CustodianDashboard {
 		
 	}
 	
+	void LoadRecord() {
+		int id;
+		
+		try {
+			id = Integer.parseInt(txtTransactionID.getText().trim());
+		} catch (NumberFormatException e) {
+			
+			parent.log(false, "ID field is empty.");
+			return;
+		}
+		
+		BorrowRecord values;
+		
+		try {
+			values = backend.fetchBorrowRecord(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		borrowUpdateLoadValues(String.valueOf(values.custodian()), String.valueOf(values.ID()),
+				String.valueOf(values.equipmentID()), String.valueOf(values.dateBorrowed()), String.valueOf(values.returbByDate()), String.valueOf(values.dateReturned()), 
+				String.valueOf(values.conditionOnBorrow()), String.valueOf(values.conditionOnReturn()), String.valueOf(values.status()));
+	}
+	
+	void borrowUpdateLoadValues(String custodianID, String borrowerID, String equipmentID, String dateBorrowed, String returnByDate, String dateReturned, String conditionOnBorrow, String conditonOnReturn, String status) {
+		txtUpdCustodian.setText(custodianID);
+		txtUpdBorrowerID.setText(borrowerID);
+		txtUpdBorrowedEquip.setText(equipmentID);
+		txtBorrowDate.setText(dateBorrowed);
+		txtUpdCondOnBorrow.setText(conditionOnBorrow);
+		if(returnByDate != null && !returnByDate.equals("null")) txtExpectedReturnDate.setText(returnByDate);
+		if(dateReturned != null && !dateReturned.equals("null")) txtDateReturned.setText(dateReturned);
+		cmbCondOnReturn.setSelectedItem(conditonOnReturn);
+		
+		if(status.equals("Returned")) toggleUpdMarkAsReturned.setSelected(true);
+		
+	}
+	
+	void enableUPDButtons() {
+		if(toggleUpdMarkAsReturned.isSelected())
+		{
+			txtDateReturned.setEditable(true);
+			cmbCondOnReturn.setEditable(true);
+		} else {
+			
+			txtDateReturned.setEditable(false);
+			cmbCondOnReturn.setEditable(false);
+			
+		}
+		
+		
+	}
+	
 	void loadItem(int target) {
 		int id;
 		JTextField targetField;
@@ -703,7 +1083,7 @@ public class CustodianDashboard {
 			parent.log(false, "Equipment field is empty.");
 			return;
 		}
-		String[] values;
+		EquipmentDetails values;
 		
 		try {
 			values = backend.fetchEquipmentDetails(id);
@@ -712,11 +1092,15 @@ public class CustodianDashboard {
 			return;
 		}
 		
-		if(values.length <= 0) { parent.log(false, "Failed to Load Equipment: Selected item does not exist."); return; }
+		boolean isAvailable = backend.isItemAvailable(id);
+		if(!isAvailable) {
+			parent.log(false, "Equipment is In Use/Under Maintenance and thus cannot accessed at the moment.");
+			return;
+		}
 		
 		switch(target) {
-		case 0: borrowLoadValues(values[1], values[2], values[10]); break;
-		case 1: maintenanceLoadValues(values[1], values[2], values[10]); break;
+		case 0: borrowLoadValues(values.equipmentName(), values.propertyTag(), values.condition()); break;
+		case 1: maintenanceLoadValues(values.equipmentName(), values.propertyTag(), values.condition()); break;
 		}
 		parent.log(true, "Target Equipment Loaded successfully.");
 	}
@@ -734,11 +1118,6 @@ public class CustodianDashboard {
 		txtBrwEquipCondition.setText(condition);
 		
 	}
-	
-	//---------------------------------------------------------------------------------------------------------------------------------
-	// BORROW CREATION METHODS
-	//---------------------------------------------------------------------------------------------------------------------------------
-	
 	
 	void loadBorrowers() {
 		parent.log(true, "Updating Borrower List...");
@@ -765,6 +1144,31 @@ public class CustodianDashboard {
 		parent.log(true, "Borrower List Updated successfully.");
 	}
 	
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// CREATE, UPDATE AND DELETE
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	void updateBorrowRecord() {
+		String
+		transactionID = txtTransactionID.getText().trim(),
+		returnByDate = txtExpectedReturnDate.getText().trim(),
+		dateReturned = txtDateReturned.getText().trim(),
+		conditionOnReturn = cmbCondOnReturn.getSelectedItem().toString(),
+		status = toggleUpdMarkAsReturned.isSelected() ? "Returned" : "Borrowed",
+		updateItems = String.valueOf(checkUpdateItems.isSelected());
+		
+		boolean result;
+		try {
+			result = backend.UpdateRecord(transactionID, returnByDate, dateReturned, conditionOnReturn, status, updateItems);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "Borrow Record sucessfully updated.");
+	}
+	
+	
 	/* Record Constructor Paremetres:
 	 * int borrowerID,
 		int equipmentID,
@@ -776,55 +1180,28 @@ public class CustodianDashboard {
 		String conditionOnReturn
 	 */
 	void createBorrowRecord() {
-		int borrowerID;
-		int equipID; boolean check;
-		Date returnByDate;
-		Date dateBorrowed = Date.valueOf(txtDateBorrowed.getText().trim());
+		String
+		borrowerID = String.valueOf(getSelectedBorrower()),
+		equipID = txtBrwEquipID.getText(),
+		dateBorrowed = txtDateBorrowed.getText().trim(),
+		returnByDate = txtBrwReturnByDate.getText().trim(),
+		dateReturned = txtBrwDateReturned.getText().trim(),
+		custodian = String.valueOf(parent.getSessionID()),
+		conditionOnBorrow = txtBrwEquipCondition.getText().trim(),
+		conditionOnReturn = cmbConditionOnReturn.getSelectedItem().toString(),
+		status = cmbBorrowStatus.getSelectedItem().toString();
 		
-		borrowerID = getSelectedBorrower();
-		if(borrowerID == -1) {
-			
-			parent.log(false, "No Borrower Selected.");
-			return;	
-		}
-		
+		boolean result;
 		
 		try {
-		equipID = Integer.parseInt(txtBrwEquipID.getText().trim());
-		} catch (NumberFormatException e) {
-			parent.log(false, "Equipment field is empty.");
+			result = backend.CreateRecord(borrowerID, equipID, dateBorrowed, returnByDate, dateReturned, custodian, conditionOnBorrow, conditionOnReturn, status);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
 			return;
 		}
 		
-		check = backend.checkItemValidity(equipID);
-		if (!check) {
-			
-			parent.log(false, "Selected Equipment does not exist.");
-			return;
-		}
+		if(result) parent.log(result, "Borrow Record successfully published to Database.");
 		
-		
-		
-		try {
-		returnByDate = Date.valueOf(txtReturnByDate.getText().trim());
-		} catch (Exception e) {
-			
-		returnByDate = null;
-			
-		}
-		
-		
-		int custodian = 1;
-		String conditionOnBorrow = txtBrwEquipCondition.getText().trim();
-		
-		
-		BorrowRecord record = new BorrowRecord(borrowerID, equipID, dateBorrowed, returnByDate, null, custodian, conditionOnBorrow, null);
-		
-//		
-//		boolean result = backend.createBorrowRecord(record);
-//						 backend.updateEquipmentAvailability(1, equipID);
-//		if(result) { parent.log(result, "New Maintenance Record created."); }
-//		else parent.log(result, "Failed to create New Maintenance Record");
 	}
 	
 	Integer getSelectedBorrower() {
@@ -851,19 +1228,20 @@ public class CustodianDashboard {
 		String
 		equipID = txtMntEquipID.getText(),
 		dateReported = txtMntDateReported.getText().trim(),
-		custodian = String.valueOf(sessionID),
+		custodian = String.valueOf(parent.getSessionID()),
 		issue = txtAMntIssue.getText() ,
 		action = txtAMntActionTaken.getText(),
 		cost = txtMntCost.getText(),
-		status = "In Progress";
+		status = cmbMaintenanceStatus.getSelectedItem().toString();
 		
+		boolean result;
 		try {
-			backend.CreateReport(equipID, dateReported, custodian, issue, action, cost, status);
+			result = backend.CreateReport(equipID, dateReported, custodian, issue, action, cost, status);
 		} catch (SPEARException e) {
 			parent.log(false, e.getMessage());
+			return;
 		}
+		
+		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
 	}
-	
-	
-	
 }
