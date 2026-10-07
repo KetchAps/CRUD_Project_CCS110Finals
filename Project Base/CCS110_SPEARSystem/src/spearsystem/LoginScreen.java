@@ -11,7 +11,8 @@ import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
+
+import spearsystem.LoginHandler.AuthStatus;
 
 public class LoginScreen {
 
@@ -86,34 +87,17 @@ public class LoginScreen {
 		
 		String user = authUsername.getText();
 		Reader pass = new CharArrayReader(authPassword.getPassword());
+		AuthStatus result;
 		
-		boolean result = backend.authenticate(user, pass);
+		try { result = backend.authenticate(user, pass); } catch (SPEARException e) { parent.log(false, e.getMessage()); return; }
 		
-		try {
-			pass.close();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		try { pass.close(); } catch (IOException e) { e.printStackTrace(); }
 		
-		if(result) {
-			sessionUser = user;
-			parent.log(result, user + " successfully logged in.");
-			if(sessionUser.equals("admin")) {
-				parent.displayAdmin();
-				
-			}
-			else {
-					
-				parent.displayCustodian();
-			}
-		}
-		else {
-
-			parent.log(result, "Authentication Failed: " + user + "is not recogninsed.");
-
-			
-		}
+		parent.setSessionCredentials(result.user(), result.ID());
+		parent.log(true, user + " successfully logged in.");
+		
+		if(result.isAdmin()) { parent.displayAdmin(); }
+		else				   parent.displayCustodian();
 		
 		authUsername.setText("");
 		authPassword.setText("");

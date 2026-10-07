@@ -38,7 +38,7 @@ public class MainClient {
 	private JFrame frame;
 	
 	private LoginHandler authHandler;
-	private DatabaseHandler custodianHandler;
+	private CustodianHandler custodianHandler;
 	
 	
 	private CardLayout card = new CardLayout(0,0);
@@ -82,7 +82,7 @@ public class MainClient {
 	private void initialize() {
 		
 		authHandler = new LoginHandler();
-		custodianHandler = new DatabaseHandler();
+		custodianHandler = new CustodianHandler();
 		
 		frame = new JFrame();
 		frame.setBounds(100, 100, 1450, 920);
@@ -155,12 +155,17 @@ public class MainClient {
 		
 	}
 	
-	String getSessionUser() {
+	public void setSessionCredentials(String user, int id) {
+		if(!(user.isBlank() || user.isEmpty())) sessionUser = user;
+		if (id > 0) sessionID = id;
+	}
+	
+	public String getSessionUser() {
 		return sessionUser;
 		
 	}
 	
-	int getSessionID() {
+	public int getSessionID() {
 		return sessionID;
 	}
 

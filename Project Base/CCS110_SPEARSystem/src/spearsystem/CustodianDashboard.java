@@ -3,6 +3,7 @@ package spearsystem;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.math.BigDecimal;
@@ -20,17 +21,19 @@ import javax.swing.JSeparator;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
 
-import spearsystem.DatabaseHandler.BorrowRecord;
-import spearsystem.DatabaseHandler.MaintenanceReport;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import spearsystem.CustodianDatabaseHandler.BorrowRecord;
+import spearsystem.CustodianDatabaseHandler.BorrowerList;
+import spearsystem.CustodianDatabaseHandler.MaintenanceReport;
 
 
 public class CustodianDashboard {
@@ -38,7 +41,7 @@ public class CustodianDashboard {
 	
 	private JPanel custodianDashboard;
 	private MainClient parent;
-	private DatabaseHandler backend;
+	private CustodianHandler backend;
 	
 	private String sessionUser;
 	private int sessionID;
@@ -111,10 +114,39 @@ public class CustodianDashboard {
 	private JTextField txtMntEquipTag;
 	private JTextField txtMntDateReported;
 	private JTextField txtMntCost;
+
+	KeyAdapter numericalOnly = new KeyAdapter() {
+		@Override
+		public void keyTyped(KeyEvent e) {
+		if(!Character.isDigit(e.getKeyChar())) e.consume();
+		}
+	};
+	
+	
+	DocumentFilter moneyInput = new DocumentFilter() {
+        public void replace(FilterBypass fb, int offset, int length, String str, AttributeSet a) throws BadLocationException {
+
+            String txt = fb.getDocument().getText(0, fb.getDocument().getLength());
+            txt += str;
+            if ((fb.getDocument().getLength() + str.length() - length) <= 20 && txt.matches("^[0-9]+[.]?[0-9]{0,10}$")) {
+                super.replace(fb, offset, length, str, a);
+            }
+        }
+
+        public void insertString(FilterBypass fb, int offset, String str, AttributeSet a) throws BadLocationException {
+
+            String txt = fb.getDocument().getText(0, fb.getDocument().getLength());
+            txt += str;
+            if ((fb.getDocument().getLength() + str.length()) <= 20 && txt.matches("^[0-9]+[.]?[0-9]{0,10}$")) {
+                super.insertString(fb, offset, str, a);
+            }
+        }
+    };
+	
 	/**
 	 * Create the application.
 	 */
-	public CustodianDashboard(MainClient parent, DatabaseHandler backend) {
+	public CustodianDashboard(MainClient parent, CustodianHandler backend) {
 		this.parent = parent;
 		this.backend = backend;
 		initialize();
@@ -128,7 +160,7 @@ public class CustodianDashboard {
 //		frame.setBounds(10, 11, 1423, 654);
 //		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		backend = new DatabaseHandler();
+		backend = new CustodianHandler();
 		
 		custodianDashboard = new JPanel();
 		custodianDashboard.setLayout(null);
@@ -220,12 +252,7 @@ public class CustodianDashboard {
 		createBorrow.add(lblBorrowForm);
 		
 		txtBrwEquipID = new JTextField();
-		txtBrwEquipID.addKeyListener(new KeyAdapter() {
-			@Override
-			public void keyTyped(KeyEvent e) {
-				
-			}
-		});
+		txtBrwEquipID.addKeyListener(numericalOnly);
 		txtBrwEquipID.setBounds(171, 63, 39, 18);
 		createBorrow.add(txtBrwEquipID);
 		txtBrwEquipID.setColumns(10);
@@ -335,10 +362,6 @@ public class CustodianDashboard {
 		lblyyyymmdd.setBounds(10, 386, 96, 14);
 		createBorrow.add(lblyyyymmdd);
 		
-		JToggleButton tglReturnDateIndefinite = new JToggleButton("Indefinite");
-		tglReturnDateIndefinite.setBounds(133, 366, 82, 23);
-		createBorrow.add(tglReturnDateIndefinite);
-		
 		JPanel createMaintenance = new JPanel();
 		createMaintenance.setLayout(null);
 		
@@ -363,6 +386,7 @@ public class CustodianDashboard {
 		createMaintenance.add(lblMntEquipID);
 		
 		txtMntEquipID = new JTextField();
+		txtMntEquipID.addKeyListener(numericalOnly);
 		txtMntEquipID.setColumns(10);
 		txtMntEquipID.setBounds(132, 60, 60, 18);
 		createMaintenance.add(txtMntEquipID);
@@ -448,6 +472,9 @@ public class CustodianDashboard {
 		createMaintenance.add(lblRepairCost);
 		
 		txtMntCost = new JTextField();
+		//txtMntCost.addKeyListener(numericsAndDecimal);
+		AbstractDocument mntCostdoc = (AbstractDocument) txtMntCost.getDocument();
+		mntCostdoc.setDocumentFilter(moneyInput);
 		txtMntCost.setBounds(151, 443, 133, 20);
 		createMaintenance.add(txtMntCost);
 		txtMntCost.setColumns(10);
@@ -536,6 +563,9 @@ public class CustodianDashboard {
 		
 		card.show(cardContainer, "dashboard");
 		
+		JPanel updateBorrow = new JPanel();
+		cardContainer.add(updateBorrow, "name_4628828223400");
+		
 		//frame.setVisible(true);
 		
 	}
@@ -591,12 +621,13 @@ public class CustodianDashboard {
 		parent.log(true, "Fetching Inventory from Database...");
 		
 		String[][] list;
-			list = backend.getEquipmentList();
-		
-		if(list == null) {
-			parent.log(false, "An error was encountered while fetching Inventory from the Database. Try refreshing the table.");
-			return;
 			
+		try {
+			list = backend.getEquipmentList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
 		}
 			
 		query = new DefaultTableModel(list.length, 13) {
@@ -637,10 +668,12 @@ public class CustodianDashboard {
 	
 	void UpdateFilterBox() {
 		parent.log(true, "Updating Inventory Categories...");
-		String[] values = backend.getInventoryFilters();
+		String[] values;
 		
-		if(values == null) {
-			parent.log(false, "Category Update failed. Try refreshing the table.");
+		try {
+			values = backend.getInventoryFilters();
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
 			return;
 		}
 		
@@ -672,7 +705,12 @@ public class CustodianDashboard {
 		}
 		String[] values;
 		
-		values = backend.fetchEquipmentDetails(id);
+		try {
+			values = backend.fetchEquipmentDetails(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
 		
 		if(values.length <= 0) { parent.log(false, "Failed to Load Equipment: Selected item does not exist."); return; }
 		
@@ -704,12 +742,16 @@ public class CustodianDashboard {
 	
 	void loadBorrowers() {
 		parent.log(true, "Updating Borrower List...");
-		String[] values = backend.getBorrowerList();
-		borrowerIDs = backend.getBorrowerIDList();
-		if(values == null) {
-			parent.log(false, "Borrower Update failed. Try refreshing the table.");
+		BorrowerList list;
+		try { 
+			list = backend.fetchBorrowers();
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
 			return;
 		}
+		
+		String[] values = list.borrower();
+		borrowerIDs = list.borrowerID();
 		
 		cmbBorrowerModel.removeAllElements();
 		cmbBorrowerModel.addElement("[Borrower]");
@@ -778,11 +820,11 @@ public class CustodianDashboard {
 		
 		BorrowRecord record = new BorrowRecord(borrowerID, equipID, dateBorrowed, returnByDate, null, custodian, conditionOnBorrow, null);
 		
-		
-		boolean result = backend.createBorrowRecord(record);
-						 backend.updateEquipmentAvailability(1, equipID);
-		if(result) { parent.log(result, "New Maintenance Record created."); }
-		else parent.log(result, "Failed to create New Maintenance Record");
+//		
+//		boolean result = backend.createBorrowRecord(record);
+//						 backend.updateEquipmentAvailability(1, equipID);
+//		if(result) { parent.log(result, "New Maintenance Record created."); }
+//		else parent.log(result, "Failed to create New Maintenance Record");
 	}
 	
 	Integer getSelectedBorrower() {
@@ -806,66 +848,22 @@ public class CustodianDashboard {
 	 * */
 	 
 	void createMaintenanceReport() {
-		int equipID; boolean check;
-		String issue; String action = null;
-		double cost;
-		String status = "In Progress";
-		
-		Date dateReported = Date.valueOf(txtMntDateReported.getText().trim());
-		
-		try {
-		equipID = Integer.parseInt(txtMntEquipID.getText().trim());
-		} catch (NumberFormatException e) {
-			parent.log(false, "Equipment field is empty.");
-			return;
-		}
-		
-		check = backend.checkItemValidity(equipID);
-		if (!check) {
-			
-			parent.log(false, "Selected Equipment does not exist.");
-			return;
-		}
-		
-		issue = txtAMntIssue.getText();
-		if(issue.isBlank() || issue.isEmpty()) {
-				
-			parent.log(false, "Empty Value: Must have a valid 'Report Issue'.");
-			return;
-			
-		}
+		String
+		equipID = txtMntEquipID.getText(),
+		dateReported = txtMntDateReported.getText().trim(),
+		custodian = String.valueOf(sessionID),
+		issue = txtAMntIssue.getText() ,
+		action = txtAMntActionTaken.getText(),
+		cost = txtMntCost.getText(),
+		status = "In Progress";
 		
 		try {
-			cost = simplifyCost(Double.parseDouble(txtMntCost.getText()));
-		} catch(NumberFormatException e) {
-			
-			parent.log(false, "Cost Input is invalid.");
-			return;
+			backend.CreateReport(equipID, dateReported, custodian, issue, action, cost, status);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
 		}
-		
-		if(cost >= 999999999) {
-			parent.log(false, "Cost Input is invalid.");
-			return;
-			
-		}
-		
-		int custodian = 1;
-		
-		
-		MaintenanceReport report = new MaintenanceReport(equipID, dateReported, custodian, issue, action, cost, status);
-		
-		
-		boolean result = backend.createMaintenanceReport(report);
-						 backend.updateEquipmentAvailability(1, equipID);
-		if(result) { parent.log(result, "New Maintenance Record created."); }
-		else parent.log(result, "Failed to create New Maintenance Record");
 	}
 	
-	double simplifyCost(double val) {
-		
-		BigDecimal bd = BigDecimal.valueOf(val);
-		bd = bd.setScale(2, RoundingMode.HALF_UP);
-		return bd.doubleValue();
-	}
+	
 	
 }

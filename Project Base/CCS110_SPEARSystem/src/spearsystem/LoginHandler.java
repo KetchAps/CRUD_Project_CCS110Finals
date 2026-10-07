@@ -8,7 +8,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 public class LoginHandler {
 
-
+	public record AuthStatus(
+			int ID,
+			String user,
+			boolean isAdmin
+			) {}
+	
 	// REGION - CONNECTION GETTER
 	//Handles the initialisation/confirmation of connections status to the Database.
 	private String connectionStatus;
@@ -36,38 +41,31 @@ public class LoginHandler {
 	
 	// REGION - LOGIN HANDLER
 	// Handles the authentication of user credentials.
-	private String authStatus;
-	public boolean authenticate(String user, Reader pass) {
+	
+	
+	public AuthStatus authenticate(String user, Reader pass) throws SPEARException {
 		
 		try(Connection auth = ConnectionHandler.tryConnect();
-			PreparedStatement st = auth.prepareStatement("select * from userAccounts WHERE username = ? AND password = password(?) LIMIT 1")) {
+			PreparedStatement st = auth.prepareStatement("select userID, username, isAdmin from userAccounts WHERE username = ? AND password = password(?) LIMIT 1")) {
+			AuthStatus authForm;
 			
 			st.setString(1, user);
 			st.setCharacterStream(2, pass);
 			
 			ResultSet results = st.executeQuery();
 			
+			
 			if(results.next()) {
-				
-				return true;
+				authForm = new AuthStatus(results.getInt(1), results.getString(2), results.getBoolean(3));
+				return authForm;
 			}
-			else {
-				
-				authStatus = "Invalid Credentials.";
-				return false;
-			}
-			
+			else throw new SPEARException("Authentication Failed: " + user + " is not recognised.");
 		} catch(SQLException e) {
-			
 			e.printStackTrace();
-			authStatus = "Connection / Database Error.";
-			return false;
+			throw new SPEARException("Authentication Failed: Connection Timeout.");
 		}
 		
 	}
 	
-	public String getAuthStatus() {
-		return authStatus;
-	}
 	
 }
