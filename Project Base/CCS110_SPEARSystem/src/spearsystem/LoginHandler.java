@@ -54,7 +54,6 @@ public class LoginHandler {
 			
 			ResultSet results = st.executeQuery();
 			
-			
 			if(results.next()) {
 				authForm = new AuthStatus(results.getInt(1), results.getString(2), results.getBoolean(3));
 				return authForm;
