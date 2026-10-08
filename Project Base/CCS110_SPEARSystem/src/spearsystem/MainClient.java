@@ -95,7 +95,7 @@ public class MainClient {
 		mainPane.setLayout(null);
 		
 		userArea = new JPanel();
-		userArea.setBounds(0, 0, 1267, 637);
+		userArea.setBounds(0, 0, 1284, 700);
 		mainPane.add(userArea);
 		userArea.setLayout(card);
 		
