@@ -31,6 +31,8 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import org.jdesktop.swingx.JXDatePicker;
+
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
 import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
@@ -308,7 +310,7 @@ public class CustodianDashboard {
 		JLabel lblBorrowForm = new JLabel("New Borrow Form");
 		lblBorrowForm.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
 		lblBorrowForm.setHorizontalAlignment(SwingConstants.CENTER);
-		lblBorrowForm.setBounds(10, 10, 274, 30);
+		lblBorrowForm.setBounds(10, 11, 274, 30);
 		createBorrow.add(lblBorrowForm);
 		
 		txtBrwEquipID = new JTextField();
@@ -380,6 +382,11 @@ public class CustodianDashboard {
 		txtBrwReturnByDate.setBounds(10, 313, 113, 20);
 		createBorrow.add(txtBrwReturnByDate);
 		txtBrwReturnByDate.setColumns(10);
+		
+//		JXDatePicker dateBorrowed = new JXDatePicker();
+//		dateBorrowed.setFormats("yyyy-MM-dd");
+//		dateBorrowed.setBounds(0, 0, 200, 28);
+//		createBorrow.add(dateBorrowed);
 		
 		txtDateBorrowed = new JTextField();
 		txtDateBorrowed.setText("2000-12-19");

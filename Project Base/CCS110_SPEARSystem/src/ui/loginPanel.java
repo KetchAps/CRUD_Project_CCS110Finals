@@ -136,10 +136,11 @@ public class loginPanel extends JFrame {
 		});
 		button.setText("Login");
 		
-		JXDatePicker dpTest = new JXDatePicker();
-		dpTest.setFormats("yyyy-MM-dd");
-		dpTest.setBounds(99, 670, 200, 28);
-		loginPane.add(dpTest);
+		// SwingX Date Picker
+//		JXDatePicker dpTest = new JXDatePicker();
+//		dpTest.setFormats("yyyy-MM-dd");
+//		dpTest.setBounds(99, 670, 200, 28);
+//		loginPane.add(dpTest);
 		
 		// =========================
 		// LAYERED PANE
@@ -185,7 +186,7 @@ public class loginPanel extends JFrame {
 		btnViewObjectives.setForeground(new Color(30, 144, 255));
 		btnViewObjectives.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 25));
 		btnViewObjectives.setBackground(new Color(255, 255, 255));
-		btnViewObjectives.setBounds(209, 726, 209, 41);
+		btnViewObjectives.setBounds(205, 608, 209, 41);
 		welcome.add(btnViewObjectives);
 
 		lblSchoolProperty = new JLabel("School Property & Equipment Asset Record System");
