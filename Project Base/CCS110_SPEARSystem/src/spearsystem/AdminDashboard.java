@@ -664,10 +664,6 @@ public class AdminDashboard {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		
-		JPanel panel = new JPanel();
-		panel.setBounds(0, 0, 10, 10);
-		sidebar.add(panel);
 		button2_1.setText("Edit");
 		button2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2_1.setBounds(150, 395, 95, 55);
@@ -774,25 +770,85 @@ public class AdminDashboard {
 		main.add(greet);
 		greet.setLayout(null);
 		
+		JLabel lblTotalEquipment_1_2 = new JLabel("Good Morning, Losamia!");
+		lblTotalEquipment_1_2.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_2.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		lblTotalEquipment_1_2.setBounds(10, 11, 554, 62);
+		greet.add(lblTotalEquipment_1_2);
+		
+		JLabel lblTotalEquipment_1_2_1 = new JLabel("Here's an overview of the school's property and equipemnt.");
+		lblTotalEquipment_1_2_1.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_2_1.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 20));
+		lblTotalEquipment_1_2_1.setBounds(10, 65, 554, 27);
+		greet.add(lblTotalEquipment_1_2_1);
+		
 		JPanel totalEquipmentPanel = new JPanel();
 		totalEquipmentPanel.setBounds(287, 139, 238, 141);
 		main.add(totalEquipmentPanel);
 		totalEquipmentPanel.setLayout(null);
+		
+		JLabel lblTotalEquipment = new JLabel("Total Equipment");
+		lblTotalEquipment.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblTotalEquipment.setBounds(55, 11, 127, 27);
+		totalEquipmentPanel.add(lblTotalEquipment);
+		
+		JLabel lblTotalEquipment_1 = new JLabel("000");
+		lblTotalEquipment_1.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
+		lblTotalEquipment_1.setBounds(75, 48, 127, 62);
+		totalEquipmentPanel.add(lblTotalEquipment_1);
 		
 		JPanel totalUsersPanel = new JPanel();
 		totalUsersPanel.setBounds(1027, 139, 247, 141);
 		main.add(totalUsersPanel);
 		totalUsersPanel.setLayout(null);
 		
+		JLabel lblTotalUsers = new JLabel("Total Users");
+		lblTotalUsers.setForeground(new Color(30, 144, 255));
+		lblTotalUsers.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblTotalUsers.setBounds(79, 11, 88, 27);
+		totalUsersPanel.add(lblTotalUsers);
+		
+		JLabel lblTotalEquipment_1_1_1_1 = new JLabel("000");
+		lblTotalEquipment_1_1_1_1.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_1_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
+		lblTotalEquipment_1_1_1_1.setBounds(75, 49, 127, 62);
+		totalUsersPanel.add(lblTotalEquipment_1_1_1_1);
+		
 		JPanel pendingReturnsPanel = new JPanel();
 		pendingReturnsPanel.setBounds(776, 139, 240, 141);
 		main.add(pendingReturnsPanel);
 		pendingReturnsPanel.setLayout(null);
 		
+		JLabel lblPendingReturns = new JLabel("Pending Returns");
+		lblPendingReturns.setForeground(new Color(30, 144, 255));
+		lblPendingReturns.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblPendingReturns.setBounds(59, 11, 121, 27);
+		pendingReturnsPanel.add(lblPendingReturns);
+		
+		JLabel lblTotalEquipment_1_1_1 = new JLabel("000");
+		lblTotalEquipment_1_1_1.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
+		lblTotalEquipment_1_1_1.setBounds(69, 50, 127, 62);
+		pendingReturnsPanel.add(lblTotalEquipment_1_1_1);
+		
 		JPanel currentlyBorrowedPanel = new JPanel();
 		currentlyBorrowedPanel.setBounds(532, 139, 234, 141);
 		main.add(currentlyBorrowedPanel);
 		currentlyBorrowedPanel.setLayout(null);
+		
+		JLabel lblCurrentlyBorrowed = new JLabel("Currently Borrowed");
+		lblCurrentlyBorrowed.setForeground(new Color(30, 144, 255));
+		lblCurrentlyBorrowed.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblCurrentlyBorrowed.setBounds(43, 11, 148, 27);
+		currentlyBorrowedPanel.add(lblCurrentlyBorrowed);
+		
+		JLabel lblTotalEquipment_1_1 = new JLabel("000");
+		lblTotalEquipment_1_1.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
+		lblTotalEquipment_1_1.setBounds(68, 49, 127, 62);
+		currentlyBorrowedPanel.add(lblTotalEquipment_1_1);
 		
 		JPanel recentEquipmentPanel = new JPanel();
 		recentEquipmentPanel.setBounds(285, 291, 481, 337);
@@ -826,6 +882,12 @@ public class AdminDashboard {
 		JScrollPane scrollPane1 = new JScrollPane(testTable);
 		scrollPane1.setBounds(0, 5, 481, 279);
 		reTablePanel.add(scrollPane1);
+		
+		JLabel lblRecentEquipment = new JLabel("Recent Equipment");
+		lblRecentEquipment.setForeground(new Color(30, 144, 255));
+		lblRecentEquipment.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentEquipment.setBounds(128, 11, 224, 27);
+		recentEquipmentPanel.add(lblRecentEquipment);
 
 		JPanel recentBorrowingsPanel = new JPanel();
 		recentBorrowingsPanel.setBounds(775, 291, 499, 337);
@@ -862,6 +924,12 @@ public class AdminDashboard {
 		JScrollPane borrowingScrollPane = new JScrollPane(borrowingTable);
 		borrowingScrollPane.setSize(499, 284);
 		ebBorrowingTablePanel.add(borrowingScrollPane, java.awt.BorderLayout.CENTER); 
+		
+		JLabel lblRecentBorrowings = new JLabel("Recent Borrowings");
+		lblRecentBorrowings.setForeground(new Color(30, 144, 255));
+		lblRecentBorrowings.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentBorrowings.setBounds(132, 11, 234, 27);
+		recentBorrowingsPanel.add(lblRecentBorrowings);
 
 		cardContainer.add(borrowFormCreation, "creation");
 		

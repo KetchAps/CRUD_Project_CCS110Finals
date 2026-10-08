@@ -31,7 +31,6 @@ public class LoginScreen {
 	
 	private String sessionUser;
 	private JTextField authUsername;
-	private JTextField authUsername_1;
 	private JPasswordField authPassword;
 	
 	public LoginScreen(MainClient parent, LoginHandler backend) {
@@ -76,10 +75,10 @@ public class LoginScreen {
 		authUsername.setBounds(100, 317, 302, 43);
 		panel.add(authUsername);
 		
-		authUsername_1 = new JPasswordField();
-		authUsername_1.setFont(new Font("Segoe UI Light", Font.PLAIN, 20));
-		authUsername_1.setBounds(100, 428, 302, 43);
-		panel.add(authUsername_1);
+		authPassword = new JPasswordField();
+		authPassword.setFont(new Font("Segoe UI Light", Font.PLAIN, 20));
+		authPassword.setBounds(100, 428, 302, 43);
+		panel.add(authPassword);
 		
 		ButtonOne button = new ButtonOne();
 		button.setBounds(170, 514, 162, 49);
@@ -115,7 +114,7 @@ public class LoginScreen {
 	
 	void tryAuthenticate() {
 		
-		String user = authUsername_1.getText();
+		String user = authUsername.getText();
 		Reader pass = new CharArrayReader(authPassword.getPassword());
 		AuthStatus result;
 		
@@ -129,7 +128,7 @@ public class LoginScreen {
 		if(result.isAdmin()) { parent.displayAdmin(); }
 		else				   parent.displayCustodian();
 		
-		authUsername_1.setText("");
+		authUsername.setText("");
 		authPassword.setText("");
 	}
 

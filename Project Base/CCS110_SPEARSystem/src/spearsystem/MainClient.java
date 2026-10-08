@@ -85,17 +85,17 @@ public class MainClient {
 		custodianHandler = new CustodianHandler();
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1240, 700);
+		frame.setBounds(100, 100, 1283, 867);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JPanel mainPane = new JPanel();
-		mainPane.setBounds(0, 21, 1250, 700);
+		mainPane.setBounds(0, 21, 1283, 700);
 		frame.getContentPane().add(mainPane);
 		mainPane.setLayout(null);
 		
 		userArea = new JPanel();
-		userArea.setBounds(0, 0, 1223, 612);
+		userArea.setBounds(0, 0, 1267, 637);
 		mainPane.add(userArea);
 		userArea.setLayout(card);
 		
@@ -117,19 +117,20 @@ public class MainClient {
 		CustodianDashboard dashB = new CustodianDashboard(this, custodianHandler);
 		userArea.add(dashB.getPanel(), "custodian");
 		
+		AdminDashboard dashC = new AdminDashboard(null, custodianHandler);
+		userArea.add(dashC.getPanel(), "admin");
+		
 		lblFeedback = new JLabel("-");
 		lblFeedback.setBounds(20, 623, 1004, 14);
 		mainPane.add(lblFeedback);
 		
 		JScrollPane scrllLogViewport = new JScrollPane();
-		scrllLogViewport.setBounds(10, 648, 1394, 190);
+		scrllLogViewport.setBounds(0, 665, 1284, 173);
 		mainPane.add(scrllLogViewport);
 		
 		areaLog = new JTextArea();
 		scrllLogViewport.setViewportView(areaLog);
-		
 
-	
 	}
 	
 	
