@@ -594,6 +594,10 @@ public class CustodianDashboard {
 		panel.add(btnUpdateBorrow);
 		
 		JButton btnUpdateMaintenanceReport = new JButton("Update Maintenance Report");
+		btnUpdateMaintenanceReport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnUpdateMaintenanceReport.setForeground(Color.WHITE);
 		btnUpdateMaintenanceReport.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnUpdateMaintenanceReport.setFocusable(false);

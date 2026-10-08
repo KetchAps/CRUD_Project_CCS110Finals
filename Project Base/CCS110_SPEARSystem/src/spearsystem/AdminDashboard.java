@@ -588,9 +588,9 @@ public class AdminDashboard {
 		brwPreviewViewport.setViewportView(tblBorrowPreview);
 
 		JPanel panel = new JPanel();
-		panel.setBackground(new Color(245, 255, 250));
+		panel.setBackground(new Color(240, 248, 255));
 		panel.setForeground(new Color(0, 0, 255));
-		panel.setBounds(0, 0, 371, 639);
+		panel.setBounds(0, 0, 293, 639);
 		main.add(panel);
 		panel.setLayout(null);
 
@@ -599,9 +599,9 @@ public class AdminDashboard {
 		button.addActionListener(e -> {
 			displayNewBorrow();
 		});
-		button.setBounds(10, 219, 351, 68);
+		button.setBounds(44, 117, 225, 55);
 		panel.add(button);
-		button.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
+		button.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button.setText("New Borrow Record");
 		// -
 
@@ -611,9 +611,9 @@ public class AdminDashboard {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		button2.setBounds(10, 480, 351, 68);
+		button2.setBounds(44, 315, 225, 55);
 		panel.add(button2);
-		button2.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
+		button2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2.setText("Update Maintenance Report");
 		// -
 
@@ -622,9 +622,9 @@ public class AdminDashboard {
 		button3.addActionListener(e -> {
 			displayUpdateBorrow();
 		});
-		button3.setBounds(10, 298, 351, 68);
+		button3.setBounds(44, 183, 225, 55);
 		panel.add(button3);
-		button3.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
+		button3.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button3.setText("Update Borrow record");
 		// -
 
@@ -633,60 +633,10 @@ public class AdminDashboard {
 		button4.addActionListener(e -> {
 			displayNewMaintenance();
 		});
-		button4.setBounds(10, 389, 351, 68);
+		button4.setBounds(44, 249, 225, 55);
 		panel.add(button4);
-		button4.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
+		button4.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button4.setText("New Maintenance Report");
-		// -
-
-		JButton btnCreateBorrow = new JButton("New Borrow Record");
-		btnCreateBorrow.addActionListener(e -> {
-			displayNewBorrow();
-		});
-		btnCreateBorrow.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnCreateBorrow.setBorderPainted(false);
-		btnCreateBorrow.setFocusable(false);
-		btnCreateBorrow.setBackground(new Color(0, 0, 255));
-		btnCreateBorrow.setForeground(new Color(255, 255, 255));
-		btnCreateBorrow.setBounds(10, 69, 351, 21);
-		panel.add(btnCreateBorrow);
-
-		JButton btnUpdateBorrow = new JButton("Update Borrow Record");
-		btnUpdateBorrow.addActionListener(e -> {
-			displayUpdateBorrow();
-		});
-		btnUpdateBorrow.setForeground(Color.WHITE);
-		btnUpdateBorrow.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnUpdateBorrow.setFocusable(false);
-		btnUpdateBorrow.setBorderPainted(false);
-		btnUpdateBorrow.setBackground(Color.BLUE);
-		btnUpdateBorrow.setBounds(10, 101, 351, 21);
-		panel.add(btnUpdateBorrow);
-
-		JButton btnUpdateMaintenanceReport = new JButton("Update Maintenance Report");
-		btnUpdateMaintenanceReport.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		btnUpdateMaintenanceReport.setForeground(Color.WHITE);
-		btnUpdateMaintenanceReport.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnUpdateMaintenanceReport.setFocusable(false);
-		btnUpdateMaintenanceReport.setBorderPainted(false);
-		btnUpdateMaintenanceReport.setBackground(Color.BLUE);
-		btnUpdateMaintenanceReport.setBounds(10, 165, 351, 21);
-		panel.add(btnUpdateMaintenanceReport);
-
-		JButton btnCreateMaintenance = new JButton("New Maintenance Report");
-		btnCreateMaintenance.addActionListener(e -> {
-			displayNewMaintenance();
-		});
-		btnCreateMaintenance.setForeground(Color.WHITE);
-		btnCreateMaintenance.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnCreateMaintenance.setFocusable(false);
-		btnCreateMaintenance.setBorderPainted(false);
-		btnCreateMaintenance.setBackground(Color.BLUE);
-		btnCreateMaintenance.setBounds(10, 133, 351, 21);
-		panel.add(btnCreateMaintenance);
 
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(30, 144, 255));
