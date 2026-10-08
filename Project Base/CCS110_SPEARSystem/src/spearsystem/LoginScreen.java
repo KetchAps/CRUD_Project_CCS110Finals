@@ -1,6 +1,7 @@
 package spearsystem;
 
 import java.awt.Font;
+import java.awt.Image;
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -12,7 +13,14 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
+import kenUI.ButtonOne;
 import spearsystem.LoginHandler.AuthStatus;
+import ui.loginPanel;
+
+import javax.swing.ImageIcon;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.Color;
 
 public class LoginScreen {
 
@@ -20,10 +28,11 @@ public class LoginScreen {
 	
 	private JPanel loginScreen;
 	private LoginHandler backend;
-	private JTextField authUsername;
-	private JPasswordField authPassword;
 	
 	private String sessionUser;
+	private JTextField authUsername;
+	private JTextField authUsername_1;
+	private JPasswordField authPassword;
 	
 	
 	
@@ -41,38 +50,66 @@ public class LoginScreen {
 		backend = new LoginHandler();
 
 		loginScreen = new JPanel();
-		loginScreen.setBounds(10, 54, 1400, 620);
+		loginScreen.setBounds(10, 54, 1240, 700);
 		loginScreen.setLayout(null);
 		
-		JLabel labelLogin = new JLabel("S.P.E.A.R System");
-		labelLogin.setFont(new Font("Trebuchet MS", Font.PLAIN, 34));
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(737, 0, 503, 700);
+		loginScreen.add(panel);
+		panel.setLayout(null);
+		
+		JLabel labelLogin = new JLabel("S.P.E.A.R");
+		labelLogin.setForeground(new Color(30, 144, 255));
 		labelLogin.setHorizontalAlignment(SwingConstants.CENTER);
-		labelLogin.setBounds(500, 11, 302, 117);
-		loginScreen.add(labelLogin);
+		labelLogin.setFont(new Font("Segoe UI Black", Font.BOLD, 60));
+		labelLogin.setBounds(100, 171, 302, 81);
+		panel.add(labelLogin);
 		
 		JLabel lblUsername = new JLabel("Username");
+		lblUsername.setForeground(new Color(30, 144, 255));
+		lblUsername.setFont(new Font("Segoe UI", Font.PLAIN, 25));
 		lblUsername.setHorizontalAlignment(SwingConstants.CENTER);
-		lblUsername.setBounds(510, 139, 85, 14);
-		loginScreen.add(lblUsername);
+		lblUsername.setBounds(168, 277, 167, 39);
+		panel.add(lblUsername);
 		
 		authUsername = new JTextField();
-		authUsername.setBounds(605, 136, 197, 20);
-		loginScreen.add(authUsername);
+		authUsername.setFont(new Font("Segoe UI Light", Font.PLAIN, 20));
 		authUsername.setColumns(10);
+		authUsername.setBounds(100, 317, 302, 43);
+		panel.add(authUsername);
+		
+		authUsername_1 = new JPasswordField();
+		authUsername_1.setFont(new Font("Segoe UI Light", Font.PLAIN, 20));
+		authUsername_1.setBounds(100, 428, 302, 43);
+		panel.add(authUsername_1);
+		
+		ButtonOne button = new ButtonOne();
+		button.setBounds(170, 520, 162, 49);
+		panel.add(button);
+		button.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
+		button.addActionListener(e -> { tryAuthenticate(); });
+		button.setText("Login");
+		
+		ImageIcon originalIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image resizedImage = originalIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+		
+		JLabel spearLogo = new JLabel("");
+		spearLogo.setBounds(180, 31, 143, 143);
+		spearLogo.setIcon(new ImageIcon(resizedImage));
+		panel.add(spearLogo);
 		
 		JLabel lblPassword = new JLabel("Password");
 		lblPassword.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPassword.setBounds(510, 167, 85, 14);
-		loginScreen.add(lblPassword);
+		lblPassword.setForeground(new Color(30, 144, 255));
+		lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 25));
+		lblPassword.setBounds(168, 388, 167, 39);
+		panel.add(lblPassword);
 		
-		authPassword = new JPasswordField();
-		authPassword.setBounds(605, 164, 197, 20);
-		loginScreen.add(authPassword);
-		
-		JButton btnAuthenticate = new JButton("Log In");
-		btnAuthenticate.addActionListener(e -> { tryAuthenticate(); });
-		btnAuthenticate.setBounds(569, 225, 135, 23);
-		loginScreen.add(btnAuthenticate);
+		JPanel panel_1 = new JPanel();
+		panel_1.setBackground(new Color(30, 144, 255));
+		panel_1.setBounds(0, 0, 738, 700);
+		loginScreen.add(panel_1);
 		
 	}
 	
@@ -80,12 +117,9 @@ public class LoginScreen {
 		return loginScreen;
 	}
 	
-
-	
-	
 	void tryAuthenticate() {
 		
-		String user = authUsername.getText();
+		String user = authUsername_1.getText();
 		Reader pass = new CharArrayReader(authPassword.getPassword());
 		AuthStatus result;
 		
@@ -99,7 +133,7 @@ public class LoginScreen {
 		if(result.isAdmin()) { parent.displayAdmin(); }
 		else				   parent.displayCustodian();
 		
-		authUsername.setText("");
+		authUsername_1.setText("");
 		authPassword.setText("");
 	}
 
@@ -108,10 +142,4 @@ public class LoginScreen {
 		
 		sessionUser = null;
 	}
-	
-	// Helper Methods
-	
-		
-	
-	
 }

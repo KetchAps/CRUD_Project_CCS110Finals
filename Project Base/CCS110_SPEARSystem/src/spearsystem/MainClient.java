@@ -85,17 +85,17 @@ public class MainClient {
 		custodianHandler = new CustodianHandler();
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1450, 920);
+		frame.setBounds(100, 100, 1240, 700);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
 		JPanel mainPane = new JPanel();
-		mainPane.setBounds(10, 21, 1414, 849);
+		mainPane.setBounds(0, 21, 1250, 700);
 		frame.getContentPane().add(mainPane);
 		mainPane.setLayout(null);
 		
 		userArea = new JPanel();
-		userArea.setBounds(10, 11, 1394, 601);
+		userArea.setBounds(0, 0, 1223, 612);
 		mainPane.add(userArea);
 		userArea.setLayout(card);
 		
@@ -104,6 +104,7 @@ public class MainClient {
 		frame.getContentPane().add(menuBar);
 		
 		JMenu menuMain = new JMenu("SETTINGS");
+		menuMain.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		menuBar.add(menuMain);
 		
 		menuOptLogout = new JMenuItem("Logout");
