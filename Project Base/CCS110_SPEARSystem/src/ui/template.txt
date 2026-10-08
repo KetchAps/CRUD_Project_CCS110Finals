@@ -11,9 +11,11 @@ button.setText("New Borrow Record");
 
 // Image
 ImageIcon originalIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
-		Image resizedImage = originalIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
+Image resizedImage = originalIcon.getImage().getScaledInstance(150, 150, Image.SCALE_SMOOTH);
 		
 		JLabel spearLogo = new JLabel("");
 		spearLogo.setBounds(180, 31, 143, 143);
 		spearLogo.setIcon(new ImageIcon(resizedImage));
-		panel.add(spearLogo);
+		panel.add(spearLogo)
+
+spearLogo.setIcon(new ImageIcon(resizedImage));

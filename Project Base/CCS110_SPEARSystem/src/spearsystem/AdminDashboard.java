@@ -3,6 +3,7 @@ package spearsystem;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -42,6 +43,7 @@ import javax.swing.JToggleButton;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.JCheckBox;
+import javax.swing.ImageIcon;
 
 public class AdminDashboard {
 
@@ -227,19 +229,12 @@ public class AdminDashboard {
 		custodianDashboard.setLayout(null);
 		custodianDashboard.setBounds(10, 54, 1240, 700);
 
-		JLabel lblCustodian = new JLabel("Admin");
-		lblCustodian.setForeground(new Color(30, 144, 255));
-		lblCustodian.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 30));
-		lblCustodian.setHorizontalAlignment(SwingConstants.LEFT);
-		lblCustodian.setBounds(10, 11, 343, 26);
-		custodianDashboard.add(lblCustodian);
-
 		query = new DefaultTableModel();
 		inventorySorter.setRowFilter(null);
 
 		cardContainer = new JPanel();
 		cardContainer.setBackground(new Color(255, 255, 255));
-		cardContainer.setBounds(0, 61, 1240, 693);
+		cardContainer.setBounds(0, 72, 1240, 628);
 		custodianDashboard.add(cardContainer);
 		cardContainer.setLayout(card);
 
@@ -590,7 +585,7 @@ public class AdminDashboard {
 		JPanel panel = new JPanel();
 		panel.setBackground(new Color(240, 248, 255));
 		panel.setForeground(new Color(0, 0, 255));
-		panel.setBounds(0, 0, 293, 639);
+		panel.setBounds(0, 0, 277, 639);
 		main.add(panel);
 		panel.setLayout(null);
 
@@ -599,7 +594,7 @@ public class AdminDashboard {
 		button.addActionListener(e -> {
 			displayNewBorrow();
 		});
-		button.setBounds(44, 117, 225, 55);
+		button.setBounds(24, 145, 225, 55);
 		panel.add(button);
 		button.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button.setText("New Borrow Record");
@@ -611,7 +606,7 @@ public class AdminDashboard {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
-		button2.setBounds(44, 315, 225, 55);
+		button2.setBounds(24, 343, 225, 55);
 		panel.add(button2);
 		button2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2.setText("Update Maintenance Report");
@@ -622,7 +617,7 @@ public class AdminDashboard {
 		button3.addActionListener(e -> {
 			displayUpdateBorrow();
 		});
-		button3.setBounds(44, 183, 225, 55);
+		button3.setBounds(24, 211, 225, 55);
 		panel.add(button3);
 		button3.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button3.setText("Update Borrow record");
@@ -633,14 +628,69 @@ public class AdminDashboard {
 		button4.addActionListener(e -> {
 			displayNewMaintenance();
 		});
-		button4.setBounds(44, 249, 225, 55);
+		button4.setBounds(24, 277, 225, 55);
 		panel.add(button4);
 		button4.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button4.setText("New Maintenance Report");
+		
+		ImageIcon originalIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		
+		JLabel spearLogo = new JLabel("S.P.E.A.R");
+		spearLogo.setForeground(new Color(30, 144, 255));
+		spearLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		spearLogo.setIcon(new ImageIcon(resizedImage));
+		spearLogo.setBounds(9, 11, 240, 64);
+		panel.add(spearLogo);
+		
+		JLabel lblNewLabel = new JLabel("Quick Actions");
+		lblNewLabel.setForeground(new Color(30, 144, 255));
+		lblNewLabel.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblNewLabel.setBounds(69, 107, 137, 27);
+		panel.add(lblNewLabel);
+		
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setForeground(new Color(30, 144, 255));
+		separator_2.setBounds(24, 94, 225, 2);
+		panel.add(separator_2);
+		
+		JSeparator separator_2_1 = new JSeparator();
+		separator_2_1.setForeground(new Color(30, 144, 255));
+		separator_2_1.setBounds(24, 409, 225, 2);
+		panel.add(separator_2_1);
+		
+		ImageIcon originalIcon2 = new ImageIcon(LoginScreen.class.getResource("/ui/custodian.png"));
+		Image resizedImage2 = originalIcon2.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+			
+		
+		ButtonOne button2_1 = new ButtonOne(new Color(26, 188, 156), new Color(22, 160, 133));
+		button2_1.setText("New Custodian");
+		button2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		button2_1.setBounds(24, 466, 225, 55);
+		panel.add(button2_1);
+		
+		ButtonOne button2_1_1 = new ButtonOne(new Color(155, 89, 182), new Color(142, 68, 173)
+);
+		button2_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		button2_1_1.setText("View Inventory");
+		button2_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		button2_1_1.setBounds(24, 532, 225, 55);
+		panel.add(button2_1_1);
+		
+		JLabel lblWhatHere = new JLabel("Data & Accounts");
+		lblWhatHere.setForeground(new Color(30, 144, 255));
+		lblWhatHere.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblWhatHere.setBounds(56, 422, 164, 27);
+		panel.add(lblWhatHere);
+		
+		
 
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(30, 144, 255));
-		separator.setBounds(10, 48, 1380, 2);
+		separator.setBounds(10, 59, 1380, 2);
 		custodianDashboard.add(separator);
 
 		cardContainer.add(main, "dashboard");
@@ -886,6 +936,13 @@ public class AdminDashboard {
 		checkUpdateItems = new JCheckBox("Update Equipment Condition");
 		checkUpdateItems.setBounds(20, 382, 274, 23);
 		updateBorrow.add(checkUpdateItems);
+		
+		JLabel lblAdmin = new JLabel("Admin");
+		lblAdmin.setIcon(new ImageIcon(resizedImage2));
+		lblAdmin.setForeground(new Color(30, 144, 255));
+		lblAdmin.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		lblAdmin.setBounds(25, -3, 240, 64);
+		custodianDashboard.add(lblAdmin);
 
 		// frame.setVisible(true);
 
