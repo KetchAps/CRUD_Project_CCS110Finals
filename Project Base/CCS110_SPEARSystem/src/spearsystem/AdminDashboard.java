@@ -33,6 +33,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import kenUI.ButtonOne;
+import kenUI.GradientPanel;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
 import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
@@ -582,12 +583,21 @@ public class AdminDashboard {
 		tblBorrowPreview = new JTable();
 		brwPreviewViewport.setViewportView(tblBorrowPreview);
 
-		JPanel panel = new JPanel();
-		panel.setBackground(new Color(240, 248, 255));
-		panel.setForeground(new Color(0, 0, 255));
+		// ==========================================
+		// Gradient test
+		// ==========================================
+		Color topColor = new Color(212, 255, 253);
+		Color bottomColor = new Color(247, 214, 190);
+		GradientPanel panel = new GradientPanel(topColor, bottomColor);
+
 		panel.setBounds(0, 0, 277, 639);
-		main.add(panel);
 		panel.setLayout(null);
+		main.add(panel);
+
+		panel.setBounds(0, 0, 277, 639);
+		panel.setLayout(null);
+		main.add(panel);
+
 
 		// Custom Button 1
 		ButtonOne button = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
@@ -640,7 +650,7 @@ public class AdminDashboard {
 		spearLogo.setForeground(new Color(30, 144, 255));
 		spearLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
 		spearLogo.setIcon(new ImageIcon(resizedImage));
-		spearLogo.setBounds(9, 11, 240, 64);
+		spearLogo.setBounds(0, 11, 249, 64);
 		panel.add(spearLogo);
 		
 		JLabel lblNewLabel = new JLabel("Quick Actions");
@@ -664,6 +674,10 @@ public class AdminDashboard {
 			
 		
 		ButtonOne button2_1 = new ButtonOne(new Color(26, 188, 156), new Color(22, 160, 133));
+		button2_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		button2_1.setText("New Custodian");
 		button2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2_1.setBounds(24, 466, 225, 55);
@@ -686,11 +700,57 @@ public class AdminDashboard {
 		lblWhatHere.setBounds(56, 422, 164, 27);
 		panel.add(lblWhatHere);
 		
+		ButtonOne whiteOutline = new ButtonOne(new Color(18, 145, 96), new Color(0, 0, 0));
+		whiteOutline.setEnabled(false);
+		whiteOutline.setText("New Borrow Record");
+		whiteOutline.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		whiteOutline.setBounds(20, 141, 233, 64);
+		panel.add(whiteOutline);
+		
+		ButtonOne whiteOutline_1 = new ButtonOne(new Color(180, 88, 15), Color.BLACK);
+		whiteOutline_1.setText("New Borrow Record");
+		whiteOutline_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		whiteOutline_1.setEnabled(false);
+		whiteOutline_1.setBounds(20, 207, 233, 64);
+		panel.add(whiteOutline_1);
+		
+		ButtonOne whiteOutline_1_1 = new ButtonOne(new Color(190, 55, 120), Color.BLACK);
+		whiteOutline_1_1.setText("New Borrow Record");
+		whiteOutline_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		whiteOutline_1_1.setEnabled(false);
+		whiteOutline_1_1.setBounds(20, 273, 233, 64);
+		panel.add(whiteOutline_1_1);
+		
+		ButtonOne whiteOutline_1_1_1 = new ButtonOne(new Color(160, 45, 38), Color.BLACK);
+		whiteOutline_1_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
+		whiteOutline_1_1_1.setText("New Borrow Record");
+		whiteOutline_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		whiteOutline_1_1_1.setEnabled(false);
+		whiteOutline_1_1_1.setBounds(20, 339, 233, 64);
+		panel.add(whiteOutline_1_1_1);
+		
+		ButtonOne whiteOutline_1_1_1_1 = new ButtonOne(new Color(15, 135, 120), Color.BLACK);
+		whiteOutline_1_1_1_1.setText("New Borrow Record");
+		whiteOutline_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		whiteOutline_1_1_1_1.setEnabled(false);
+		whiteOutline_1_1_1_1.setBounds(20, 462, 233, 64);
+		panel.add(whiteOutline_1_1_1_1);
+		
+		ButtonOne whiteOutline_1_1_1_1_1 = new ButtonOne(new Color(112, 55, 145), Color.BLACK);
+		whiteOutline_1_1_1_1_1.setText("New Borrow Record");
+		whiteOutline_1_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		whiteOutline_1_1_1_1_1.setEnabled(false);
+		whiteOutline_1_1_1_1_1.setBounds(20, 528, 233, 64);
+		panel.add(whiteOutline_1_1_1_1_1);
+		
 		
 
 		JSeparator separator = new JSeparator();
 		separator.setForeground(new Color(30, 144, 255));
-		separator.setBounds(10, 59, 1380, 2);
+		separator.setBounds(10, 62, 1380, 2);
 		custodianDashboard.add(separator);
 
 		cardContainer.add(main, "dashboard");
@@ -941,7 +1001,7 @@ public class AdminDashboard {
 		lblAdmin.setIcon(new ImageIcon(resizedImage2));
 		lblAdmin.setForeground(new Color(30, 144, 255));
 		lblAdmin.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
-		lblAdmin.setBounds(25, -3, 240, 64);
+		lblAdmin.setBounds(10, 0, 181, 64);
 		custodianDashboard.add(lblAdmin);
 
 		// frame.setVisible(true);
