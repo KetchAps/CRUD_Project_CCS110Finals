@@ -79,8 +79,6 @@ public class AdminDashboard {
 
 	private JTextField searchBar;
 	private JTable searchResult;
-
-	private JTable tblBorrowPreview;
 	private JTable tblborrowRecord;
 
 	private DefaultTableModel query;
@@ -228,14 +226,14 @@ public class AdminDashboard {
 
 		custodianDashboard = new JPanel();
 		custodianDashboard.setLayout(null);
-		custodianDashboard.setBounds(10, 54, 1240, 700);
+		custodianDashboard.setBounds(10, 54, 1283, 700);
 
 		query = new DefaultTableModel();
 		inventorySorter.setRowFilter(null);
 
 		cardContainer = new JPanel();
 		cardContainer.setBackground(new Color(255, 255, 255));
-		cardContainer.setBounds(0, 72, 1240, 628);
+		cardContainer.setBounds(0, 72, 1284, 628);
 		custodianDashboard.add(cardContainer);
 		cardContainer.setLayout(card);
 
@@ -571,32 +569,20 @@ public class AdminDashboard {
 
 		main.setLayout(null);
 
-		JPanel borrowTablePreview = new JPanel();
-		borrowTablePreview.setBounds(436, 11, 471, 544);
-		main.add(borrowTablePreview);
-		borrowTablePreview.setLayout(null);
-
-		JScrollPane brwPreviewViewport = new JScrollPane();
-		brwPreviewViewport.setBounds(10, 93, 451, 440);
-		borrowTablePreview.add(brwPreviewViewport);
-
-		tblBorrowPreview = new JTable();
-		brwPreviewViewport.setViewportView(tblBorrowPreview);
-
 		// ==========================================
 		// Gradient test
 		// ==========================================
 		Color topColor = new Color(212, 255, 253);
 		Color bottomColor = new Color(247, 214, 190);
-		GradientPanel panel = new GradientPanel(topColor, bottomColor);
+		GradientPanel sidebar = new GradientPanel(topColor, bottomColor);
 
-		panel.setBounds(0, 0, 277, 639);
-		panel.setLayout(null);
-		main.add(panel);
+		sidebar.setBounds(0, 0, 297, 639);
+		sidebar.setLayout(null);
+		main.add(sidebar);
 
-		panel.setBounds(0, 0, 277, 639);
-		panel.setLayout(null);
-		main.add(panel);
+		sidebar.setBounds(0, 0, 277, 639);
+		sidebar.setLayout(null);
+		main.add(sidebar);
 
 
 		// Custom Button 1
@@ -605,7 +591,7 @@ public class AdminDashboard {
 			displayNewBorrow();
 		});
 		button.setBounds(24, 145, 225, 55);
-		panel.add(button);
+		sidebar.add(button);
 		button.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button.setText("Register Custodian");
 		// -
@@ -617,7 +603,7 @@ public class AdminDashboard {
 			}
 		});
 		button2.setBounds(24, 281, 225, 55);
-		panel.add(button2);
+		sidebar.add(button2);
 		button2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2.setText("Delete Custodian");
 		// -
@@ -628,7 +614,7 @@ public class AdminDashboard {
 			displayUpdateBorrow();
 		});
 		button3.setBounds(24, 211, 225, 55);
-		panel.add(button3);
+		sidebar.add(button3);
 		button3.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button3.setText("Update Custodian");
 		// -
@@ -639,7 +625,7 @@ public class AdminDashboard {
 			displayNewMaintenance();
 		});
 		button4.setBounds(28, 395, 99, 55);
-		panel.add(button4);
+		sidebar.add(button4);
 		button4.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button4.setText("View");
 		
@@ -651,23 +637,23 @@ public class AdminDashboard {
 		spearLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
 		spearLogo.setIcon(new ImageIcon(resizedImage));
 		spearLogo.setBounds(0, 11, 249, 64);
-		panel.add(spearLogo);
+		sidebar.add(spearLogo);
 		
 		JLabel lblNewLabel = new JLabel("Custodian Management");
 		lblNewLabel.setForeground(new Color(30, 144, 255));
 		lblNewLabel.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblNewLabel.setBounds(24, 107, 225, 27);
-		panel.add(lblNewLabel);
+		sidebar.add(lblNewLabel);
 		
 		JSeparator separator_2 = new JSeparator();
 		separator_2.setForeground(new Color(30, 144, 255));
 		separator_2.setBounds(24, 94, 225, 2);
-		panel.add(separator_2);
+		sidebar.add(separator_2);
 		
 		JSeparator separator_2_1 = new JSeparator();
 		separator_2_1.setForeground(new Color(30, 144, 255));
 		separator_2_1.setBounds(24, 347, 225, 2);
-		panel.add(separator_2_1);
+		sidebar.add(separator_2_1);
 		
 		ImageIcon originalIcon2 = new ImageIcon(LoginScreen.class.getResource("/ui/custodian.png"));
 		Image resizedImage2 = originalIcon2.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
@@ -678,10 +664,14 @@ public class AdminDashboard {
 			public void actionPerformed(ActionEvent e) {
 			}
 		});
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(0, 0, 10, 10);
+		sidebar.add(panel);
 		button2_1.setText("Edit");
 		button2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2_1.setBounds(150, 395, 95, 55);
-		panel.add(button2_1);
+		sidebar.add(button2_1);
 		
 		ButtonOne button2_1_1 = new ButtonOne(new Color(155, 89, 182), new Color(142, 68, 173)
 );
@@ -692,33 +682,33 @@ public class AdminDashboard {
 		button2_1_1.setText("Borrowing");
 		button2_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2_1_1.setBounds(28, 516, 99, 55);
-		panel.add(button2_1_1);
+		sidebar.add(button2_1_1);
 		
 		JLabel lblWhatHere = new JLabel("Inventory Management");
 		lblWhatHere.setForeground(new Color(30, 144, 255));
 		lblWhatHere.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblWhatHere.setBounds(24, 360, 225, 27);
-		panel.add(lblWhatHere);
+		sidebar.add(lblWhatHere);
 		
 		ButtonOne whiteOutline = new ButtonOne(new Color(18, 145, 96), new Color(0, 0, 0));
 		whiteOutline.setEnabled(false);
 		whiteOutline.setText("New Borrow Record");
 		whiteOutline.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline.setBounds(20, 141, 233, 64);
-		panel.add(whiteOutline);
+		sidebar.add(whiteOutline);
 		
 		ButtonOne whiteOutline_1 = new ButtonOne(new Color(180, 88, 15), Color.BLACK);
 		whiteOutline_1.setText("New Borrow Record");
 		whiteOutline_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline_1.setEnabled(false);
 		whiteOutline_1.setBounds(20, 207, 233, 64);
-		panel.add(whiteOutline_1);
+		sidebar.add(whiteOutline_1);
 		
 		ButtonOne whiteOutline_1_1 = new ButtonOne(new Color(190, 55, 120), Color.BLACK);
 		whiteOutline_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline_1_1.setEnabled(false);
 		whiteOutline_1_1.setBounds(24, 391, 107, 64);
-		panel.add(whiteOutline_1_1);
+		sidebar.add(whiteOutline_1_1);
 		
 		ButtonOne whiteOutline_1_1_1 = new ButtonOne(new Color(160, 45, 38), Color.BLACK);
 		whiteOutline_1_1_1.addActionListener(new ActionListener() {
@@ -729,30 +719,30 @@ public class AdminDashboard {
 		whiteOutline_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline_1_1_1.setEnabled(false);
 		whiteOutline_1_1_1.setBounds(20, 277, 233, 64);
-		panel.add(whiteOutline_1_1_1);
+		sidebar.add(whiteOutline_1_1_1);
 		
 		ButtonOne whiteOutline_1_1_1_1 = new ButtonOne(new Color(15, 135, 120), Color.BLACK);
 		whiteOutline_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline_1_1_1_1.setEnabled(false);
 		whiteOutline_1_1_1_1.setBounds(146, 391, 103, 64);
-		panel.add(whiteOutline_1_1_1_1);
+		sidebar.add(whiteOutline_1_1_1_1);
 		
 		ButtonOne whiteOutline_1_1_1_1_1 = new ButtonOne(new Color(112, 55, 145), Color.BLACK);
 		whiteOutline_1_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline_1_1_1_1_1.setEnabled(false);
 		whiteOutline_1_1_1_1_1.setBounds(24, 512, 107, 64);
-		panel.add(whiteOutline_1_1_1_1_1);
+		sidebar.add(whiteOutline_1_1_1_1_1);
 		
 		JSeparator separator_2_1_1 = new JSeparator();
 		separator_2_1_1.setForeground(new Color(30, 144, 255));
 		separator_2_1_1.setBounds(24, 461, 225, 2);
-		panel.add(separator_2_1_1);
+		sidebar.add(separator_2_1_1);
 		
 		JLabel lblWhatHere_1 = new JLabel("Inventory Management");
 		lblWhatHere_1.setForeground(new Color(30, 144, 255));
 		lblWhatHere_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblWhatHere_1.setBounds(24, 474, 225, 27);
-		panel.add(lblWhatHere_1);
+		sidebar.add(lblWhatHere_1);
 		
 		ButtonOne button2_1_1_1 = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
 		button2_1_1_1.addActionListener(new ActionListener() {
@@ -762,13 +752,13 @@ public class AdminDashboard {
 		button2_1_1_1.setText("Maintenance");
 		button2_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		button2_1_1_1.setBounds(138, 516, 107, 55);
-		panel.add(button2_1_1_1);
+		sidebar.add(button2_1_1_1);
 		
 		ButtonOne whiteOutline_1_1_1_1_1_1 = new ButtonOne(new Color(160, 45, 38), Color.BLACK);
 		whiteOutline_1_1_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		whiteOutline_1_1_1_1_1_1.setEnabled(false);
 		whiteOutline_1_1_1_1_1_1.setBounds(134, 512, 115, 64);
-		panel.add(whiteOutline_1_1_1_1_1_1);
+		sidebar.add(whiteOutline_1_1_1_1_1_1);
 		
 		
 
@@ -778,8 +768,103 @@ public class AdminDashboard {
 		custodianDashboard.add(separator);
 
 		cardContainer.add(main, "dashboard");
+		
+		JPanel greet = new JPanel();
+		greet.setBounds(287, 11, 987, 117);
+		main.add(greet);
+		greet.setLayout(null);
+		
+		JPanel totalEquipmentPanel = new JPanel();
+		totalEquipmentPanel.setBounds(287, 139, 238, 141);
+		main.add(totalEquipmentPanel);
+		totalEquipmentPanel.setLayout(null);
+		
+		JPanel totalUsersPanel = new JPanel();
+		totalUsersPanel.setBounds(1027, 139, 247, 141);
+		main.add(totalUsersPanel);
+		totalUsersPanel.setLayout(null);
+		
+		JPanel pendingReturnsPanel = new JPanel();
+		pendingReturnsPanel.setBounds(776, 139, 240, 141);
+		main.add(pendingReturnsPanel);
+		pendingReturnsPanel.setLayout(null);
+		
+		JPanel currentlyBorrowedPanel = new JPanel();
+		currentlyBorrowedPanel.setBounds(532, 139, 234, 141);
+		main.add(currentlyBorrowedPanel);
+		currentlyBorrowedPanel.setLayout(null);
+		
+		JPanel recentEquipmentPanel = new JPanel();
+		recentEquipmentPanel.setBounds(285, 291, 481, 337);
+		main.add(recentEquipmentPanel);
+		recentEquipmentPanel.setLayout(null);
+		
+		JPanel reTablePanel = new JPanel();
+		reTablePanel.setBounds(0, 53, 481, 284);
+		recentEquipmentPanel.add(reTablePanel);
+		
+		Object[][] testData = {
+		    {"Laser Cutter", "ICT equipment", "Active"},
+		    {"3D Printer", "AV Equipment", "Maintenance"},
+		    {"CNC Router", "Photography", "Idle"}
+		};
+		String[] columnNames = {"ItemName", "Category", "Status"};
+		reTablePanel.setLayout(null);
+
+		org.jdesktop.swingx.JXTable testTable = new org.jdesktop.swingx.JXTable(testData, columnNames);
+		testTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		testTable.setColumnControlVisible(true); 
+		testTable.setHighlighters(org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping()); 
+		testTable.setRowHeight(30);
+
+		testTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+		testTable.setFillsViewportHeight(true);
+
+		testTable.setIntercellSpacing(new java.awt.Dimension(2, 2));
+		testTable.setGridColor(java.awt.Color.LIGHT_GRAY); 
+
+		JScrollPane scrollPane1 = new JScrollPane(testTable);
+		scrollPane1.setBounds(0, 5, 481, 279);
+		reTablePanel.add(scrollPane1);
+
+		JPanel recentBorrowingsPanel = new JPanel();
+		recentBorrowingsPanel.setBounds(775, 291, 499, 337);
+		main.add(recentBorrowingsPanel);
+		recentBorrowingsPanel.setLayout(null);
+		
+		JPanel ebBorrowingTablePanel = new JPanel();
+		ebBorrowingTablePanel.setBounds(0, 53, 499, 284);
+		recentBorrowingsPanel.add(ebBorrowingTablePanel);
+		ebBorrowingTablePanel.setLayout(null);
 		cardContainer.add(borrowFormCreation, "creation");
 
+		Object[][] borrowingData = {
+		    {"Laser Cutter", "Felonia", "2026-10-08", "Pending"},
+		    {"3D Printer", "Losamia", "2026-10-07", "Approved"},
+		    {"CNC Router", "Paz", "2026-10-05", "Returned"}
+		};
+		String[] borrowingColumns = {"Item", "Borrower", "Date", "Status"};
+
+		org.jdesktop.swingx.JXTable borrowingTable = new org.jdesktop.swingx.JXTable(borrowingData, borrowingColumns);
+		borrowingTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+		borrowingTable.setColumnControlVisible(true); 
+		borrowingTable.setHighlighters(org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping()); 
+		borrowingTable.setRowHeight(30);
+
+		borrowingTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
+		borrowingTable.setFillsViewportHeight(true);
+
+		borrowingTable.setIntercellSpacing(new java.awt.Dimension(2, 2));
+		borrowingTable.setGridColor(java.awt.Color.LIGHT_GRAY);
+		borrowingTable.setShowHorizontalLines(true);
+		borrowingTable.setShowVerticalLines(true);
+
+		JScrollPane borrowingScrollPane = new JScrollPane(borrowingTable);
+		borrowingScrollPane.setSize(499, 284);
+		ebBorrowingTablePanel.add(borrowingScrollPane, java.awt.BorderLayout.CENTER); 
+
+		cardContainer.add(borrowFormCreation, "creation");
+		
 		formCreator.add(createBorrow, "borrowForm");
 
 		JLabel lblyyyymmdd_1 = new JLabel("(YYYY-MM-DD)");
