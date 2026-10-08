@@ -671,34 +671,6 @@ public class CustodianDashboardUI {
 		
 		ImageIcon originalIcon2 = new ImageIcon(LoginScreen.class.getResource("/ui/custodian.png"));
 		Image resizedImage2 = originalIcon2.getImage().getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-			
-		
-		ButtonOne button2_1 = new ButtonOne(new Color(26, 188, 156), new Color(22, 160, 133));
-		button2_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		button2_1.setText("New Custodian");
-		button2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		button2_1.setBounds(24, 466, 225, 55);
-		panel.add(button2_1);
-		
-		ButtonOne button2_1_1 = new ButtonOne(new Color(155, 89, 182), new Color(142, 68, 173)
-);
-		button2_1_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
-		button2_1_1.setText("View Inventory");
-		button2_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		button2_1_1.setBounds(24, 532, 225, 55);
-		panel.add(button2_1_1);
-		
-		JLabel lblWhatHere = new JLabel("Data & Accounts");
-		lblWhatHere.setForeground(new Color(30, 144, 255));
-		lblWhatHere.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
-		lblWhatHere.setBounds(56, 422, 164, 27);
-		panel.add(lblWhatHere);
 		
 		ButtonOne whiteOutline = new ButtonOne(new Color(18, 145, 96), new Color(0, 0, 0));
 		whiteOutline.setEnabled(false);
@@ -731,20 +703,6 @@ public class CustodianDashboardUI {
 		whiteOutline_1_1_1.setEnabled(false);
 		whiteOutline_1_1_1.setBounds(20, 339, 233, 64);
 		panel.add(whiteOutline_1_1_1);
-		
-		ButtonOne whiteOutline_1_1_1_1 = new ButtonOne(new Color(15, 135, 120), Color.BLACK);
-		whiteOutline_1_1_1_1.setText("New Borrow Record");
-		whiteOutline_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		whiteOutline_1_1_1_1.setEnabled(false);
-		whiteOutline_1_1_1_1.setBounds(20, 462, 233, 64);
-		panel.add(whiteOutline_1_1_1_1);
-		
-		ButtonOne whiteOutline_1_1_1_1_1 = new ButtonOne(new Color(112, 55, 145), Color.BLACK);
-		whiteOutline_1_1_1_1_1.setText("New Borrow Record");
-		whiteOutline_1_1_1_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		whiteOutline_1_1_1_1_1.setEnabled(false);
-		whiteOutline_1_1_1_1_1.setBounds(20, 528, 233, 64);
-		panel.add(whiteOutline_1_1_1_1_1);
 		
 		
 
