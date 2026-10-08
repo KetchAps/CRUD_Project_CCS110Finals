@@ -85,7 +85,7 @@ public class MainClient {
 		custodianHandler = new CustodianHandler();
 		
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1283, 867);
+		frame.setBounds(100, 100, 1290, 752);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 		
@@ -95,7 +95,7 @@ public class MainClient {
 		mainPane.setLayout(null);
 		
 		userArea = new JPanel();
-		userArea.setBounds(0, 0, 1284, 700);
+		userArea.setBounds(0, 0, 1290, 700);
 		mainPane.add(userArea);
 		userArea.setLayout(card);
 		
@@ -125,7 +125,7 @@ public class MainClient {
 		mainPane.add(lblFeedback);
 		
 		JScrollPane scrllLogViewport = new JScrollPane();
-		scrllLogViewport.setBounds(0, 665, 1284, 173);
+		scrllLogViewport.setBounds(0, 699, 1284, 139);
 		mainPane.add(scrllLogViewport);
 		
 		areaLog = new JTextArea();
