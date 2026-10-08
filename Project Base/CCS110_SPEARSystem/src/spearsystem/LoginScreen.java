@@ -34,8 +34,6 @@ public class LoginScreen {
 	private JTextField authUsername_1;
 	private JPasswordField authPassword;
 	
-	
-	
 	public LoginScreen(MainClient parent, LoginHandler backend) {
 		this.parent = parent;
 		this.backend = backend;
@@ -52,7 +50,6 @@ public class LoginScreen {
 		loginScreen = new JPanel();
 		loginScreen.setBounds(10, 54, 1240, 700);
 		loginScreen.setLayout(null);
-		
 		
 		JPanel panel = new JPanel();
 		panel.setBounds(737, 0, 503, 700);
@@ -85,7 +82,7 @@ public class LoginScreen {
 		panel.add(authUsername_1);
 		
 		ButtonOne button = new ButtonOne();
-		button.setBounds(170, 520, 162, 49);
+		button.setBounds(170, 514, 162, 49);
 		panel.add(button);
 		button.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
 		button.addActionListener(e -> { tryAuthenticate(); });
@@ -110,7 +107,6 @@ public class LoginScreen {
 		panel_1.setBackground(new Color(30, 144, 255));
 		panel_1.setBounds(0, 0, 738, 700);
 		loginScreen.add(panel_1);
-		
 	}
 	
 	JPanel getPanel() {

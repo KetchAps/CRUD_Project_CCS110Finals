@@ -7,7 +7,6 @@ import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 import javax.swing.JButton;
 import javax.swing.Timer;
 
@@ -16,7 +15,6 @@ public class ButtonOne extends JButton {
 
 	// 0 = normal, 1 = hover
 	private float progress = 0f;
-
 	// 0 = released, 1 = pressed
 	private float pressProgress = 0f;
 
@@ -24,9 +22,9 @@ public class ButtonOne extends JButton {
 	private boolean hovering = false;
 
 	// Colors
-	private final Color normalColor = new Color(30, 144, 255); // Dodger Blue
-	private final Color hoverColor = new Color(34, 76, 214); // Deep Sapphire (Rich hue shift)
-	private final Color glowColor = new Color(30, 144, 255, 60); // Semi-transparent blue for hover glow
+	private Color normalColor;
+	private Color hoverColor;
+	private Color glowColor;
 
 	// Animation speeds
 	private static final float HOVER_STEP = 0.05f; // Takes ~200ms to complete (Smooth & snappy)
@@ -37,16 +35,25 @@ public class ButtonOne extends JButton {
 
 	private Timer timer;
 
+	// Default constructor 
 	public ButtonOne() {
+		this(new Color(30, 144, 255), new Color(34, 76, 214));
+	}
 
-		// remove the outline of swing button but no animation so we customized it
+	// Constructor
+	public ButtonOne(Color normalColor, Color hoverColor) {
+		this.normalColor = normalColor;
+		this.hoverColor = hoverColor;
+		
+		this.glowColor = new Color(normalColor.getRed(), normalColor.getGreen(), normalColor.getBlue(), 60);
+
+	
 		setBorderPainted(false);
 		setFocusPainted(false);
 		setContentAreaFilled(false);
 		setOpaque(false);
 
 		timer = new Timer(10, e -> {
-
 			float hoverTarget = hovering ? 1f : 0f;
 			float pressTarget = getModel().isPressed() ? 1f : 0f;
 
@@ -55,14 +62,13 @@ public class ButtonOne extends JButton {
 
 			repaint();
 
-			// Stop only when BOTH animations have arrived
+		
 			if (progress == hoverTarget && pressProgress == pressTarget) {
 				timer.stop();
 			}
 		});
 
 		addMouseListener(new MouseAdapter() {
-
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				hovering = true;
@@ -86,11 +92,9 @@ public class ButtonOne extends JButton {
 			}
 		});
 
-		// Safety net: restart whenever the button model changes (pressed, armed, etc.)
 		addChangeListener(e -> timer.start());
 	}
 
-	// Moves a value toward a target by 'step' without overshooting
 	private float moveToward(float current, float target, float step) {
 		if (current < target) {
 			return Math.min(current + step, target);
@@ -102,13 +106,11 @@ public class ButtonOne extends JButton {
 
 	@Override
 	protected void paintComponent(Graphics g) {
-
 		Graphics2D g2 = (Graphics2D) g.create();
-
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 
-		// Cubic ease-out 
+		// Cubic ease-out
 		float easedProgress = 1f - (1f - progress) * (1f - progress) * (1f - progress);
 
 		// Press effect
@@ -126,7 +128,6 @@ public class ButtonOne extends JButton {
 			Color currentGlow = new Color(glowColor.getRed(), glowColor.getGreen(), glowColor.getBlue(),
 					currentGlowAlpha);
 			g2.setColor(currentGlow);
-
 			g2.fillRoundRect(x - 2, y - 2, width + 4, height + 4, 34, 34);
 		}
 
@@ -136,7 +137,6 @@ public class ButtonOne extends JButton {
 		int blue = (int) (normalColor.getBlue() + (hoverColor.getBlue() - normalColor.getBlue()) * easedProgress);
 
 		g2.setColor(new Color(red, green, blue));
-
 		g2.fillRoundRect(x, y, width, height, 30, 30);
 
 		g2.setColor(Color.WHITE);
@@ -149,7 +149,6 @@ public class ButtonOne extends JButton {
 		int textY = y + (height - metrics.getHeight()) / 2 + metrics.getAscent();
 
 		g2.drawString(getText(), textX, textY);
-
 		g2.dispose();
 	}
 }
