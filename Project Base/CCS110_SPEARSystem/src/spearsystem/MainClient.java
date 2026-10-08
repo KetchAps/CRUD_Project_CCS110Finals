@@ -40,6 +40,8 @@ public class MainClient {
 	private LoginHandler authHandler;
 	private CustodianHandler custodianHandler;
 	
+	private LoginScreen loginScrn;
+	private CustodianDashboard custodian;
 	
 	private CardLayout card = new CardLayout(0,0);
 	private JPanel userArea;
@@ -110,11 +112,11 @@ public class MainClient {
 		menuOptLogout.setEnabled(false);
 		menuMain.add(menuOptLogout);
 		
-		LoginScreen loginScrn = new LoginScreen(this, authHandler);
+		loginScrn = new LoginScreen(this, authHandler);
 		userArea.add(loginScrn.getPanel(), "login");
 		
-		CustodianDashboard dashB = new CustodianDashboard(this, custodianHandler);
-		userArea.add(dashB.getPanel(), "custodian");
+		custodian = new CustodianDashboard(this, custodianHandler);
+		userArea.add(custodian.getPanel(), "custodian");
 		
 		lblFeedback = new JLabel("-");
 		lblFeedback.setBounds(20, 623, 1004, 14);
@@ -190,7 +192,7 @@ public class MainClient {
 	public void displayCustodian() {
 		card.show(userArea, "custodian");
 		menuOptLogout.setEnabled(true);
-		
+		custodian.initialiseDisplays();
 	}
 	public void displayAdmin() {
 		card.show(userArea, "admin");

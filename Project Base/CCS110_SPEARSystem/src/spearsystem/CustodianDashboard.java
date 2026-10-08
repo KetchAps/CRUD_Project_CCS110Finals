@@ -37,18 +37,23 @@ import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
 import spearsystem.CustodianDatabaseHandler.MaintenanceReport;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import javax.swing.JToggleButton;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.ChangeEvent;
-import javax.swing.JCheckBox;
 
 
 public class CustodianDashboard {
 	
-	final String[] RECORDSTATUS = {"Returned", "Borrowed"};
+	final String[] RECORDSTATUS = {"Return", "Borrow"};
+	final String[] REPORTSTATUS = {"In Progress", "Resolved"};
 	
 	final String[] EQUIPCONDITIONS = {"Good", "Worn", "Damaged"};
 	final String[] EQUIPAVAILABILITY = {"Available", "Borrowed", "Maintenance"}; 
+	private Integer[] borrowerIDs;
+	
+	private EquipmentDetails loadedEquip;
+	private BorrowRecord loadedRecord;
+	private MaintenanceReport loadedReport;
+	
+	private int activeScreen = 0;
+	
 	
 	private JPanel custodianDashboard;
 	private MainClient parent;
@@ -60,9 +65,6 @@ public class CustodianDashboard {
 	private JComboBox<String> cmbCondition;
 	private JComboBox<String> cmbCategory;
 	private JComboBox<String> cmbAvailability;
-	private JComboBox<String> cmbMaintenanceStatus;
-	private JComboBox<String> cmbConditionOnReturn;
-	private JComboBox<String> cmbBorrowStatus;
 	private JComboBox<String> cmbReceivedBy;
 	private JComboBox<String> cmbStatus;	
 	private JComboBox<String> cmbBorrowerName;
@@ -77,33 +79,36 @@ public class CustodianDashboard {
 	private JTextField searchBar;
 	private JTable searchResult;
 	
+	
 	private JTable tblBorrowPreview;
+	private DefaultTableModel borrowPreview;
+	
+	private JTable tblMaintenancePreview;
+	private DefaultTableModel maintenancePreview;
+	
 	private JTable tblborrowRecord;
+	private JTable tblUpdReport;
 	
 	private DefaultTableModel query;
 	private DefaultTableModel borrowList;
+	private DefaultTableModel reportList;
 	
 	private JTextArea txtAMntIssue;
-	private JTextArea txtAMntActionTaken;
+	private JTextArea txtAMntUpdIssueReported;
+	private JTextArea txtAMntUpdActionTaken;
 	private JTextField txtBrwEquipID;
 	private JTextField txtBrwEquipName;
 	private JTextField txtBrwEquipTag;
 	private JTextField txtBrwReturnByDate;
 	private JTextField txtDateBorrowed;
 	private JTextField txtBrwEquipCondition;
-	
-	
-	private Integer[] borrowerIDs;
+
 	private JTextField txtMntEquipID;
 	private JTextField txtMntEquipName;
 	private JTextField txtMntEquipCondition;
 	private JTextField txtMntEquipTag;
 	private JTextField txtMntDateReported;
-	private JTextField txtMntCost;
-	private JTextField txtBrwDateReturned;
 	private JTextField txtbrwSearchBar;
-	private JToggleButton toggleUpdMarkAsReturned;
-	private JCheckBox checkUpdateItems;
 	
 	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
@@ -162,7 +167,35 @@ public class CustodianDashboard {
 		
 	};
 	
-	
+	private TableRowSorter<DefaultTableModel> maintenanceSorter = new TableRowSorter<>(reportList);
+	private RowFilter<DefaultTableModel, Integer> maintenanceRF = new RowFilter<>() {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean include( Entry entry) {
+			
+			String searchFilter = searchBar.getText();
+			String categoryFilter = cmbCategory.getSelectedItem().toString();
+			String conditionFilter = cmbCondition.getSelectedItem().toString();
+			String availabilityFilter = cmbAvailability.getSelectedItem().toString();
+			
+			// searchBar
+			String id = entry.getStringValue(0);
+			String tag = entry.getStringValue(1);
+			String name = entry.getStringValue(2);
+			
+			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
+				!(id.contains(searchFilter) || tag.contains(searchFilter) || name.contains(searchFilter))) return false;
+			
+			if(!categoryFilter.equals("[Category]") && !entry.getStringValue(3).equals(categoryFilter)) return false;
+			
+			if(!conditionFilter.equals("[Condition]") && !entry.getStringValue(11).equals(conditionFilter)) return false;
+			
+			if(!availabilityFilter.equals("[Availability]") && !entry.getStringValue(12).equals(availabilityFilter)) return false;
+			return true;
+		}
+		
+		
+	};
 	
 	
 	
@@ -201,6 +234,15 @@ public class CustodianDashboard {
 	private JTextField txtUpdCondOnBorrow;
 	private JTextField txtExpectedReturnDate;
 	private JTextField txtDateReturned;
+	private JTextField txtBrwEquipAvail;
+	
+	private JTextField textField;
+	private JTextField txtMntCost;
+	private JTextField txtMntUpdTransactionID;
+	private JTextField txtMntUpdReport;
+	private JTextField txtMntUpdDate;
+	private JTextField txtMntUpdEquipID;
+	
 	
 	
 	/**
@@ -212,13 +254,8 @@ public class CustodianDashboard {
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 */
+	
 	private void initialize() {
-//		frame = new JFrame();
-//		frame.setBounds(10, 11, 1423, 654);
-//		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		backend = new CustodianHandler();
 		
@@ -270,7 +307,7 @@ public class CustodianDashboard {
 		inventoryTable.add(searchBar);
 		
 		JButton btnRefresh = new JButton("⟳");
-		btnRefresh.addActionListener(e -> {workUpdateBorrowMenu();});
+		btnRefresh.addActionListener(e -> { displayInventoryValues();});
 		btnRefresh.setBounds(1014, 0, 62, 23);
 		inventoryTable.add(btnRefresh);
 		
@@ -294,7 +331,7 @@ public class CustodianDashboard {
 		inventoryTable.add(scrollPane);
 		
 		searchResult = new JTable();
-		searchResult.getTableHeader().setReorderingAllowed(false);
+		
 		scrollPane.setViewportView(searchResult);
 		
 		formCreator = new JPanel();
@@ -369,15 +406,15 @@ public class CustodianDashboard {
 		
 		cmbBorrowerName = new JComboBox<String>();
 		cmbBorrowerName.setModel(cmbBorrowerModel);
-		cmbBorrowerName.setBounds(10, 232, 274, 20);
+		cmbBorrowerName.setBounds(10, 233, 274, 20);
 		createBorrow.add(cmbBorrowerName);
 		
 		JLabel lblBorrowerName = new JLabel("Borrower");
-		lblBorrowerName.setBounds(10, 221, 82, 12);
+		lblBorrowerName.setBounds(10, 222, 82, 12);
 		createBorrow.add(lblBorrowerName);
 		
 		txtBrwReturnByDate = new JTextField();
-		txtBrwReturnByDate.setBounds(10, 313, 113, 20);
+		txtBrwReturnByDate.setBounds(154, 276, 113, 20);
 		createBorrow.add(txtBrwReturnByDate);
 		txtBrwReturnByDate.setColumns(10);
 		
@@ -385,15 +422,15 @@ public class CustodianDashboard {
 		txtDateBorrowed.setText("2000-12-19");
 		txtDateBorrowed.setEditable(false);
 		txtDateBorrowed.setColumns(10);
-		txtDateBorrowed.setBounds(10, 273, 113, 20);
+		txtDateBorrowed.setBounds(10, 278, 113, 20);
 		createBorrow.add(txtDateBorrowed);
 		
 		JLabel lblDateBorrowed = new JLabel("Date Borrowed:");
-		lblDateBorrowed.setBounds(10, 259, 96, 14);
+		lblDateBorrowed.setBounds(10, 264, 96, 14);
 		createBorrow.add(lblDateBorrowed);
 		
 		JLabel lblRetunByDate = new JLabel("Return by Date:*");
-		lblRetunByDate.setBounds(10, 301, 96, 14);
+		lblRetunByDate.setBounds(154, 264, 96, 14);
 		createBorrow.add(lblRetunByDate);
 		
 		txtBrwEquipCondition = new JTextField();
@@ -419,7 +456,7 @@ public class CustodianDashboard {
 		JLabel lblyyyymmdd = new JLabel("(YYYY-MM-DD)");
 		lblyyyymmdd.setHorizontalAlignment(SwingConstants.CENTER);
 		lblyyyymmdd.setForeground(new Color(192, 192, 192));
-		lblyyyymmdd.setBounds(10, 332, 113, 14);
+		lblyyyymmdd.setBounds(154, 295, 113, 14);
 		createBorrow.add(lblyyyymmdd);
 		
 		JPanel createMaintenance = new JPanel();
@@ -496,22 +533,18 @@ public class CustodianDashboard {
 		createMaintenance.add(lblMaintenanceDetails);
 		
 		JLabel lblDateReported = new JLabel("Date Reported:");
-		lblDateReported.setBounds(171, 185, 113, 14);
+		lblDateReported.setBounds(171, 135, 113, 14);
 		createMaintenance.add(lblDateReported);
 		
 		txtMntDateReported = new JTextField();
 		txtMntDateReported.setEditable(false);
 		txtMntDateReported.setColumns(10);
-		txtMntDateReported.setBounds(171, 199, 113, 20);
+		txtMntDateReported.setBounds(171, 149, 113, 20);
 		createMaintenance.add(txtMntDateReported);
 		
 		JLabel lblMntIssue = new JLabel("Reported Issue:");
 		lblMntIssue.setBounds(10, 205, 113, 14);
 		createMaintenance.add(lblMntIssue);
-		
-		JLabel lblMntAction = new JLabel("Actions Taken:");
-		lblMntAction.setBounds(10, 326, 89, 14);
-		createMaintenance.add(lblMntAction);
 		
 		JScrollPane txtMntIssueViewport = new JScrollPane();
 		txtMntIssueViewport.setBounds(10, 224, 274, 95);
@@ -520,24 +553,6 @@ public class CustodianDashboard {
 		txtAMntIssue = new JTextArea();
 		txtMntIssueViewport.setViewportView(txtAMntIssue);
 		
-		JScrollPane txtMntIssueViewport_1 = new JScrollPane();
-		txtMntIssueViewport_1.setBounds(10, 343, 274, 95);
-		createMaintenance.add(txtMntIssueViewport_1);
-		
-		txtAMntActionTaken = new JTextArea();
-		txtMntIssueViewport_1.setViewportView(txtAMntActionTaken);
-		
-		JLabel lblRepairCost = new JLabel("Maintenance Cost          ₱");
-		lblRepairCost.setBounds(10, 446, 141, 14);
-		createMaintenance.add(lblRepairCost);
-		
-		txtMntCost = new JTextField();
-		//txtMntCost.addKeyListener(numericsAndDecimal);
-		AbstractDocument mntCostdoc = (AbstractDocument) txtMntCost.getDocument();
-		mntCostdoc.setDocumentFilter(moneyInput);
-		txtMntCost.setBounds(151, 443, 133, 20);
-		createMaintenance.add(txtMntCost);
-		txtMntCost.setColumns(10);
 		
 		JButton btnMntSubmit = new JButton("Create Report");
 		btnMntSubmit.addActionListener(e -> { createMaintenanceReport(); });
@@ -555,23 +570,24 @@ public class CustodianDashboard {
 		main.setLayout(null);
 		
 		JPanel borrowTablePreview = new JPanel();
-		borrowTablePreview.setBounds(436, 11, 471, 544);
+		borrowTablePreview.setBounds(381, 11, 344, 544);
 		main.add(borrowTablePreview);
 		borrowTablePreview.setLayout(null);
 		
 		JScrollPane brwPreviewViewport = new JScrollPane();
-		brwPreviewViewport.setBounds(10, 93, 451, 440);
+		brwPreviewViewport.setBounds(10, 143, 324, 390);
 		borrowTablePreview.add(brwPreviewViewport);
 		
 		tblBorrowPreview = new JTable();
+		tblBorrowPreview.setFillsViewportHeight(true);
 		brwPreviewViewport.setViewportView(tblBorrowPreview);
 		
-		JPanel panel = new JPanel();
-		panel.setBackground(new Color(0, 0, 255));
-		panel.setForeground(new Color(0, 0, 255));
-		panel.setBounds(0, 0, 371, 566);
-		main.add(panel);
-		panel.setLayout(null);
+		JPanel sideBar = new JPanel();
+		sideBar.setBackground(new Color(0, 0, 255));
+		sideBar.setForeground(new Color(0, 0, 255));
+		sideBar.setBounds(0, 0, 371, 566);
+		main.add(sideBar);
+		sideBar.setLayout(null);
 		
 		JButton btnCreateBorrow = new JButton("New Borrow Record");
 		btnCreateBorrow.addActionListener(e -> { displayNewBorrow(); });
@@ -581,7 +597,7 @@ public class CustodianDashboard {
 		btnCreateBorrow.setBackground(new Color(0, 0, 255));
 		btnCreateBorrow.setForeground(new Color(255, 255, 255));
 		btnCreateBorrow.setBounds(10, 69, 351, 21);
-		panel.add(btnCreateBorrow);
+		sideBar.add(btnCreateBorrow);
 		
 		JButton btnUpdateBorrow = new JButton("Update Borrow Record");
 		btnUpdateBorrow.addActionListener(e -> { displayUpdateBorrow(); });
@@ -591,16 +607,17 @@ public class CustodianDashboard {
 		btnUpdateBorrow.setBorderPainted(false);
 		btnUpdateBorrow.setBackground(Color.BLUE);
 		btnUpdateBorrow.setBounds(10, 101, 351, 21);
-		panel.add(btnUpdateBorrow);
+		sideBar.add(btnUpdateBorrow);
 		
 		JButton btnUpdateMaintenanceReport = new JButton("Update Maintenance Report");
+		btnUpdateMaintenanceReport.addActionListener(e -> { displayUpdateMaintenance(); });
 		btnUpdateMaintenanceReport.setForeground(Color.WHITE);
 		btnUpdateMaintenanceReport.setFont(new Font("Tahoma", Font.BOLD, 11));
 		btnUpdateMaintenanceReport.setFocusable(false);
 		btnUpdateMaintenanceReport.setBorderPainted(false);
 		btnUpdateMaintenanceReport.setBackground(Color.BLUE);
 		btnUpdateMaintenanceReport.setBounds(10, 165, 351, 21);
-		panel.add(btnUpdateMaintenanceReport);
+		sideBar.add(btnUpdateMaintenanceReport);
 		
 		JButton btnCreateMaintenance = new JButton("New Maintenance Report");
 		btnCreateMaintenance.addActionListener(e -> { displayNewMaintenance(); });
@@ -610,64 +627,45 @@ public class CustodianDashboard {
 		btnCreateMaintenance.setBorderPainted(false);
 		btnCreateMaintenance.setBackground(Color.BLUE);
 		btnCreateMaintenance.setBounds(10, 133, 351, 21);
-		panel.add(btnCreateMaintenance);
+		sideBar.add(btnCreateMaintenance);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 41, 1380, 2);
 		custodianDashboard.add(separator);
 		
 		cardContainer.add(main, "dashboard");
+		
+		JPanel borrowTablePreview_1 = new JPanel();
+		borrowTablePreview_1.setLayout(null);
+		borrowTablePreview_1.setBounds(735, 11, 344, 544);
+		main.add(borrowTablePreview_1);
+		
+		JScrollPane brwPreviewViewport_1 = new JScrollPane();
+		brwPreviewViewport_1.setBounds(10, 143, 324, 390);
+		borrowTablePreview_1.add(brwPreviewViewport_1);
+		
+		tblMaintenancePreview = new JTable();
+		brwPreviewViewport_1.setViewportView(tblMaintenancePreview);
+		tblMaintenancePreview.setFillsViewportHeight(true);
 		cardContainer.add(borrowFormCreation, "creation");
 		
 		formCreator.add(createBorrow, "borrowForm");
-		
-		JLabel lblyyyymmdd_1 = new JLabel("(YYYY-MM-DD)");
-		lblyyyymmdd_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblyyyymmdd_1.setForeground(Color.LIGHT_GRAY);
-		lblyyyymmdd_1.setBounds(154, 332, 113, 14);
-		createBorrow.add(lblyyyymmdd_1);
-		
-		txtBrwDateReturned = new JTextField();
-		txtBrwDateReturned.setColumns(10);
-		txtBrwDateReturned.setBounds(154, 313, 113, 20);
-		createBorrow.add(txtBrwDateReturned);
-		
-		JLabel lblDateReturned = new JLabel("Date Returned:*");
-		lblDateReturned.setBounds(154, 301, 96, 14);
-		createBorrow.add(lblDateReturned);
 		
 		JLabel lblNote = new JLabel("* : If applicable");
 		lblNote.setForeground(new Color(128, 128, 128));
 		lblNote.setBounds(10, 485, 257, 14);
 		createBorrow.add(lblNote);
 		
-		cmbBorrowStatus = new JComboBox<String>();
-		cmbBorrowStatus.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
-		cmbBorrowStatus.setBounds(151, 272, 116, 22);
-		createBorrow.add(cmbBorrowStatus);
-		
-		JLabel lblBorrowStatus = new JLabel("Borrow Status:");
-		lblBorrowStatus.setBounds(154, 259, 96, 14);
+		JLabel lblBorrowStatus = new JLabel("Availability");
+		lblBorrowStatus.setBounds(171, 139, 96, 14);
 		createBorrow.add(lblBorrowStatus);
 		
-		JLabel lblBrwEquipCondOnReturn = new JLabel("Condition");
-		lblBrwEquipCondOnReturn.setBounds(154, 139, 82, 12);
-		createBorrow.add(lblBrwEquipCondOnReturn);
-		
-		cmbConditionOnReturn = new JComboBox<String>();
-		cmbConditionOnReturn.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
-		cmbConditionOnReturn.setBounds(151, 155, 133, 22);
-		createBorrow.add(cmbConditionOnReturn);
+		txtBrwEquipAvail = new JTextField();
+		txtBrwEquipAvail.setEditable(false);
+		txtBrwEquipAvail.setColumns(10);
+		txtBrwEquipAvail.setBounds(171, 157, 101, 18);
+		createBorrow.add(txtBrwEquipAvail);
 		formCreator.add(createMaintenance, "maintenanceForm");
-		
-		JLabel lblMaintenanceStatus = new JLabel("Maintenance Status:");
-		lblMaintenanceStatus.setBounds(10, 471, 113, 14);
-		createMaintenance.add(lblMaintenanceStatus);
-		
-		cmbMaintenanceStatus = new JComboBox<>();
-		cmbMaintenanceStatus.setModel(new DefaultComboBoxModel<>(new String[] {"In Progress", "Resolved"}));
-		cmbMaintenanceStatus.setBounds(151, 467, 133, 22);
-		createMaintenance.add(cmbMaintenanceStatus);
 		
 		card.show(cardContainer, "dashboard");
 		
@@ -691,10 +689,18 @@ public class CustodianDashboard {
 		updateBorrow.add(btnRefresh_1);
 		
 		JButton btnClearFilter_1 = new JButton("Clear");
+		btnClearFilter_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnClearFilter_1.setBounds(921, 11, 75, 23);
 		updateBorrow.add(btnClearFilter_1);
 		
 		JButton btnFilter_1 = new JButton("⌕");
+		btnFilter_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			}
+		});
 		btnFilter_1.setBounds(849, 11, 62, 23);
 		updateBorrow.add(btnFilter_1);
 		
@@ -790,6 +796,7 @@ public class CustodianDashboard {
 		updateBorrow.add(btnUpdSelect);
 		
 		txtExpectedReturnDate = new JTextField();
+		txtExpectedReturnDate.setEditable(false);
 		txtExpectedReturnDate.setBounds(20, 262, 274, 20);
 		updateBorrow.add(txtExpectedReturnDate);
 		txtExpectedReturnDate.setColumns(10);
@@ -801,17 +808,12 @@ public class CustodianDashboard {
 		txtDateReturned = new JTextField();
 		txtDateReturned.setEditable(false);
 		txtDateReturned.setColumns(10);
-		txtDateReturned.setBounds(20, 308, 138, 20);
+		txtDateReturned.setBounds(20, 308, 274, 20);
 		updateBorrow.add(txtDateReturned);
 		
 		JLabel lblUpdDateReturned = new JLabel("Date Returned");
 		lblUpdDateReturned.setBounds(20, 293, 130, 14);
 		updateBorrow.add(lblUpdDateReturned);
-		
-		toggleUpdMarkAsReturned = new JToggleButton("Returned");
-		toggleUpdMarkAsReturned.addChangeListener(e -> { enableUPDButtons(); });
-		toggleUpdMarkAsReturned.setBounds(173, 307, 121, 23);
-		updateBorrow.add(toggleUpdMarkAsReturned);
 		
 		JLabel lblUpdConditionOnReturn = new JLabel("Condition On Return");
 		lblUpdConditionOnReturn.setBounds(20, 339, 130, 14);
@@ -835,22 +837,169 @@ public class CustodianDashboard {
 		lbldateformat_1.setBounds(20, 328, 138, 14);
 		updateBorrow.add(lbldateformat_1);
 		
-		JButton btnMntCancel_1 = new JButton("Cancel");
-		btnMntCancel_1.setBounds(160, 503, 134, 23);
-		updateBorrow.add(btnMntCancel_1);
+		JButton btnBrwUpdCancel = new JButton("Cancel");
+		btnBrwUpdCancel.addActionListener(e -> {displayDashboard();});
+		btnBrwUpdCancel.setBounds(20, 503, 274, 23);
+		updateBorrow.add(btnBrwUpdCancel);
+		
+		JButton btnBrwUpdate = new JButton("Update Record");
+		btnBrwUpdate.addActionListener(e -> { updateBorrowRecord(); });
+		btnBrwUpdate.setBounds(20, 478, 274, 23);
+		updateBorrow.add(btnBrwUpdate);
+		
+		JPanel updateMaintenance = new JPanel();
+		cardContainer.add(updateMaintenance, "updateMaintenance");
+		updateMaintenance.setLayout(null);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(324, 12, 115, 20);
+		updateMaintenance.add(textField);
+		
+		JComboBox<String> cmbReceivedBy_1 = new JComboBox<String>();
+		cmbReceivedBy_1.setBounds(635, 11, 97, 22);
+		updateMaintenance.add(cmbReceivedBy_1);
+		
+		JComboBox<String> cmbStatus_1 = new JComboBox<String>();
+		cmbStatus_1.setBounds(742, 11, 97, 22);
+		updateMaintenance.add(cmbStatus_1);
+		
+		JButton btnFilter_1_1 = new JButton("⌕");
+		btnFilter_1_1.setBounds(849, 11, 62, 23);
+		updateMaintenance.add(btnFilter_1_1);
+		
+		JButton btnClearFilter_1_1 = new JButton("Clear");
+		btnClearFilter_1_1.setBounds(921, 11, 75, 23);
+		updateMaintenance.add(btnClearFilter_1_1);
+		
+		JButton btnUpdMntRefresh = new JButton("⟳");
+		btnUpdMntRefresh.addActionListener(e -> { displayMaintenanceReports(); });
+		btnUpdMntRefresh.setBounds(1328, 11, 62, 23);
+		updateMaintenance.add(btnUpdMntRefresh);
+		
+		JLabel lblMntAction = new JLabel("Actions Taken:");
+		lblMntAction.setBounds(10, 319, 89, 14);
+		updateMaintenance.add(lblMntAction);
+		
+		JLabel lblRepairCost = new JLabel("Maintenance Cost          ₱");
+		lblRepairCost.setBounds(10, 439, 141, 14);
+		updateMaintenance.add(lblRepairCost);
+		
+		txtMntCost = new JTextField();
+		txtMntCost.setColumns(10);
+		txtMntCost.setBounds(151, 436, 133, 20);
+		AbstractDocument mntCostdoc = (AbstractDocument) txtMntCost.getDocument();
+		mntCostdoc.setDocumentFilter(moneyInput);
+		updateMaintenance.add(txtMntCost);
+		
+		JLabel lblMaintenanceForm_1 = new JLabel("Update Maintenance Report");
+		lblMaintenanceForm_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMaintenanceForm_1.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblMaintenanceForm_1.setBounds(10, 11, 274, 30);
+		updateMaintenance.add(lblMaintenanceForm_1);
+		
+		JSeparator sprtrBrwTop_2_1 = new JSeparator();
+		sprtrBrwTop_2_1.setBounds(10, 38, 274, 6);
+		updateMaintenance.add(sprtrBrwTop_2_1);
+		
+		JLabel lblEquipDetails_1_1 = new JLabel("Equipment Details");
+		lblEquipDetails_1_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblEquipDetails_1_1.setBounds(10, 39, 113, 18);
+		updateMaintenance.add(lblEquipDetails_1_1);
+		
+		JLabel lblMntTransaction = new JLabel("Transaction ID");
+		lblMntTransaction.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMntTransaction.setBounds(10, 63, 96, 12);
+		updateMaintenance.add(lblMntTransaction);
+		
+		txtMntUpdTransactionID = new JTextField();
+		txtMntUpdTransactionID.setColumns(10);
+		txtMntUpdTransactionID.setBounds(132, 60, 60, 18);
+		updateMaintenance.add(txtMntUpdTransactionID);
+		
+		JLabel lblMntUpdReportedBy = new JLabel("Reported By");
+		lblMntUpdReportedBy.setBounds(36, 132, 82, 12);
+		updateMaintenance.add(lblMntUpdReportedBy);
+		
+		txtMntUpdReport = new JTextField();
+		txtMntUpdReport.setEditable(false);
+		txtMntUpdReport.setColumns(10);
+		txtMntUpdReport.setBounds(36, 150, 97, 18);
+		updateMaintenance.add(txtMntUpdReport);
+		
+		JButton btnMntUpdSelect = new JButton("Select");
+		btnMntUpdSelect.addActionListener(e -> { LoadReport(); });
+		btnMntUpdSelect.setBounds(200, 59, 84, 20);
+		updateMaintenance.add(btnMntUpdSelect);
+		
+		JLabel lblDateReported_1 = new JLabel("Date Reported:");
+		lblDateReported_1.setBounds(142, 89, 113, 14);
+		updateMaintenance.add(lblDateReported_1);
+		
+		txtMntUpdDate = new JTextField();
+		txtMntUpdDate.setEditable(false);
+		txtMntUpdDate.setColumns(10);
+		txtMntUpdDate.setBounds(142, 103, 113, 20);
+		updateMaintenance.add(txtMntUpdDate);
+		
+		JLabel lblBorrowedEquipID_1 = new JLabel("Equipment ID");
+		lblBorrowedEquipID_1.setBounds(36, 89, 97, 14);
+		updateMaintenance.add(lblBorrowedEquipID_1);
+		
+		txtMntUpdEquipID = new JTextField();
+		txtMntUpdEquipID.setEditable(false);
+		txtMntUpdEquipID.setColumns(10);
+		txtMntUpdEquipID.setBounds(36, 101, 97, 20);
+		updateMaintenance.add(txtMntUpdEquipID);
+		
+		JSeparator sprtrBrwTop_1_1_1 = new JSeparator();
+		sprtrBrwTop_1_1_1.setBounds(10, 177, 274, 6);
+		updateMaintenance.add(sprtrBrwTop_1_1_1);
+		
+		JLabel lblMaintenanceDetails_1 = new JLabel("Maintenance Details");
+		lblMaintenanceDetails_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblMaintenanceDetails_1.setBounds(10, 177, 113, 18);
+		updateMaintenance.add(lblMaintenanceDetails_1);
+		
+		JScrollPane srllPaneATViewport = new JScrollPane();
+		srllPaneATViewport.setBounds(10, 335, 272, 93);
+		updateMaintenance.add(srllPaneATViewport);
+		
+		
+		JScrollPane srllPaneIssueViewport = new JScrollPane();
+		srllPaneIssueViewport.setBounds(10, 215, 272, 93);
+		updateMaintenance.add(srllPaneIssueViewport);
+
+		txtAMntUpdIssueReported = new JTextArea();
+		txtAMntUpdIssueReported.setEditable(false);
+		srllPaneIssueViewport.setViewportView(txtAMntUpdIssueReported);
+		
+		txtAMntUpdActionTaken = new JTextArea();
+		srllPaneATViewport.setViewportView(txtAMntUpdActionTaken);
+	
+		
+		
+		JLabel lblMntUpdIssue = new JLabel("Reported Issue");
+		lblMntUpdIssue.setBounds(10, 199, 89, 14);
+		updateMaintenance.add(lblMntUpdIssue);
 		
 		JButton btnMntUpdate = new JButton("Update Record");
-		btnMntUpdate.addActionListener(e -> { updateBorrowRecord(); });
-		btnMntUpdate.setBounds(20, 478, 274, 23);
-		updateBorrow.add(btnMntUpdate);
+		btnMntUpdate.addActionListener(e -> { updateMaintenanceReport(); });
+		btnMntUpdate.setBounds(10, 506, 274, 23);
+		updateMaintenance.add(btnMntUpdate);
 		
-		JButton btnDeleteRecord = new JButton("Delete");
-		btnDeleteRecord.setBounds(20, 503, 130, 23);
-		updateBorrow.add(btnDeleteRecord);
+		JButton btnMntUpdateCancel = new JButton("Cancel");
+		btnMntUpdateCancel.addActionListener(e -> { displayDashboard(); });
+		btnMntUpdateCancel.setBounds(10, 531, 274, 23);
+		updateMaintenance.add(btnMntUpdateCancel);
 		
-		checkUpdateItems = new JCheckBox("Update Equipment Condition");
-		checkUpdateItems.setBounds(20, 382, 274, 23);
-		updateBorrow.add(checkUpdateItems);
+		JScrollPane updtMaintenanceViewport = new JScrollPane();
+		updtMaintenanceViewport.setBounds(314, 44, 1076, 511);
+		updateMaintenance.add(updtMaintenanceViewport);
+		
+		tblUpdReport = new JTable();
+		updtMaintenanceViewport.setViewportView(tblUpdReport);
+		tblUpdReport.setFillsViewportHeight(true);
 		
 		//frame.setVisible(true);
 		
@@ -872,22 +1021,17 @@ public class CustodianDashboard {
 		
 	}
 
-	private void workUpdateBorrowMenu() {
-		SwingWorker<?, ?> e = new SwingWorker<>() {
-
-			@Override
-			protected Object doInBackground() throws Exception {
-				refreshBorrowCreator();
-				return null;
-			}
-		};
+	public void initialiseDisplays() {
 		
-		e.execute();
+		loadPreviews();
+		displayInventoryValues();
+		displayBorrowRecords();
+		displayMaintenanceReports();
 	}
 	
 	void displayDashboard() {
 		card.show(cardContainer, "dashboard");
-		
+		clearAllFields();
 	}
 	
 	void displayNewBorrow() {
@@ -907,9 +1051,129 @@ public class CustodianDashboard {
 		refreshMaintenanceCreator();
 	}
 	
+	void displayUpdateMaintenance() {
+		card.show(cardContainer, "updateMaintenance");
+		
+	}
+	
+	void clearAllFields() {
+		/*
+			Clean this up tomorrow, future me - Paz
+		*/
+		txtAMntIssue.setText("");
+		txtAMntUpdIssueReported.setText("");
+		txtAMntUpdActionTaken.setText("");
+		txtBrwEquipID.setText("");
+		txtBrwEquipName.setText("");
+		txtBrwEquipTag.setText("");
+		txtBrwReturnByDate.setText("");
+		txtDateBorrowed.setText("");
+		txtBrwEquipCondition.setText("");
+
+		txtMntEquipID.setText("");
+		txtMntEquipName.setText("");
+		txtMntEquipCondition.setText("");
+		txtMntEquipTag.setText("");
+		txtMntDateReported.setText("");
+		txtbrwSearchBar.setText("");
+		
+		txtTransactionID.setText("");;
+		txtUpdBorrowerID.setText("");
+		txtUpdBorrowedEquip.setText("");
+		txtBorrowDate.setText("");
+		txtUpdCustodian.setText("");
+		txtUpdCondOnBorrow.setText("");
+		txtExpectedReturnDate.setText("");
+		txtDateReturned.setText("");
+		txtBrwEquipAvail.setText("");
+		
+		textField.setText("");
+		txtMntCost.setText("");
+		txtMntUpdTransactionID.setText("");
+		txtMntUpdReport.setText("");
+		txtMntUpdDate.setText("");
+		txtMntUpdEquipID.setText("");
+	}
+	
+	void loadPreviews() {
+		
+		BorrowPreview();
+		MaintenancePreview();
+		
+	}
+	
+	
+	void BorrowPreview() {
+
+		String[][] list;
+		
+		try {
+			list = backend.getBorrowPreview();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		borrowPreview = new DefaultTableModel(list.length, 3) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		borrowPreview.setColumnIdentifiers(new String[] {
+				"ID", "Equipment ID", "Status"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				borrowPreview.setValueAt(list[r][c], r, c);
+		
+		tblBorrowPreview.setModel(borrowPreview);
+		tblBorrowPreview.getTableHeader().setReorderingAllowed(false);
+		
+	}
+	
+	void MaintenancePreview() {
+
+		String[][] list;
+		
+		try {
+			list = backend.getMaintenancePreview();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		maintenancePreview = new DefaultTableModel(list.length, 3) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		maintenancePreview.setColumnIdentifiers(new String[] {
+				"ID", "Equipment ID", "Status"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				maintenancePreview.setValueAt(list[r][c], r, c);
+		
+		tblMaintenancePreview.setModel(borrowPreview);
+		tblMaintenancePreview.getTableHeader().setReorderingAllowed(false);
+		
+	}
+	
+	
+	// ----------------------------------------------------------------------------------------------------------------------
+	
+	
 	void displayBorrowRecords() {
 		
-parent.log(true, "Fetching Inventory from Database...");
+		parent.log(true, "Fetching Records from Database...");
 		
 		String[][] list;
 			
@@ -927,7 +1191,9 @@ parent.log(true, "Fetching Inventory from Database...");
 			       return false;
 			    }	
 		};
-		
+		borrowList.setColumnIdentifiers(new String[] {
+				"ID", "Borrower", "Equipment", "Borrow Date", "Return By", "Date Returned", "Processed By", "Cond. On Borrow", "Cond. On Return", "Status", "Remarks"
+			});
 		for(int r = 0; r < list.length; r++)
 			for (int c = 0; c < list[r].length; c++)
 				borrowList.setValueAt(list[r][c], r, c);
@@ -935,6 +1201,8 @@ parent.log(true, "Fetching Inventory from Database...");
 		tblborrowRecord.setModel(borrowList);
 		borrowRecordSorter.setModel(borrowList);
 		tblborrowRecord.setRowSorter(borrowRecordSorter);
+		tblborrowRecord.getTableHeader().setReorderingAllowed(false);
+		tblborrowRecord.getTableHeader().setResizingAllowed(false);
 		
 		parent.log(true, "Record fetch successful. Now Displaying Inventory.");
 		parent.log(true, "Borrow Record View Update completed successfully.");
@@ -963,6 +1231,9 @@ parent.log(true, "Fetching Inventory from Database...");
 			       return false;
 			    }	
 		};
+		query.setColumnIdentifiers(new String[] {
+				"ID", "Property Tag", "Name", "Category", "Brand Model", "Serial Number", "Description", "RoomID", "Purchase Date", "Purchase Cost", "Condition", "Availability", "Date Added"
+			});
 		
 		for(int r = 0; r < list.length; r++)
 			for (int c = 0; c < list[r].length; c++)
@@ -971,7 +1242,48 @@ parent.log(true, "Fetching Inventory from Database...");
 		searchResult.setModel(query);
 		inventorySorter.setModel(query);
 		searchResult.setRowSorter(inventorySorter);
+		searchResult.getTableHeader().setReorderingAllowed(false);
+		searchResult.getTableHeader().setResizingAllowed(false);
 		
+		parent.log(true, "Inventory fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Inventory View Update completed successfully.");
+		
+	}
+	
+	void displayMaintenanceReports() {
+		
+		parent.log(true, "Fetching Reports from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getMaintenanceReportsList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		reportList = new DefaultTableModel(list.length, 8) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		reportList.setColumnIdentifiers(new String[] {
+				"ID", "Equipment ID", "Reported Date", "Custodian ID", "Issue Description", "Action Taken", "Cost", "Status"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				reportList.setValueAt(list[r][c], r, c);
+		
+		tblUpdReport.setModel(reportList);
+		maintenanceSorter.setModel(reportList);
+		tblUpdReport.setRowSorter(maintenanceSorter);
+		tblUpdReport.getTableHeader().setReorderingAllowed(false);
+		tblUpdReport.getTableHeader().setResizingAllowed(false);
 		parent.log(true, "Inventory fetch successful. Now Displaying Inventory.");
 		parent.log(true, "Inventory View Update completed successfully.");
 		
@@ -1016,7 +1328,7 @@ parent.log(true, "Fetching Inventory from Database...");
 		
 	}
 	
-	void LoadRecord() {
+	boolean LoadRecord() {
 		int id;
 		
 		try {
@@ -1024,21 +1336,21 @@ parent.log(true, "Fetching Inventory from Database...");
 		} catch (NumberFormatException e) {
 			
 			parent.log(false, "ID field is empty.");
-			return;
+			return false;
 		}
-		
-		BorrowRecord values;
-		
 		try {
-			values = backend.fetchBorrowRecord(id);
+			loadedRecord = backend.fetchBorrowRecord(id);
 		} catch (SPEARException e) {
 			parent.log(false, e.getMessage());
-			return;
+			return false;
 		}
 		
-		borrowUpdateLoadValues(String.valueOf(values.custodian()), String.valueOf(values.ID()),
-				String.valueOf(values.equipmentID()), String.valueOf(values.dateBorrowed()), String.valueOf(values.returbByDate()), String.valueOf(values.dateReturned()), 
-				String.valueOf(values.conditionOnBorrow()), String.valueOf(values.conditionOnReturn()), String.valueOf(values.status()));
+		
+		
+		borrowUpdateLoadValues(String.valueOf(loadedRecord.custodian()), String.valueOf(loadedRecord.borrowerID()),
+				String.valueOf(loadedRecord.equipmentID()), String.valueOf(loadedRecord.dateBorrowed()), String.valueOf(loadedRecord.returbByDate()), String.valueOf(loadedRecord.dateReturned()), 
+				String.valueOf(loadedRecord.conditionOnBorrow()), String.valueOf(loadedRecord.conditionOnReturn()), String.valueOf(loadedRecord.status()));
+		return true;
 	}
 	
 	void borrowUpdateLoadValues(String custodianID, String borrowerID, String equipmentID, String dateBorrowed, String returnByDate, String dateReturned, String conditionOnBorrow, String conditonOnReturn, String status) {
@@ -1051,26 +1363,21 @@ parent.log(true, "Fetching Inventory from Database...");
 		if(dateReturned != null && !dateReturned.equals("null")) txtDateReturned.setText(dateReturned);
 		cmbCondOnReturn.setSelectedItem(conditonOnReturn);
 		
-		if(status.equals("Returned")) toggleUpdMarkAsReturned.setSelected(true);
-		
-	}
-	
-	void enableUPDButtons() {
-		if(toggleUpdMarkAsReturned.isSelected())
-		{
-			txtDateReturned.setEditable(true);
-			cmbCondOnReturn.setEditable(true);
-		} else {
-			
+		if(status.equals("Returned")) {
 			txtDateReturned.setEditable(false);
-			cmbCondOnReturn.setEditable(false);
+			cmbCondOnReturn.setEnabled(false);
+		} else {
+			txtDateReturned.setEditable(true);
+			cmbCondOnReturn.setEnabled(true);
 			
 		}
 		
 		
 	}
 	
-	void loadItem(int target) {
+
+	
+	boolean loadItem(int target) {
 		int id;
 		JTextField targetField;
 		if(target == 0) targetField = txtBrwEquipID;
@@ -1081,43 +1388,54 @@ parent.log(true, "Fetching Inventory from Database...");
 		} catch(NumberFormatException e) {
 			
 			parent.log(false, "Equipment field is empty.");
-			return;
+			return false;
 		}
-		EquipmentDetails values;
 		
 		try {
-			values = backend.fetchEquipmentDetails(id);
+			loadedEquip = backend.fetchEquipmentDetails(id);
 		} catch (SPEARException e) {
 			parent.log(false, e.getMessage());
-			return;
+			return false;
 		}
 		
-		boolean isAvailable = backend.isItemAvailable(id);
+		boolean isAvailable;
+		
+		switch(target) {
+		default:
+		case 0: isAvailable = backend.isItemAvailable(id);  break;
+		case 1: isAvailable = backend.isItemAvailable(id);  break;
+		
+		}
 		if(!isAvailable) {
-			parent.log(false, "Equipment is In Use/Under Maintenance and thus cannot accessed at the moment.");
-			return;
+			parent.log(false, "Equipment is Under Maintenance and thus cannot accessed at the moment.");
+			return false;
 		}
 		
 		switch(target) {
-		case 0: borrowLoadValues(values.equipmentName(), values.propertyTag(), values.condition()); break;
-		case 1: maintenanceLoadValues(values.equipmentName(), values.propertyTag(), values.condition()); break;
+		case 0: borrowLoadValues(loadedEquip.equipmentName(), loadedEquip.propertyTag(), loadedEquip.condition(), loadedEquip.availability()); break;
+		case 1: maintenanceLoadValues(loadedEquip.equipmentName(), loadedEquip.propertyTag(), loadedEquip.condition(), loadedEquip.availability()); break;
 		}
 		parent.log(true, "Target Equipment Loaded successfully.");
+		return true;
 	}
 	
-	void maintenanceLoadValues(String name, String tag, String condition) {
+	void maintenanceLoadValues(String name, String tag, String condition, String availability) {
 		txtMntEquipName.setText(name);
 		txtMntEquipTag.setText(tag);
 		txtMntEquipCondition.setText(condition);
 		
+		
+		
 	}
 	
-	void borrowLoadValues(String name, String tag, String condition) {
+	void borrowLoadValues(String name, String tag, String condition, String availability) {
 		txtBrwEquipName.setText(name);
 		txtBrwEquipTag.setText(tag);
 		txtBrwEquipCondition.setText(condition);
+		txtBrwEquipAvail.setText(availability);
 		
 	}
+	
 	
 	void loadBorrowers() {
 		parent.log(true, "Updating Borrower List...");
@@ -1144,28 +1462,97 @@ parent.log(true, "Fetching Inventory from Database...");
 		parent.log(true, "Borrower List Updated successfully.");
 	}
 	
+	
+	boolean LoadReport() {
+	int id;
+		
+		try {
+			id = Integer.parseInt(txtMntUpdTransactionID.getText().trim());
+		} catch (NumberFormatException e) {
+			
+			parent.log(false, "ID field is empty.");
+			return false;
+		}
+		try {
+			loadedReport = backend.fetchMaintenanceReport(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return false;
+		}
+		
+		
+		
+		maintenanceUpdateLoadValues(String.valueOf(loadedReport.equipmentID()), String.valueOf(loadedReport.reportedDate()), String.valueOf(loadedReport.custodian()), loadedReport.issueReport(), loadedReport.status());
+		return true;
+		
+		
+	}
+	
+	void maintenanceUpdateLoadValues(String equipID, String reportDay, String custodian, String issue, String status) {
+		
+		txtMntUpdEquipID.setText(equipID);
+		txtMntUpdDate.setText(reportDay);
+		txtMntUpdReport.setText(custodian);
+		txtAMntUpdIssueReported.setText(issue);
+	}
+	
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// CREATE, UPDATE AND DELETE
 	//---------------------------------------------------------------------------------------------------------------------------------
 	
 	void updateBorrowRecord() {
+		boolean loadRecord = LoadRecord();
+		
+		if(!loadRecord) {
+			parent.log(false, "No Equipment selected.");
+			return;
+		}
+		
+		boolean verify;
+		try { verify = verifyRecordIntegrity(loadedRecord.equipmentID()); } catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(!verify) {
+			parent.log(false, "The equipment related to this transaction has already been returned.");
+			return;
+		}
+		
+		if(loadedRecord.status().equals("Returned")) {
+			parent.log(false, "Returned Equipment transactions cannot be edited.");
+			return;
+		}
+		
 		String
-		transactionID = txtTransactionID.getText().trim(),
+		custodian = txtUpdCustodian.getText().trim(),
+		borrowerID = txtUpdBorrowerID.getText().trim(),
+		equipID = txtUpdBorrowedEquip.getText().trim(),
+		dateBorrowed = txtBorrowDate.getText().trim(),
+		condOnBorrow = txtUpdCondOnBorrow.getText().trim(),
 		returnByDate = txtExpectedReturnDate.getText().trim(),
 		dateReturned = txtDateReturned.getText().trim(),
-		conditionOnReturn = cmbCondOnReturn.getSelectedItem().toString(),
-		status = toggleUpdMarkAsReturned.isSelected() ? "Returned" : "Borrowed",
-		updateItems = String.valueOf(checkUpdateItems.isSelected());
+		conditionOnReturn = cmbCondOnReturn.getSelectedItem().toString();
+		
+		
 		
 		boolean result;
 		try {
-			result = backend.UpdateRecord(transactionID, returnByDate, dateReturned, conditionOnReturn, status, updateItems);
+			result = backend.UpdateRecord(borrowerID, equipID, dateBorrowed, returnByDate, dateReturned, custodian, condOnBorrow, conditionOnReturn, "Returned", loadedRecord.transactionID());
 		} catch (SPEARException e) {
 			parent.log(false, e.getMessage());
 			return;
 		}
 		
 		if(result) parent.log(true, "Borrow Record sucessfully updated.");
+	}
+	
+	boolean verifyRecordIntegrity(int ID) throws SPEARException {
+		EquipmentDetails equip = backend.fetchEquipmentDetails(ID);
+		System.out.println(equip.availability());
+		if(equip.availability().equals("Borrowed")) return true;
+		
+		return false;
 	}
 	
 	
@@ -1180,21 +1567,24 @@ parent.log(true, "Fetching Inventory from Database...");
 		String conditionOnReturn
 	 */
 	void createBorrowRecord() {
+		boolean loadItem = loadItem(0);
+		
+		if(!loadItem)
+			return;
+		
+		
 		String
 		borrowerID = String.valueOf(getSelectedBorrower()),
 		equipID = txtBrwEquipID.getText(),
 		dateBorrowed = txtDateBorrowed.getText().trim(),
 		returnByDate = txtBrwReturnByDate.getText().trim(),
-		dateReturned = txtBrwDateReturned.getText().trim(),
 		custodian = String.valueOf(parent.getSessionID()),
-		conditionOnBorrow = txtBrwEquipCondition.getText().trim(),
-		conditionOnReturn = cmbConditionOnReturn.getSelectedItem().toString(),
-		status = cmbBorrowStatus.getSelectedItem().toString();
+		conditionOnBorrow = txtBrwEquipCondition.getText().trim();
 		
 		boolean result;
 		
 		try {
-			result = backend.CreateRecord(borrowerID, equipID, dateBorrowed, returnByDate, dateReturned, custodian, conditionOnBorrow, conditionOnReturn, status);
+			result = backend.CreateRecord(borrowerID, equipID, dateBorrowed, returnByDate, null, custodian, conditionOnBorrow, null, "Borrowed");
 		} catch (SPEARException e) {
 			parent.log(false, e.getMessage());
 			return;
@@ -1214,6 +1604,44 @@ parent.log(true, "Fetching Inventory from Database...");
 	// MAINTENANCE CREATION METHODS
 	//---------------------------------------------------------------------------------------------------------------------------------
 	
+	void updateMaintenanceReport() {
+		boolean loadReport = LoadReport();
+		
+		if(!loadReport)
+			return;
+		
+		
+		boolean verify;
+		try { verify = verifyReportIntegrity(loadedReport.equipmentID()); } catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(verify) {
+			parent.log(false, "The equipment related to this report is no longer under maintenance.");
+			return;
+		}
+		
+		String
+		equipID = txtMntUpdEquipID.getText(),
+		dateReported = txtMntUpdDate.getText().trim(),
+		custodian = String.valueOf(parent.getSessionID()),
+		issue = txtAMntUpdIssueReported.getText(),
+		action = txtAMntUpdActionTaken.getText(),
+		cost = txtMntCost.getText();
+		
+		boolean result;
+		try {
+			result = backend.UpdateReport(equipID, dateReported, custodian, issue, action, cost, "Resolved", loadedReport.maintenanceID());
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
+	}
+	
+	
 	/* Report Constructor Parametres:
 	 		int equipmentID,
 			Date reportedDate,
@@ -1225,23 +1653,36 @@ parent.log(true, "Fetching Inventory from Database...");
 	 * */
 	 
 	void createMaintenanceReport() {
+		boolean loadItem = loadItem(1);
+		
+		if(!loadItem) {
+			parent.log(false, "No Equipment selected.");
+			return;
+		}
 		String
 		equipID = txtMntEquipID.getText(),
 		dateReported = txtMntDateReported.getText().trim(),
 		custodian = String.valueOf(parent.getSessionID()),
-		issue = txtAMntIssue.getText() ,
-		action = txtAMntActionTaken.getText(),
-		cost = txtMntCost.getText(),
-		status = cmbMaintenanceStatus.getSelectedItem().toString();
+		issue = txtAMntIssue.getText() ;
+//		action = txtAMntActionTaken.getText(),
+//		cost = txtMntCost.getText();
 		
 		boolean result;
 		try {
-			result = backend.CreateReport(equipID, dateReported, custodian, issue, action, cost, status);
+			result = backend.CreateReport(equipID, dateReported, custodian, issue, null, null, "In Progress");
 		} catch (SPEARException e) {
 			parent.log(false, e.getMessage());
 			return;
 		}
 		
 		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
+	}
+	
+	boolean verifyReportIntegrity(int ID) throws SPEARException {
+		EquipmentDetails equip = backend.fetchEquipmentDetails(ID);
+		System.out.println(equip.availability());
+		if(!equip.availability().equals("Maintenance")) return true;
+		
+		return false;
 	}
 }

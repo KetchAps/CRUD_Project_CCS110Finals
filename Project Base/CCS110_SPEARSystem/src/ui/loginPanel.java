@@ -3,14 +3,10 @@ package ui;
 import java.awt.EventQueue;
 import java.awt.Image;
 import controller.AppController;
-import kenUI.ButtonOne;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
-
-import org.jdesktop.swingx.JXDatePicker;
-
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.swing.ImageIcon;
@@ -98,17 +94,31 @@ public class loginPanel extends JFrame {
 		loginPane.add(title);
 
 		textField = new JTextField();
-		textField.setFont(new Font("Segoe UI Light", Font.PLAIN, 25));
 		textField.setBounds(99, 356, 352, 57);
 		loginPane.add(textField);
 		textField.setColumns(10);
 
 		textField_1 = new JTextField();
-		textField_1.setFont(new Font("Segoe UI Light", Font.PLAIN, 25));
 		textField_1.setColumns(10);
 		textField_1.setBounds(99, 495, 352, 57);
 		loginPane.add(textField_1);
-		
+
+		JButton btnNewButton = new JButton("Login");
+		btnNewButton.addActionListener(new ActionListener() {
+		    public void actionPerformed(ActionEvent e) {
+
+		        String username = textField.getText();
+		        String password = textField_1.getText();
+
+		        controller.login(username, password);
+		    }
+		});
+		btnNewButton.setForeground(new Color(255, 255, 255));
+		btnNewButton.setFont(new Font("Segoe UI Black", Font.PLAIN, 30));
+		btnNewButton.setBackground(new Color(30, 144, 255));
+		btnNewButton.setBounds(181, 619, 188, 49);
+		loginPane.add(btnNewButton);
+
 		JLabel lbluserName = new JLabel("User Name");
 		lbluserName.setForeground(new Color(30, 144, 255));
 		lbluserName.setFont(new Font("Segoe UI", Font.PLAIN, 25));
@@ -120,27 +130,7 @@ public class loginPanel extends JFrame {
 		lblPassword.setFont(new Font("Segoe UI", Font.PLAIN, 25));
 		lblPassword.setBounds(222, 450, 106, 34);
 		loginPane.add(lblPassword);
-		
-		ButtonOne button = new ButtonOne();
-		button.setBounds(194, 589, 162, 49);
-		loginPane.add(button);
-		button.setFont(new Font("Segoe UI Black", Font.BOLD, 22));
-		button.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				String username = textField.getText();
-				String password = textField_1.getText();
-				
-				controller.login(username, password);
-				System.out.println("Clicked! ButtonOne");
-			}
-		});
-		button.setText("Login");
-		
-		JXDatePicker dpTest = new JXDatePicker();
-		dpTest.setFormats("yyyy-MM-dd");
-		dpTest.setBounds(99, 670, 200, 28);
-		loginPane.add(dpTest);
-		
+
 		// =========================
 		// LAYERED PANE
 		// =========================
