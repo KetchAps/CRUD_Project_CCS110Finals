@@ -566,7 +566,6 @@ public class AdminDashboard {
 
 		JPanel main = new JPanel();
 		main.setBackground(new Color(255, 255, 255));
-
 		main.setLayout(null);
 
 		// ==========================================
@@ -723,7 +722,7 @@ public class AdminDashboard {
 		JLabel lblPendingReturns = new JLabel("Pending Returns");
 		lblPendingReturns.setForeground(new Color(30, 144, 255));
 		lblPendingReturns.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
-		lblPendingReturns.setBounds(59, 11, 121, 27);
+		lblPendingReturns.setBounds(53, 11, 133, 27);
 		pendingReturnsPanel.add(lblPendingReturns);
 		
 		JLabel lblTotalEquipment_1_1_1 = new JLabel("000");
@@ -766,19 +765,7 @@ public class AdminDashboard {
 		String[] columnNames = {"ItemName", "Category", "Status"};
 		reTablePanel.setLayout(null);
 
-		org.jdesktop.swingx.JXTable testTable = new org.jdesktop.swingx.JXTable(testData, columnNames);
-		testTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		testTable.setColumnControlVisible(true); 
-		testTable.setHighlighters(org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping()); 
-		testTable.setRowHeight(30);
-
-		testTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-		testTable.setFillsViewportHeight(true);
-
-		testTable.setIntercellSpacing(new java.awt.Dimension(2, 2));
-		testTable.setGridColor(java.awt.Color.LIGHT_GRAY); 
-
-		JScrollPane scrollPane1 = new JScrollPane(testTable);
+		JScrollPane scrollPane1 = new JScrollPane();
 		scrollPane1.setBounds(0, 5, 481, 279);
 		reTablePanel.add(scrollPane1);
 		
@@ -806,21 +793,7 @@ public class AdminDashboard {
 		};
 		String[] borrowingColumns = {"Item", "Borrower", "Date", "Status"};
 
-		org.jdesktop.swingx.JXTable borrowingTable = new org.jdesktop.swingx.JXTable(borrowingData, borrowingColumns);
-		borrowingTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		borrowingTable.setColumnControlVisible(true); 
-		borrowingTable.setHighlighters(org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping()); 
-		borrowingTable.setRowHeight(30);
-
-		borrowingTable.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-		borrowingTable.setFillsViewportHeight(true);
-
-		borrowingTable.setIntercellSpacing(new java.awt.Dimension(2, 2));
-		borrowingTable.setGridColor(java.awt.Color.LIGHT_GRAY);
-		borrowingTable.setShowHorizontalLines(true);
-		borrowingTable.setShowVerticalLines(true);
-
-		JScrollPane borrowingScrollPane = new JScrollPane(borrowingTable);
+		JScrollPane borrowingScrollPane = new JScrollPane();
 		borrowingScrollPane.setSize(499, 284);
 		ebBorrowingTablePanel.add(borrowingScrollPane, java.awt.BorderLayout.CENTER); 
 		
@@ -1137,6 +1110,47 @@ public class AdminDashboard {
 		JPanel panel = new JPanel();
 		panel.setBounds(275, 0, 1009, 617);
 		custodianManagementPanel.add(panel);
+		panel.setLayout(null);
+		
+		JPanel recentEquipmentPanel_1_1 = new JPanel();
+		recentEquipmentPanel_1_1.setLayout(null);
+		recentEquipmentPanel_1_1.setBounds(508, 0, 491, 628);
+		panel.add(recentEquipmentPanel_1_1);
+		
+		JPanel reTablePanel_1_1 = new JPanel();
+		reTablePanel_1_1.setLayout(null);
+		reTablePanel_1_1.setBounds(0, 49, 491, 579);
+		recentEquipmentPanel_1_1.add(reTablePanel_1_1);
+		
+		JScrollPane scrollPane1_1_1 = new JScrollPane();
+		scrollPane1_1_1.setBounds(0, 5, 491, 567);
+		reTablePanel_1_1.add(scrollPane1_1_1);
+		
+		JLabel lblRecentEquipment_1_1 = new JLabel("User Accounts");
+		lblRecentEquipment_1_1.setForeground(new Color(30, 144, 255));
+		lblRecentEquipment_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentEquipment_1_1.setBounds(147, 11, 197, 27);
+		recentEquipmentPanel_1_1.add(lblRecentEquipment_1_1);
+		
+		JPanel recentBorrowingsPanel_1_1 = new JPanel();
+		recentBorrowingsPanel_1_1.setLayout(null);
+		recentBorrowingsPanel_1_1.setBounds(0, 0, 499, 628);
+		panel.add(recentBorrowingsPanel_1_1);
+		
+		JPanel ebBorrowingTablePanel_1_1 = new JPanel();
+		ebBorrowingTablePanel_1_1.setLayout(null);
+		ebBorrowingTablePanel_1_1.setBounds(0, 53, 499, 575);
+		recentBorrowingsPanel_1_1.add(ebBorrowingTablePanel_1_1);
+		
+		JScrollPane borrowingScrollPane_1_1 = new JScrollPane();
+		borrowingScrollPane_1_1.setBounds(0, 0, 499, 576);
+		ebBorrowingTablePanel_1_1.add(borrowingScrollPane_1_1);
+		
+		JLabel lblRecentBorrowings_1_1 = new JLabel("Registered Custodians");
+		lblRecentBorrowings_1_1.setForeground(new Color(30, 144, 255));
+		lblRecentBorrowings_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentBorrowings_1_1.setBounds(109, 11, 280, 27);
+		recentBorrowingsPanel_1_1.add(lblRecentBorrowings_1_1);
 		
 		JPanel InventoryManagementPanel = new JPanel();
 		cardContainer.add(InventoryManagementPanel, "InventoryManagementPanel");
@@ -1191,6 +1205,47 @@ public class AdminDashboard {
 		JPanel panel_1 = new JPanel();
 		panel_1.setBounds(275, 0, 1009, 628);
 		InventoryManagementPanel.add(panel_1);
+		panel_1.setLayout(null);
+		
+		JPanel recentEquipmentPanel_1 = new JPanel();
+		recentEquipmentPanel_1.setLayout(null);
+		recentEquipmentPanel_1.setBounds(0, 0, 491, 628);
+		panel_1.add(recentEquipmentPanel_1);
+		
+		JPanel reTablePanel_1 = new JPanel();
+		reTablePanel_1.setLayout(null);
+		reTablePanel_1.setBounds(0, 53, 481, 575);
+		recentEquipmentPanel_1.add(reTablePanel_1);
+		
+		JScrollPane scrollPane1_1 = new JScrollPane();
+		scrollPane1_1.setBounds(0, 5, 481, 567);
+		reTablePanel_1.add(scrollPane1_1);
+		
+		JLabel lblRecentEquipment_1 = new JLabel("Recent Equipment");
+		lblRecentEquipment_1.setForeground(new Color(30, 144, 255));
+		lblRecentEquipment_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentEquipment_1.setBounds(133, 11, 224, 27);
+		recentEquipmentPanel_1.add(lblRecentEquipment_1);
+		
+		JPanel recentBorrowingsPanel_1 = new JPanel();
+		recentBorrowingsPanel_1.setLayout(null);
+		recentBorrowingsPanel_1.setBounds(501, 0, 499, 628);
+		panel_1.add(recentBorrowingsPanel_1);
+		
+		JPanel ebBorrowingTablePanel_1 = new JPanel();
+		ebBorrowingTablePanel_1.setLayout(null);
+		ebBorrowingTablePanel_1.setBounds(0, 53, 499, 551);
+		recentBorrowingsPanel_1.add(ebBorrowingTablePanel_1);
+		
+		JScrollPane borrowingScrollPane_1 = new JScrollPane();
+		borrowingScrollPane_1.setBounds(0, 0, 499, 551);
+		ebBorrowingTablePanel_1.add(borrowingScrollPane_1);
+		
+		JLabel lblRecentBorrowings_1 = new JLabel("Recent Borrowings");
+		lblRecentBorrowings_1.setForeground(new Color(30, 144, 255));
+		lblRecentBorrowings_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentBorrowings_1.setBounds(132, 11, 234, 27);
+		recentBorrowingsPanel_1.add(lblRecentBorrowings_1);
 		
 		JLabel lblAdmin = new JLabel("Admin Dashboard");
 		lblAdmin.setIcon(new ImageIcon(resizedImage2));
