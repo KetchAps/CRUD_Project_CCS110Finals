@@ -51,6 +51,17 @@ public class CustodianDatabaseHandler {
 		    String availability,
 		    Date date_added
 		    ) {}
+
+	public record BorrowerProfile(
+			int borrowerID,
+		    String firstName,
+		    String lastName,
+		    String idNumber,
+		    String deptOrGrade,
+		    String contactNo,
+		    String email
+		    ) {}
+	
 	
 	public record BorrowerList(String[] borrower, Integer[] borrowerID) {}
 	
@@ -193,6 +204,29 @@ public class CustodianDatabaseHandler {
 		
 	}
 	
+	public boolean registerNewBorrower(BorrowerProfile dt) throws SPEARException {
+		
+		try(Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("insert into borrowers values (borrowerID, ?, ? ,?, ?, ?, ?)")) {
+			
+			st.setString(1, dt.firstName());
+			st.setString(2, dt.lastName());
+			st.setString(3, dt.idNumber());
+			st.setString(4, dt.deptOrGrade());
+			st.setString(5, dt.contactNo);
+			st.setString(6, dt.email());
+			
+			st.executeUpdate();
+			return true;
+		} catch(SQLException e) {
+			
+			e.printStackTrace();
+			return false;
+		}
+		
+		
+		
+	}
 	
 	public boolean updateEquipmentAvailability(int value, int id) {
 			String status;
@@ -541,7 +575,6 @@ public class CustodianDatabaseHandler {
 				while(rs.next()) {
 					
 						list.add(rs.getString(1));
-						System.out.println(rs.getString(1));
 				}
 				
 				return list.toArray(new String[0]);

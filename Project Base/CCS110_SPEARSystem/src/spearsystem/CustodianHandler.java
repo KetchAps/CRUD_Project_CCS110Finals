@@ -6,6 +6,7 @@ import java.sql.Date;
 
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
+import spearsystem.CustodianDatabaseHandler.BorrowerProfile;
 import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
 import spearsystem.CustodianDatabaseHandler.MaintenanceReport;
 
@@ -120,6 +121,30 @@ public class CustodianHandler {
 		if(!check.equals("Maintenance")) return true;
 		else return false;
 	}
+	
+	// WRITE
+	
+	public boolean RegisterBorrower(String[] details) throws SPEARException {
+		BorrowerProfile prof = ValidateRegistration(details);
+		
+		boolean createProfile = db.registerNewBorrower(prof); if (!createProfile) throw new SPEARException("Something went wrong while trying to create the user Profile. Check your connection.");
+		
+		
+		
+		return true;
+	}
+	
+	public BorrowerProfile ValidateRegistration(String[] details) throws SPEARException {
+		
+		for(int i = 0; i < details.length; i++) {
+			System.out.print(details[i] + " ");
+			if(details == null || details[i].isBlank() || details[i].isEmpty())
+				throw new SPEARException("All fields must be field in.");
+		}
+		
+		BorrowerProfile profile = new BorrowerProfile(-1, details[0], details[1], details[2], details[3], details[4], details[5]);
+		return profile;
+		}
 	
 	// RECORD CREATION
 

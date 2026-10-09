@@ -3,6 +3,7 @@ package spearsystem;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -12,6 +13,7 @@ import java.sql.Date;
 import java.time.LocalDate;
 
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -31,6 +33,7 @@ import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
+import kenUI.ButtonOne;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
 import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
@@ -41,7 +44,7 @@ import java.awt.event.ActionEvent;
 
 public class CustodianDashboard {
 	
-	final String[] RECORDSTATUS = {"Return", "Borrow"};
+	final String[] RECORDSTATUS = {"Returned", "Borrowed"};
 	final String[] REPORTSTATUS = {"In Progress", "Resolved"};
 	
 	final String[] EQUIPCONDITIONS = {"Good", "Worn", "Damaged"};
@@ -65,10 +68,10 @@ public class CustodianDashboard {
 	private JComboBox<String> cmbCondition;
 	private JComboBox<String> cmbCategory;
 	private JComboBox<String> cmbAvailability;
-	private JComboBox<String> cmbReceivedBy;
 	private JComboBox<String> cmbStatus;	
 	private JComboBox<String> cmbBorrowerName;
 	private JComboBox<String> cmbCondOnReturn;
+	private JComboBox<String> cmbStatusMnt;
 	
 	private JPanel cardContainer;
 	private JPanel formCreator; // JPanel of the Forms
@@ -147,20 +150,17 @@ public class CustodianDashboard {
 		public boolean include( Entry entry) {
 			
 			String searchFilter = txtbrwSearchBar.getText();
-			String receiverFilter = cmbReceivedBy.getSelectedItem().toString();
 			String statusFilter = cmbStatus.getSelectedItem().toString();
 			
 			// searchBar
 			String id = entry.getStringValue(0);
-			String tag = entry.getStringValue(1);
-			String name = entry.getStringValue(2);
+//			String tag = entry.getStringValue(1);
+//			String name = entry.getStringValue(2);
 			
 			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
-				!(id.contains(searchFilter) || tag.contains(searchFilter) || name.contains(searchFilter))) return false;
+				!(id.contains(searchFilter))) return false;
 			
-			if(!receiverFilter.equals("[Custodian]") && !entry.getStringValue(11).equals(receiverFilter)) return false;
-			
-			if(!statusFilter.equals("[Status]") && !entry.getStringValue(12).equals(statusFilter)) return false;
+			if(!statusFilter.equals("[Status]") && !entry.getStringValue(9).equals(statusFilter)) return false;
 			return true;
 		}
 		
@@ -173,24 +173,15 @@ public class CustodianDashboard {
 		@SuppressWarnings("rawtypes")
 		public boolean include( Entry entry) {
 			
-			String searchFilter = searchBar.getText();
-			String categoryFilter = cmbCategory.getSelectedItem().toString();
-			String conditionFilter = cmbCondition.getSelectedItem().toString();
-			String availabilityFilter = cmbAvailability.getSelectedItem().toString();
+			String searchFilter = txtUpdMntSearch.getText();
+			String statusFilter = cmbStatusMnt.getSelectedItem().toString();
 			
 			// searchBar
 			String id = entry.getStringValue(0);
-			String tag = entry.getStringValue(1);
-			String name = entry.getStringValue(2);
-			
 			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
-				!(id.contains(searchFilter) || tag.contains(searchFilter) || name.contains(searchFilter))) return false;
+				!(id.contains(searchFilter))) return false;
 			
-			if(!categoryFilter.equals("[Category]") && !entry.getStringValue(3).equals(categoryFilter)) return false;
-			
-			if(!conditionFilter.equals("[Condition]") && !entry.getStringValue(11).equals(conditionFilter)) return false;
-			
-			if(!availabilityFilter.equals("[Availability]") && !entry.getStringValue(12).equals(availabilityFilter)) return false;
+			if(!statusFilter.equals("[Availability]") && !entry.getStringValue(7).equals(statusFilter)) return false;
 			return true;
 		}
 		
@@ -226,6 +217,7 @@ public class CustodianDashboard {
             }
         }
     };
+  
 	private JTextField txtTransactionID;
 	private JTextField txtUpdBorrowerID;
 	private JTextField txtUpdBorrowedEquip;
@@ -236,12 +228,20 @@ public class CustodianDashboard {
 	private JTextField txtDateReturned;
 	private JTextField txtBrwEquipAvail;
 	
-	private JTextField textField;
+	private JTextField txtUpdMntSearch;
 	private JTextField txtMntCost;
 	private JTextField txtMntUpdTransactionID;
 	private JTextField txtMntUpdReport;
 	private JTextField txtMntUpdDate;
 	private JTextField txtMntUpdEquipID;
+	private JTable table;
+	private JTextField textField;
+	private JTextField txtNewBorrowNameF;
+	private JTextField txtNewBorrowNameL;
+	private JTextField txtNewBorrowID;
+	private JTextField txtNewBorrowDept;
+	private JTextField txtNewBorrowContact;
+	private JTextField txtNewBorrowEmail;
 	
 	
 	
@@ -266,7 +266,8 @@ public class CustodianDashboard {
 		
 		
 		JLabel lblCustodian = new JLabel("Custodian");
-		lblCustodian.setFont(new Font("Tahoma", Font.PLAIN, 20));
+		lblCustodian.setForeground(new Color(0, 153, 255));
+		lblCustodian.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblCustodian.setHorizontalAlignment(SwingConstants.LEFT);
 		lblCustodian.setBounds(10, 11, 343, 32);
 		custodianDashboard.add(lblCustodian);
@@ -318,12 +319,12 @@ public class CustodianDashboard {
 		
 		JButton btnFilter = new JButton("⌕");
 		btnFilter.addActionListener(e -> { inventorySorter.setRowFilter(inventoryRF); });
-		btnFilter.setBounds(535, 0, 62, 23);
+		btnFilter.setBounds(129, 0, 62, 22);
 		inventoryTable.add(btnFilter);
 		
 		JButton btnClearFilter = new JButton("Clear");
 		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
-		btnClearFilter.setBounds(607, 0, 75, 23);
+		btnClearFilter.setBounds(929, 0, 75, 23);
 		inventoryTable.add(btnClearFilter);
 		
 		JScrollPane scrollPane = new JScrollPane();
@@ -343,40 +344,46 @@ public class CustodianDashboard {
 		createBorrow.setLayout(null);
 		
 		JLabel lblBorrowForm = new JLabel("New Borrow Form");
-		lblBorrowForm.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblBorrowForm.setFont(new Font("Segoe UI", Font.BOLD, 25));
 		lblBorrowForm.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBorrowForm.setBounds(10, 10, 274, 30);
 		createBorrow.add(lblBorrowForm);
 		
 		txtBrwEquipID = new JTextField();
+		txtBrwEquipID.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		txtBrwEquipID.addKeyListener(numericalOnly);
-		txtBrwEquipID.setBounds(171, 63, 39, 18);
+		txtBrwEquipID.setBounds(171, 99, 39, 28);
 		createBorrow.add(txtBrwEquipID);
 		txtBrwEquipID.setColumns(10);
 		
 		JLabel lblBrowEQuipID = new JLabel("Equipment ID");
+		lblBrowEQuipID.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
 		lblBrowEQuipID.setHorizontalAlignment(SwingConstants.LEFT);
-		lblBrowEQuipID.setBounds(171, 51, 96, 12);
+		lblBrowEQuipID.setBounds(171, 82, 96, 12);
 		createBorrow.add(lblBrowEQuipID);
 		
 		txtBrwEquipName = new JTextField();
+		txtBrwEquipName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		txtBrwEquipName.setEditable(false);
-		txtBrwEquipName.setBounds(10, 110, 182, 18);
+		txtBrwEquipName.setBounds(10, 100, 151, 28);
 		createBorrow.add(txtBrwEquipName);
 		txtBrwEquipName.setColumns(10);
 		
 		JLabel lblBrwEquipName = new JLabel("Equipment Name");
-		lblBrwEquipName.setBounds(10, 92, 101, 12);
+		lblBrwEquipName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBrwEquipName.setBounds(10, 82, 101, 12);
 		createBorrow.add(lblBrwEquipName);
 		
 		txtBrwEquipTag = new JTextField();
+		txtBrwEquipTag.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		txtBrwEquipTag.setEditable(false);
-		txtBrwEquipTag.setBounds(202, 110, 82, 18);
+		txtBrwEquipTag.setBounds(200, 158, 82, 22);
 		createBorrow.add(txtBrwEquipTag);
 		txtBrwEquipTag.setColumns(10);
 		
 		JLabel lblBrwEquipTag = new JLabel("Property Tag");
-		lblBrwEquipTag.setBounds(202, 92, 82, 12);
+		lblBrwEquipTag.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBrwEquipTag.setBounds(200, 140, 82, 12);
 		createBorrow.add(lblBrwEquipTag);
 		
 		JSeparator sprtrBrwTop = new JSeparator();
@@ -384,70 +391,81 @@ public class CustodianDashboard {
 		createBorrow.add(sprtrBrwTop);
 		
 		JLabel lblEquipDetails = new JLabel("Equipment Details");
-		lblEquipDetails.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblEquipDetails.setBounds(10, 40, 113, 18);
+		lblEquipDetails.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
+		lblEquipDetails.setBounds(84, 50, 126, 18);
 		createBorrow.add(lblEquipDetails);
 		
 		JSeparator sprtrBrwTop_1 = new JSeparator();
-		sprtrBrwTop_1.setBounds(10, 186, 274, 6);
+		sprtrBrwTop_1.setBounds(9, 196, 274, 6);
 		createBorrow.add(sprtrBrwTop_1);
 		
 		JLabel lblBorrowerDetails = new JLabel("Borrower Details");
-		lblBorrowerDetails.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblBorrowerDetails.setBounds(10, 193, 113, 18);
+		lblBorrowerDetails.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		lblBorrowerDetails.setBounds(102, 202, 96, 18);
 		createBorrow.add(lblBorrowerDetails);
 		
+		// Custom button here
 		JButton btnBrwLoadID = new JButton("Select");
 		btnBrwLoadID.addActionListener(e -> { loadItem(0); });
-		btnBrwLoadID.setBounds(213, 62, 71, 20);
+		btnBrwLoadID.setBounds(213, 99, 71, 29);
 		createBorrow.add(btnBrwLoadID);
 		
 		cmbBorrowerModel = new DefaultComboBoxModel<String>();
 		
 		cmbBorrowerName = new JComboBox<String>();
+		cmbBorrowerName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		cmbBorrowerName.setModel(cmbBorrowerModel);
-		cmbBorrowerName.setBounds(10, 233, 274, 20);
+		cmbBorrowerName.setBounds(10, 233, 274, 26);
 		createBorrow.add(cmbBorrowerName);
 		
 		JLabel lblBorrowerName = new JLabel("Borrower");
-		lblBorrowerName.setBounds(10, 222, 82, 12);
+		lblBorrowerName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBorrowerName.setBounds(10, 216, 82, 18);
 		createBorrow.add(lblBorrowerName);
 		
 		txtBrwReturnByDate = new JTextField();
-		txtBrwReturnByDate.setBounds(154, 276, 113, 20);
+		txtBrwReturnByDate.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwReturnByDate.setBounds(171, 285, 113, 20);
 		createBorrow.add(txtBrwReturnByDate);
 		txtBrwReturnByDate.setColumns(10);
 		
 		txtDateBorrowed = new JTextField();
+		txtDateBorrowed.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		txtDateBorrowed.setText("2000-12-19");
 		txtDateBorrowed.setEditable(false);
 		txtDateBorrowed.setColumns(10);
-		txtDateBorrowed.setBounds(10, 278, 113, 20);
+		txtDateBorrowed.setBounds(10, 284, 113, 20);
 		createBorrow.add(txtDateBorrowed);
 		
 		JLabel lblDateBorrowed = new JLabel("Date Borrowed:");
-		lblDateBorrowed.setBounds(10, 264, 96, 14);
+		lblDateBorrowed.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblDateBorrowed.setBounds(10, 269, 96, 15);
 		createBorrow.add(lblDateBorrowed);
 		
 		JLabel lblRetunByDate = new JLabel("Return by Date:*");
-		lblRetunByDate.setBounds(154, 264, 96, 14);
+		lblRetunByDate.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblRetunByDate.setBounds(171, 270, 96, 15);
 		createBorrow.add(lblRetunByDate);
 		
 		txtBrwEquipCondition = new JTextField();
+		txtBrwEquipCondition.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		txtBrwEquipCondition.setEditable(false);
 		txtBrwEquipCondition.setColumns(10);
-		txtBrwEquipCondition.setBounds(10, 157, 101, 18);
+		txtBrwEquipCondition.setBounds(10, 157, 85, 24);
 		createBorrow.add(txtBrwEquipCondition);
 		
 		JLabel lblBrwEquipCondition = new JLabel("Condition");
+		lblBrwEquipCondition.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
 		lblBrwEquipCondition.setBounds(10, 139, 82, 12);
 		createBorrow.add(lblBrwEquipCondition);
 		
+		// Custom Button #2
 		JButton btnBrwSubmit = new JButton("Create Record");
 		btnBrwSubmit.addActionListener(e -> { createBorrowRecord(); });
 		btnBrwSubmit.setBounds(10, 510, 151, 23);
 		createBorrow.add(btnBrwSubmit);
 		
+		// Custom Button #3
 		JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(e -> { displayDashboard(); });
 		btnCancel.setBounds(171, 510, 113, 23);
@@ -456,7 +474,7 @@ public class CustodianDashboard {
 		JLabel lblyyyymmdd = new JLabel("(YYYY-MM-DD)");
 		lblyyyymmdd.setHorizontalAlignment(SwingConstants.CENTER);
 		lblyyyymmdd.setForeground(new Color(192, 192, 192));
-		lblyyyymmdd.setBounds(154, 295, 113, 14);
+		lblyyyymmdd.setBounds(171, 307, 113, 14);
 		createBorrow.add(lblyyyymmdd);
 		
 		JPanel createMaintenance = new JPanel();
@@ -570,12 +588,12 @@ public class CustodianDashboard {
 		main.setLayout(null);
 		
 		JPanel borrowTablePreview = new JPanel();
-		borrowTablePreview.setBounds(381, 11, 344, 544);
+		borrowTablePreview.setBounds(293, 11, 344, 544);
 		main.add(borrowTablePreview);
 		borrowTablePreview.setLayout(null);
 		
 		JScrollPane brwPreviewViewport = new JScrollPane();
-		brwPreviewViewport.setBounds(10, 143, 324, 390);
+		brwPreviewViewport.setBounds(10, 10, 324, 523);
 		borrowTablePreview.add(brwPreviewViewport);
 		
 		tblBorrowPreview = new JTable();
@@ -583,51 +601,81 @@ public class CustodianDashboard {
 		brwPreviewViewport.setViewportView(tblBorrowPreview);
 		
 		JPanel sideBar = new JPanel();
-		sideBar.setBackground(new Color(0, 0, 255));
+		sideBar.setBackground(new Color(240, 255, 240));
 		sideBar.setForeground(new Color(0, 0, 255));
-		sideBar.setBounds(0, 0, 371, 566);
+		sideBar.setBounds(0, 0, 283, 566);
 		main.add(sideBar);
 		sideBar.setLayout(null);
 		
-		JButton btnCreateBorrow = new JButton("New Borrow Record");
-		btnCreateBorrow.addActionListener(e -> { displayNewBorrow(); });
-		btnCreateBorrow.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnCreateBorrow.setBorderPainted(false);
-		btnCreateBorrow.setFocusable(false);
-		btnCreateBorrow.setBackground(new Color(0, 0, 255));
-		btnCreateBorrow.setForeground(new Color(255, 255, 255));
-		btnCreateBorrow.setBounds(10, 69, 351, 21);
-		sideBar.add(btnCreateBorrow);
+		ImageIcon originalIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
 		
-		JButton btnUpdateBorrow = new JButton("Update Borrow Record");
-		btnUpdateBorrow.addActionListener(e -> { displayUpdateBorrow(); });
-		btnUpdateBorrow.setForeground(Color.WHITE);
-		btnUpdateBorrow.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnUpdateBorrow.setFocusable(false);
-		btnUpdateBorrow.setBorderPainted(false);
-		btnUpdateBorrow.setBackground(Color.BLUE);
-		btnUpdateBorrow.setBounds(10, 101, 351, 21);
-		sideBar.add(btnUpdateBorrow);
+		JLabel spearLogo = new JLabel("S.P.E.A.R");
+		spearLogo.setForeground(new Color(30, 144, 255));
+		spearLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		spearLogo.setIcon(new ImageIcon(resizedImage));
+		spearLogo.setBounds(10, 10, 249, 64);
+		sideBar.add(spearLogo);
 		
-		JButton btnUpdateMaintenanceReport = new JButton("Update Maintenance Report");
-		btnUpdateMaintenanceReport.addActionListener(e -> { displayUpdateMaintenance(); });
-		btnUpdateMaintenanceReport.setForeground(Color.WHITE);
-		btnUpdateMaintenanceReport.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnUpdateMaintenanceReport.setFocusable(false);
-		btnUpdateMaintenanceReport.setBorderPainted(false);
-		btnUpdateMaintenanceReport.setBackground(Color.BLUE);
-		btnUpdateMaintenanceReport.setBounds(10, 165, 351, 21);
-		sideBar.add(btnUpdateMaintenanceReport);
+		ButtonOne btnRegister = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				displayBorrowerRegistration();
+			
+			}
+		});
+		btnRegister.setBounds(27, 114, 225, 55);
+		sideBar.add(btnRegister);
+		btnRegister.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnRegister.setText("Add Borrower");
 		
-		JButton btnCreateMaintenance = new JButton("New Maintenance Report");
-		btnCreateMaintenance.addActionListener(e -> { displayNewMaintenance(); });
-		btnCreateMaintenance.setForeground(Color.WHITE);
-		btnCreateMaintenance.setFont(new Font("Tahoma", Font.BOLD, 11));
-		btnCreateMaintenance.setFocusable(false);
-		btnCreateMaintenance.setBorderPainted(false);
-		btnCreateMaintenance.setBackground(Color.BLUE);
-		btnCreateMaintenance.setBounds(10, 133, 351, 21);
-		sideBar.add(btnCreateMaintenance);
+		ButtonOne btnNewBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnNewBorrowRecord.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				displayNewBorrow();
+				
+			}
+		});
+		btnNewBorrowRecord.setText("New Borrow Record");
+		btnNewBorrowRecord.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnNewBorrowRecord.setBounds(27, 179, 225, 55);
+		sideBar.add(btnNewBorrowRecord);
+		
+		ButtonOne btnUpdateBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnUpdateBorrowRecord.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayUpdateBorrow();
+				
+			}
+		});
+		btnUpdateBorrowRecord.setText("Update Borrow Record");
+		btnUpdateBorrowRecord.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnUpdateBorrowRecord.setBounds(27, 244, 225, 55);
+		sideBar.add(btnUpdateBorrowRecord);
+		
+		ButtonOne btnNewMaintenanceReport = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnNewMaintenanceReport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayNewMaintenance();
+			}
+		});
+		btnNewMaintenanceReport.setText("New Maintenance Report");
+		btnNewMaintenanceReport.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnNewMaintenanceReport.setBounds(27, 309, 225, 55);
+		sideBar.add(btnNewMaintenanceReport);
+		
+		ButtonOne btnUpdateMaintenanceReport_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnUpdateMaintenanceReport_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayUpdateMaintenance();
+			}
+		});
+		btnUpdateMaintenanceReport_1.setText("Update Maintenance Report");
+		btnUpdateMaintenanceReport_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnUpdateMaintenanceReport_1.setBounds(27, 374, 225, 55);
+		sideBar.add(btnUpdateMaintenanceReport_1);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 41, 1380, 2);
@@ -637,16 +685,25 @@ public class CustodianDashboard {
 		
 		JPanel borrowTablePreview_1 = new JPanel();
 		borrowTablePreview_1.setLayout(null);
-		borrowTablePreview_1.setBounds(735, 11, 344, 544);
+		borrowTablePreview_1.setBounds(656, 11, 344, 544);
 		main.add(borrowTablePreview_1);
 		
 		JScrollPane brwPreviewViewport_1 = new JScrollPane();
-		brwPreviewViewport_1.setBounds(10, 143, 324, 390);
+		brwPreviewViewport_1.setBounds(10, 10, 324, 523);
 		borrowTablePreview_1.add(brwPreviewViewport_1);
 		
 		tblMaintenancePreview = new JTable();
 		brwPreviewViewport_1.setViewportView(tblMaintenancePreview);
 		tblMaintenancePreview.setFillsViewportHeight(true);
+		
+		JPanel borrowTablePreview_1_1 = new JPanel();
+		borrowTablePreview_1_1.setLayout(null);
+		borrowTablePreview_1_1.setBounds(1017, 11, 344, 544);
+		main.add(borrowTablePreview_1_1);
+		
+		JScrollPane brwPreviewViewport_1_1 = new JScrollPane();
+		brwPreviewViewport_1_1.setBounds(10, 10, 324, 523);
+		borrowTablePreview_1_1.add(brwPreviewViewport_1_1);
 		cardContainer.add(borrowFormCreation, "creation");
 		
 		formCreator.add(createBorrow, "borrowForm");
@@ -657,13 +714,15 @@ public class CustodianDashboard {
 		createBorrow.add(lblNote);
 		
 		JLabel lblBorrowStatus = new JLabel("Availability");
-		lblBorrowStatus.setBounds(171, 139, 96, 14);
+		lblBorrowStatus.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBorrowStatus.setBounds(105, 139, 85, 14);
 		createBorrow.add(lblBorrowStatus);
 		
 		txtBrwEquipAvail = new JTextField();
+		txtBrwEquipAvail.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		txtBrwEquipAvail.setEditable(false);
 		txtBrwEquipAvail.setColumns(10);
-		txtBrwEquipAvail.setBounds(171, 157, 101, 18);
+		txtBrwEquipAvail.setBounds(105, 157, 85, 24);
 		createBorrow.add(txtBrwEquipAvail);
 		formCreator.add(createMaintenance, "maintenanceForm");
 		
@@ -691,30 +750,32 @@ public class CustodianDashboard {
 		JButton btnClearFilter_1 = new JButton("Clear");
 		btnClearFilter_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+			
+				borrowRecordSorter.setRowFilter(null);
+			
 			}
 		});
 		btnClearFilter_1.setBounds(921, 11, 75, 23);
 		updateBorrow.add(btnClearFilter_1);
 		
-		JButton btnFilter_1 = new JButton("⌕");
-		btnFilter_1.addActionListener(new ActionListener() {
+		JButton btnBrwUpdFilter = new JButton("⌕");
+		btnBrwUpdFilter.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				borrowRecordSorter.setRowFilter(borrowRecordRF);
 			}
 		});
-		btnFilter_1.setBounds(849, 11, 62, 23);
-		updateBorrow.add(btnFilter_1);
+		btnBrwUpdFilter.setBounds(849, 11, 62, 23);
+		updateBorrow.add(btnBrwUpdFilter);
 		
 		cmbStatus = new JComboBox<String>();
+		cmbStatus.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
 		cmbStatus.setBounds(742, 11, 97, 22);
 		updateBorrow.add(cmbStatus);
 		
-		cmbReceivedBy = new JComboBox<String>();
-		cmbReceivedBy.setBounds(635, 11, 97, 22);
-		updateBorrow.add(cmbReceivedBy);
-		
 		txtbrwSearchBar = new JTextField();
 		txtbrwSearchBar.setColumns(10);
-		txtbrwSearchBar.setBounds(324, 12, 115, 20);
+		txtbrwSearchBar.setBounds(314, 12, 125, 20);
 		updateBorrow.add(txtbrwSearchBar);
 		
 		JSeparator sprtrBrwTop_3 = new JSeparator();
@@ -851,24 +912,33 @@ public class CustodianDashboard {
 		cardContainer.add(updateMaintenance, "updateMaintenance");
 		updateMaintenance.setLayout(null);
 		
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(324, 12, 115, 20);
-		updateMaintenance.add(textField);
+		txtUpdMntSearch = new JTextField();
+		txtUpdMntSearch.setColumns(10);
+		txtUpdMntSearch.setBounds(324, 12, 115, 20);
+		updateMaintenance.add(txtUpdMntSearch);
 		
-		JComboBox<String> cmbReceivedBy_1 = new JComboBox<String>();
-		cmbReceivedBy_1.setBounds(635, 11, 97, 22);
-		updateMaintenance.add(cmbReceivedBy_1);
-		
-		JComboBox<String> cmbStatus_1 = new JComboBox<String>();
-		cmbStatus_1.setBounds(742, 11, 97, 22);
-		updateMaintenance.add(cmbStatus_1);
+		cmbStatusMnt = new JComboBox<String>();
+		cmbStatusMnt.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
+		cmbStatusMnt.setBounds(742, 11, 97, 22);
+		updateMaintenance.add(cmbStatusMnt);
 		
 		JButton btnFilter_1_1 = new JButton("⌕");
+		btnFilter_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				maintenanceSorter.setRowFilter(maintenanceRF);
+			}
+		});
 		btnFilter_1_1.setBounds(849, 11, 62, 23);
 		updateMaintenance.add(btnFilter_1_1);
 		
 		JButton btnClearFilter_1_1 = new JButton("Clear");
+		btnClearFilter_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				maintenanceSorter.setRowFilter(null);
+				
+			}
+		});
 		btnClearFilter_1_1.setBounds(921, 11, 75, 23);
 		updateMaintenance.add(btnClearFilter_1_1);
 		
@@ -1001,6 +1071,107 @@ public class CustodianDashboard {
 		updtMaintenanceViewport.setViewportView(tblUpdReport);
 		tblUpdReport.setFillsViewportHeight(true);
 		
+		JPanel addBorrower = new JPanel();
+		cardContainer.add(addBorrower, "borrowerRegistration");
+		addBorrower.setLayout(null);
+		
+		table = new JTable();
+		table.setFillsViewportHeight(true);
+		table.setBounds(315, 44, 1074, 509);
+		addBorrower.add(table);
+		
+		JButton btnUpdMntRefresh_1 = new JButton("⟳");
+		btnUpdMntRefresh_1.setBounds(1328, 10, 62, 23);
+		addBorrower.add(btnUpdMntRefresh_1);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(324, 11, 115, 20);
+		addBorrower.add(textField);
+		
+		JSeparator sprtrBrwTop_2_1_1 = new JSeparator();
+		sprtrBrwTop_2_1_1.setBounds(10, 37, 274, 6);
+		addBorrower.add(sprtrBrwTop_2_1_1);
+		
+		JLabel lblBorrowerRegistration = new JLabel("Register New Borrower");
+		lblBorrowerRegistration.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorrowerRegistration.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblBorrowerRegistration.setBounds(10, 10, 274, 30);
+		addBorrower.add(lblBorrowerRegistration);
+		
+		JLabel lblBrwrFirstName = new JLabel("First Name");
+		lblBrwrFirstName.setBounds(10, 53, 67, 12);
+		addBorrower.add(lblBrwrFirstName);
+		
+		txtNewBorrowNameF = new JTextField();
+		txtNewBorrowNameF.setBounds(134, 50, 150, 18);
+		addBorrower.add(txtNewBorrowNameF);
+		txtNewBorrowNameF.setColumns(10);
+		
+		JLabel lblBrwrLastName = new JLabel("Last Name");
+		lblBrwrLastName.setBounds(10, 78, 67, 12);
+		addBorrower.add(lblBrwrLastName);
+		
+		txtNewBorrowNameL = new JTextField();
+		txtNewBorrowNameL.setColumns(10);
+		txtNewBorrowNameL.setBounds(134, 75, 150, 18);
+		addBorrower.add(txtNewBorrowNameL);
+		
+		JLabel lblBrwrIDNumber = new JLabel("ID Number");
+		lblBrwrIDNumber.setBounds(10, 103, 67, 12);
+		addBorrower.add(lblBrwrIDNumber);
+		
+		txtNewBorrowID = new JTextField();
+		txtNewBorrowID.setColumns(10);
+		txtNewBorrowID.setBounds(134, 100, 150, 18);
+		addBorrower.add(txtNewBorrowID);
+		
+		JLabel lblBrwrDepartment = new JLabel("Department / Grade");
+		lblBrwrDepartment.setBounds(10, 131, 114, 12);
+		addBorrower.add(lblBrwrDepartment);
+		
+		txtNewBorrowDept = new JTextField();
+		txtNewBorrowDept.setColumns(10);
+		txtNewBorrowDept.setBounds(134, 128, 150, 18);
+		addBorrower.add(txtNewBorrowDept);
+		
+		JLabel lblContactNo = new JLabel("Contact No.");
+		lblContactNo.setBounds(10, 156, 67, 12);
+		addBorrower.add(lblContactNo);
+		
+		txtNewBorrowContact = new JTextField();
+		txtNewBorrowContact.setColumns(10);
+		txtNewBorrowContact.setBounds(134, 153, 150, 18);
+		addBorrower.add(txtNewBorrowContact);
+		
+		JLabel lblEmail = new JLabel("Email");
+		lblEmail.setBounds(10, 181, 67, 12);
+		addBorrower.add(lblEmail);
+		
+		txtNewBorrowEmail = new JTextField();
+		txtNewBorrowEmail.setColumns(10);
+		txtNewBorrowEmail.setBounds(134, 178, 150, 18);
+		addBorrower.add(txtNewBorrowEmail);
+		
+		JButton btnMntUpdateCancel_1 = new JButton("Cancel");
+		btnMntUpdateCancel_1.setBounds(10, 530, 274, 23);
+		addBorrower.add(btnMntUpdateCancel_1);
+		
+		JButton btnRegisterBorrower = new JButton("Register Borrower");
+		btnRegisterBorrower.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				registerBorrower();
+			
+			}
+		});
+		btnRegisterBorrower.setBounds(10, 505, 274, 23);
+		addBorrower.add(btnRegisterBorrower);
+		
+		JPanel panel = new JPanel();
+		panel.setBounds(10, 10, 292, 546);
+		addBorrower.add(panel);
+		
 		//frame.setVisible(true);
 		
 	}
@@ -1056,6 +1227,12 @@ public class CustodianDashboard {
 		
 	}
 	
+	void displayBorrowerRegistration() {
+		card.show(cardContainer, "borrowerRegistration");
+		
+		
+	}
+	
 	void clearAllFields() {
 		/*
 			Clean this up tomorrow, future me - Paz
@@ -1087,7 +1264,7 @@ public class CustodianDashboard {
 		txtDateReturned.setText("");
 		txtBrwEquipAvail.setText("");
 		
-		textField.setText("");
+		txtUpdMntSearch.setText("");
 		txtMntCost.setText("");
 		txtMntUpdTransactionID.setText("");
 		txtMntUpdReport.setText("");
@@ -1499,6 +1676,30 @@ public class CustodianDashboard {
 	//---------------------------------------------------------------------------------------------------------------------------------
 	// CREATE, UPDATE AND DELETE
 	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	void registerBorrower() {
+		String[] rawProfile = new String[] {
+		txtNewBorrowNameF.getText().trim(),
+		txtNewBorrowNameL.getText().trim(),
+		txtNewBorrowID.getText().trim(),
+		txtNewBorrowDept.getText().trim(),
+		txtNewBorrowContact.getText().trim(),
+		txtNewBorrowEmail.getText().trim()
+		};
+		boolean result;
+		
+		try {
+			
+			result = backend.RegisterBorrower(rawProfile);
+			
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "New Borrower successfully registered.");
+	}
+	
 	
 	void updateBorrowRecord() {
 		boolean loadRecord = LoadRecord();
