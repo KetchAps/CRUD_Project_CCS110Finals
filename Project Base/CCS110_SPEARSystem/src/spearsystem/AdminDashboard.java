@@ -21,10 +21,8 @@ import java.awt.event.ActionEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
-import javax.swing.JTree;
 import javax.swing.JButton;
 import javax.swing.JTable;
-import javax.swing.JTextPane;
 
 public class AdminDashboard {
 
@@ -224,10 +222,10 @@ public class AdminDashboard {
 		lblTotalEquipment.setBounds(55, 11, 127, 27);
 		totalEquipmentPanel.add(lblTotalEquipment);
 
-		JLabel lblTotalEquipment_1 = new JLabel("000");
+		JLabel lblTotalEquipment_1 = new JLabel("00");
 		lblTotalEquipment_1.setForeground(new Color(30, 144, 255));
-		lblTotalEquipment_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
-		lblTotalEquipment_1.setBounds(75, 48, 127, 62);
+		lblTotalEquipment_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblTotalEquipment_1.setBounds(77, 39, 72, 62);
 		totalEquipmentPanel.add(lblTotalEquipment_1);
 
 		JPanel totalUsersPanel = new JPanel();
@@ -240,12 +238,12 @@ public class AdminDashboard {
 		lblTotalUsers.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblTotalUsers.setBounds(79, 11, 88, 27);
 		totalUsersPanel.add(lblTotalUsers);
-
-		JLabel lblTotalEquipment_1_1_1_1 = new JLabel("000");
-		lblTotalEquipment_1_1_1_1.setForeground(new Color(30, 144, 255));
-		lblTotalEquipment_1_1_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
-		lblTotalEquipment_1_1_1_1.setBounds(75, 49, 127, 62);
-		totalUsersPanel.add(lblTotalEquipment_1_1_1_1);
+		
+		JLabel lblTotalEquipment_1_4 = new JLabel("00");
+		lblTotalEquipment_1_4.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_4.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblTotalEquipment_1_4.setBounds(87, 39, 72, 62);
+		totalUsersPanel.add(lblTotalEquipment_1_4);
 
 		JPanel pendingReturnsPanel = new JPanel();
 		pendingReturnsPanel.setBounds(776, 139, 240, 141);
@@ -257,12 +255,12 @@ public class AdminDashboard {
 		lblPendingReturns.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblPendingReturns.setBounds(59, 11, 121, 27);
 		pendingReturnsPanel.add(lblPendingReturns);
-
-		JLabel lblTotalEquipment_1_1_1 = new JLabel("000");
-		lblTotalEquipment_1_1_1.setForeground(new Color(30, 144, 255));
-		lblTotalEquipment_1_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
-		lblTotalEquipment_1_1_1.setBounds(69, 50, 127, 62);
-		pendingReturnsPanel.add(lblTotalEquipment_1_1_1);
+		
+		JLabel lblTotalEquipment_1_3 = new JLabel("00");
+		lblTotalEquipment_1_3.setForeground(new Color(30, 144, 255));
+		lblTotalEquipment_1_3.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblTotalEquipment_1_3.setBounds(84, 39, 72, 62);
+		pendingReturnsPanel.add(lblTotalEquipment_1_3);
 
 		JPanel currentlyBorrowedPanel = new JPanel();
 		currentlyBorrowedPanel.setBounds(532, 139, 234, 141);
@@ -274,11 +272,11 @@ public class AdminDashboard {
 		lblCurrentlyBorrowed.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblCurrentlyBorrowed.setBounds(43, 11, 148, 27);
 		currentlyBorrowedPanel.add(lblCurrentlyBorrowed);
-
-		JLabel lblTotalEquipment_1_1 = new JLabel("000");
+		
+		JLabel lblTotalEquipment_1_1 = new JLabel("00");
 		lblTotalEquipment_1_1.setForeground(new Color(30, 144, 255));
-		lblTotalEquipment_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 50));
-		lblTotalEquipment_1_1.setBounds(68, 49, 127, 62);
+		lblTotalEquipment_1_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblTotalEquipment_1_1.setBounds(81, 39, 72, 62);
 		currentlyBorrowedPanel.add(lblTotalEquipment_1_1);
 
 		JPanel recentEquipmentPanel = new JPanel();
@@ -450,6 +448,7 @@ public class AdminDashboard {
 		sidebar2.add(btnGoBack);
 		
 		ButtonOne btnViewInventory_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		
 		btnViewInventory_1.setText("View Inventory");
 		btnViewInventory_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnViewInventory_1.setBounds(26, 510, 224, 45);
@@ -652,7 +651,7 @@ public class AdminDashboard {
 		
 		JPanel inventoryManagementPanel = new JPanel();
 		inventoryManagementPanel.setLayout(null);
-		cardContainer.add(inventoryManagementPanel, "name_9012209605000");
+		cardContainer.add(inventoryManagementPanel, "inventoryManagementPanel");
 		
 		GradientPanel sidebar2_2 = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
 		sidebar2_2.setLayout(null);
@@ -695,12 +694,14 @@ public class AdminDashboard {
 		panel_4.add(lblNewLabel_1_4_2_3);
 		
 		ButtonOne btnGoBack_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		
 		btnGoBack_1.setText("Go Back");
 		btnGoBack_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnGoBack_1.setBounds(26, 561, 224, 45);
 		sidebar2_2.add(btnGoBack_1);
 		
 		ButtonOne btnViewInventory_1_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		
 		btnViewInventory_1_1.setText("View Custodian");
 		btnViewInventory_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnViewInventory_1_1.setBounds(26, 510, 224, 45);
@@ -999,13 +1000,16 @@ public class AdminDashboard {
 		lblAdmin.setBounds(10, 0, 396, 64);
 		adminDashboard.add(lblAdmin);
 
+		// ===========================================
+		// BUTTON ACTION LISTENER
+		// ===========================================
 		btnViewCustodian.addActionListener(e -> {
 			card.show(cardContainer, "custodianManagement");
 			lblAdmin.setText("Custodian Manager");
 		});
 
 		btnViewInventory.addActionListener(e -> {
-			card.show(cardContainer, "InventoryManagementPanel");
+			card.show(cardContainer, "inventoryManagementPanel");
 			lblAdmin.setText("Inventory Manager");
 		});
 		
@@ -1013,6 +1017,27 @@ public class AdminDashboard {
 			public void actionPerformed(ActionEvent e) {
 				card.show(cardContainer, "dashboard");
 				lblAdmin.setText("Admin Dashboard");
+			}
+		});
+		
+		btnGoBack_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				card.show(cardContainer, "dashboard");
+				lblAdmin.setText("Admin Dashboard");
+			}
+		});
+		
+		btnViewInventory_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				card.show(cardContainer, "inventoryManagementPanel");
+				lblAdmin.setText("Inventory Manager");
+			}
+		});
+		
+		btnViewInventory_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				card.show(cardContainer, "custodianManagement");
+				lblAdmin.setText("Custodian Manager");
 			}
 		});
 
