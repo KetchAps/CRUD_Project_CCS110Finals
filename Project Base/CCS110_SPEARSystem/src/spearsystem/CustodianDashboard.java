@@ -31,6 +31,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import kenUI.ButtonOne;
+import normie.util.*;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
 import spearsystem.CustodianDatabaseHandler.BorrowerProfile;
@@ -53,6 +54,8 @@ public class CustodianDashboard {
 	private MaintenanceReport loadedReport;
 	private BorrowerProfile loadedProfile;
 	
+	private EmailValidator mailValidator = new EmailValidator();
+	
 	private int activeScreen = 0;
 	
 	
@@ -62,7 +65,7 @@ public class CustodianDashboard {
 	
 	private CardLayout card = new CardLayout(0,0);
 	private CardLayout formCard = new CardLayout(0,0);
-	
+	private CardLayout borrowManagingCard = new CardLayout(0, 0);
 	private JComboBox<String> cmbCondition;
 	private JComboBox<String> cmbCategory;
 	private JComboBox<String> cmbAvailability;
@@ -72,16 +75,18 @@ public class CustodianDashboard {
 	private JComboBox<String> cmbStatusMnt;
 	private JComboBox<String> cmbNewBorrowType;
 	private JComboBox<String> cmbBorrowType;
+	private JComboBox<String> cmbMngBorrowerType;
 	
 	private JPanel cardContainer;
 	private JPanel formCreator; // JPanel of the Forms
+	private JPanel borrowerManager;
 
 	private DefaultComboBoxModel<String> cmbCategoryModel;
 	private DefaultComboBoxModel<String> cmbBorrowerModel;
 	
 	private JTextField searchBar;
 	private JTable searchResult;
-	
+	private DefaultTableModel query;
 	
 	private JTable tblBorrowPreview;
 	private DefaultTableModel borrowPreview;
@@ -92,9 +97,13 @@ public class CustodianDashboard {
 	private JTable tblborrowRecord;
 	private JTable tblUpdReport;
 	
-	private DefaultTableModel query;
+	private JTable tblBorrowers;
+	private DefaultTableModel registeredUserList;
+	
+	
 	private DefaultTableModel borrowList;
 	private DefaultTableModel reportList;
+	
 	
 	private JTextArea txtAMntIssue;
 	private JTextArea txtAMntUpdIssueReported;
@@ -112,6 +121,38 @@ public class CustodianDashboard {
 	private JTextField txtMntEquipTag;
 	private JTextField txtMntDateReported;
 	private JTextField txtbrwSearchBar;
+	
+	private JTextField txtTransactionID;
+	private JTextField txtUpdBorrowerID;
+	private JTextField txtUpdBorrowedEquip;
+	private JTextField txtBorrowDate;
+	private JTextField txtUpdCustodian;
+	private JTextField txtUpdCondOnBorrow;
+	private JTextField txtExpectedReturnDate;
+	private JTextField txtDateReturned;
+	private JTextField txtBrwEquipAvail;
+	
+	private JTextField txtUpdMntSearch;
+	private JTextField txtMntCost;
+	private JTextField txtMntUpdTransactionID;
+	private JTextField txtMntUpdReport;
+	private JTextField txtMntUpdDate;
+	private JTextField txtMntUpdEquipID;
+
+	private JTextField textField;
+	private JTextField txtNewBorrowNameF;
+	private JTextField txtNewBorrowNameL;
+	private JTextField txtNewBorrowID;
+	private JTextField txtNewBorrowDept;
+	private JTextField txtNewBorrowContact;
+	private JTextField txtNewBorrowEmail;
+	private JTextField txtMngBorrowerEmail;
+	private JTextField txtMngBorrowerContactNo;
+	private JTextField txtMngBorrowerDept;
+	private JTextField txtMngBorrowerID;
+	private JTextField txtMngBorrowerNameL;
+	private JTextField txtMngBorrowerNameF;
+	private JTextField txtMngBorrowerTransaction;
 	
 	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
@@ -218,37 +259,8 @@ public class CustodianDashboard {
         }
     };
   
-	private JTextField txtTransactionID;
-	private JTextField txtUpdBorrowerID;
-	private JTextField txtUpdBorrowedEquip;
-	private JTextField txtBorrowDate;
-	private JTextField txtUpdCustodian;
-	private JTextField txtUpdCondOnBorrow;
-	private JTextField txtExpectedReturnDate;
-	private JTextField txtDateReturned;
-	private JTextField txtBrwEquipAvail;
+    
 	
-	private JTextField txtUpdMntSearch;
-	private JTextField txtMntCost;
-	private JTextField txtMntUpdTransactionID;
-	private JTextField txtMntUpdReport;
-	private JTextField txtMntUpdDate;
-	private JTextField txtMntUpdEquipID;
-	private JTable tblBorrowers;
-	private JTextField textField;
-	private JTextField txtNewBorrowNameF;
-	private JTextField txtNewBorrowNameL;
-	private JTextField txtNewBorrowID;
-	private JTextField txtNewBorrowDept;
-	private JTextField txtNewBorrowContact;
-	private JTextField txtNewBorrowEmail;
-	private JTextField txtMngBorrowerEmail;
-	private JTextField txtMngBorrowerContactNo;
-	private JTextField txtMngBorrowerDept;
-	private JTextField txtMngBorrowerID;
-	private JTextField txtMngBorrowerNameL;
-	private JTextField txtMngBorrowerNameF;
-	private JTextField txtMngBorrowerTransaction;
 	
 	
 	
@@ -635,7 +647,7 @@ public class CustodianDashboard {
 		btnRegister.setBounds(27, 114, 225, 55);
 		sideBar.add(btnRegister);
 		btnRegister.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnRegister.setText("Add Borrower");
+		btnRegister.setText("Register Borrowers");
 		
 		ButtonOne btnNewBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnNewBorrowRecord.addActionListener(new ActionListener() {
@@ -647,7 +659,7 @@ public class CustodianDashboard {
 		});
 		btnNewBorrowRecord.setText("New Borrow Record");
 		btnNewBorrowRecord.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnNewBorrowRecord.setBounds(27, 179, 225, 55);
+		btnNewBorrowRecord.setBounds(27, 246, 225, 55);
 		sideBar.add(btnNewBorrowRecord);
 		
 		ButtonOne btnUpdateBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
@@ -659,7 +671,7 @@ public class CustodianDashboard {
 		});
 		btnUpdateBorrowRecord.setText("Update Borrow Record");
 		btnUpdateBorrowRecord.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnUpdateBorrowRecord.setBounds(27, 244, 225, 55);
+		btnUpdateBorrowRecord.setBounds(27, 317, 225, 55);
 		sideBar.add(btnUpdateBorrowRecord);
 		
 		ButtonOne btnNewMaintenanceReport = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
@@ -670,7 +682,7 @@ public class CustodianDashboard {
 		});
 		btnNewMaintenanceReport.setText("New Maintenance Report");
 		btnNewMaintenanceReport.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnNewMaintenanceReport.setBounds(27, 309, 225, 55);
+		btnNewMaintenanceReport.setBounds(27, 382, 225, 55);
 		sideBar.add(btnNewMaintenanceReport);
 		
 		ButtonOne btnUpdateMaintenanceReport_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
@@ -681,8 +693,21 @@ public class CustodianDashboard {
 		});
 		btnUpdateMaintenanceReport_1.setText("Update Maintenance Report");
 		btnUpdateMaintenanceReport_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnUpdateMaintenanceReport_1.setBounds(27, 374, 225, 55);
+		btnUpdateMaintenanceReport_1.setBounds(27, 447, 225, 55);
 		sideBar.add(btnUpdateMaintenanceReport_1);
+		
+		ButtonOne btnManage = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnManage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				displayManageBorrower();
+			
+			}
+		});
+		btnManage.setText("Manage Borrowers");
+		btnManage.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnManage.setBounds(27, 180, 225, 55);
+		sideBar.add(btnManage);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 41, 1380, 2);
@@ -1082,11 +1107,6 @@ public class CustodianDashboard {
 		cardContainer.add(addBorrower, "borrowerRegistration");
 		addBorrower.setLayout(null);
 		
-		tblBorrowers = new JTable();
-		tblBorrowers.setFillsViewportHeight(true);
-		tblBorrowers.setBounds(315, 44, 1074, 509);
-		addBorrower.add(tblBorrowers);
-		
 		JButton btnUpdMntRefresh_1 = new JButton("⟳");
 		btnUpdMntRefresh_1.setBounds(1328, 10, 62, 23);
 		addBorrower.add(btnUpdMntRefresh_1);
@@ -1109,13 +1129,13 @@ public class CustodianDashboard {
 		btnClearFilter_1_1_1.setBounds(893, 10, 75, 23);
 		addBorrower.add(btnClearFilter_1_1_1);
 		
-		JPanel borrowerManager = new JPanel();
+		borrowerManager = new JPanel();
 		borrowerManager.setBounds(10, 10, 292, 546);
 		addBorrower.add(borrowerManager);
-		borrowerManager.setLayout(new CardLayout(0, 0));
+		borrowerManager.setLayout(borrowManagingCard);
 		
 		JPanel register = new JPanel();
-		borrowerManager.add(register, "name_362001567932800");
+		borrowerManager.add(register, "registerBorrower");
 		register.setLayout(null);
 		
 		JSeparator sprtrBrwTop_2_1_1 = new JSeparator();
@@ -1183,6 +1203,13 @@ public class CustodianDashboard {
 		txtNewBorrowEmail.setColumns(10);
 		
 		JButton btnMntUpdateCancel_1 = new JButton("Cancel");
+		btnMntUpdateCancel_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				displayDashboard();
+				
+			}
+		});
 		btnMntUpdateCancel_1.setBounds(0, 520, 274, 23);
 		register.add(btnMntUpdateCancel_1);
 		
@@ -1200,7 +1227,7 @@ public class CustodianDashboard {
 		register.add(cmbNewBorrowType);
 		
 		JPanel delete = new JPanel();
-		borrowerManager.add(delete, "name_362243642496800");
+		borrowerManager.add(delete, "manageBorrower");
 		delete.setLayout(null);
 		
 		JSeparator sprtrBrwTop_2_1_1_1 = new JSeparator();
@@ -1262,8 +1289,8 @@ public class CustodianDashboard {
 		txtMngBorrowerID.setBounds(124, 160, 150, 18);
 		delete.add(txtMngBorrowerID);
 		
-		JComboBox<String> cmbMngBorrowerType = new JComboBox<String>();
-		cmbMngBorrowerType.setEnabled(false);
+		cmbMngBorrowerType = new JComboBox<String>();
+		cmbMngBorrowerType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
 		cmbMngBorrowerType.setBounds(124, 131, 150, 20);
 		delete.add(cmbMngBorrowerType);
 		
@@ -1280,6 +1307,12 @@ public class CustodianDashboard {
 		delete.add(txtMngBorrowerNameF);
 		
 		JButton btnMntUpdateCancel_1_1 = new JButton("Cancel");
+		btnMntUpdateCancel_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayDashboard();
+				
+			}
+		});
 		btnMntUpdateCancel_1_1.setBounds(10, 513, 264, 23);
 		delete.add(btnMntUpdateCancel_1_1);
 		
@@ -1288,6 +1321,11 @@ public class CustodianDashboard {
 		delete.add(btnPublishEdit);
 		
 		JButton btnDeleteProfile = new JButton("Delete");
+		btnDeleteProfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deleteBorrower();
+			}
+		});
 		btnDeleteProfile.setBounds(10, 487, 264, 23);
 		delete.add(btnDeleteProfile);
 		
@@ -1301,8 +1339,23 @@ public class CustodianDashboard {
 		delete.add(lblBrwrID);
 		
 		JButton btnNewButton = new JButton("Select");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				loadBorrower();
+			
+			}
+		});
 		btnNewButton.setBounds(209, 56, 67, 20);
 		delete.add(btnNewButton);
+		
+		JScrollPane scrlPaneBorrowerViewport = new JScrollPane();
+		scrlPaneBorrowerViewport.setBounds(315, 44, 1074, 509);
+		addBorrower.add(scrlPaneBorrowerViewport);
+		
+		tblBorrowers = new JTable();
+		scrlPaneBorrowerViewport.setViewportView(tblBorrowers);
+		tblBorrowers.setFillsViewportHeight(true);
 		btnRegisterBorrower.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			
@@ -1337,11 +1390,13 @@ public class CustodianDashboard {
 		displayInventoryValues();
 		displayBorrowRecords();
 		displayMaintenanceReports();
+		displayBorrowerList();
 	}
 	
 	void displayDashboard() {
 		card.show(cardContainer, "dashboard");
 		clearAllFields();
+		initialiseDisplays();
 	}
 	
 	void displayNewBorrow() {
@@ -1368,8 +1423,12 @@ public class CustodianDashboard {
 	
 	void displayBorrowerRegistration() {
 		card.show(cardContainer, "borrowerRegistration");
-		
-		
+		borrowManagingCard.show(borrowerManager, "registerBorrower");
+	}
+	
+	void displayManageBorrower() {
+		card.show(cardContainer, "borrowerRegistration");
+		borrowManagingCard.show(borrowerManager, "manageBorrower");
 	}
 	
 	void clearAllFields() {
@@ -1566,6 +1625,7 @@ public class CustodianDashboard {
 		
 	}
 	
+	
 	void displayMaintenanceReports() {
 		
 		parent.log(true, "Fetching Reports from Database...");
@@ -1602,6 +1662,46 @@ public class CustodianDashboard {
 		tblUpdReport.getTableHeader().setResizingAllowed(false);
 		parent.log(true, "Inventory fetch successful. Now Displaying Inventory.");
 		parent.log(true, "Inventory View Update completed successfully.");
+		
+	}
+	
+	void displayBorrowerList( ) {
+		
+		parent.log(true, "Fetching Borrower List from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getRegisteredBorrowersList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		registeredUserList = new DefaultTableModel(list.length, 8) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		registeredUserList.setColumnIdentifiers(new String[] {
+				"ID", "First Name", "Last Name	", "Borrower Type", "ID Number", "Department/Grade", "Contact No.", "Email"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				registeredUserList.setValueAt(list[r][c], r, c);
+		
+		tblBorrowers.setModel(registeredUserList);
+		//inventorySorter.setModel(query);
+		//tblBorrowers.setRowSorter(inventorySorter);
+		tblBorrowers.getTableHeader().setReorderingAllowed(false);
+		tblBorrowers.getTableHeader().setResizingAllowed(false);
+		
+		parent.log(true, "Borrower List fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Borrower List View Update completed successfully.");
 		
 	}
 	
@@ -1779,7 +1879,11 @@ public class CustodianDashboard {
 							String firstName, String lastName, String borrowType, String id, String dept, String contact, String email) {
 		txtMngBorrowerNameF.setText(firstName);
 		txtMngBorrowerNameL.setText(lastName);
-		cmbMngBorrowerType.se
+		cmbMngBorrowerType.setSelectedItem(borrowType);
+		txtMngBorrowerID.setText(id);
+		txtMngBorrowerDept.setText(dept);
+		txtMngBorrowerContactNo.setText(contact);
+		txtMngBorrowerEmail.setText(email);
 	}
 	
 	void loadBorrowers() {
@@ -1845,6 +1949,70 @@ public class CustodianDashboard {
 	// CREATE, UPDATE AND DELETE
 	//---------------------------------------------------------------------------------------------------------------------------------
 	
+	void deleteBorrower() {
+		int id;
+		try { id = Integer.parseInt(txtMngBorrowerTransaction.getText().trim()); } catch(NumberFormatException e) {
+			parent.log(false, "Invalid ID format for ID field.");
+			return;
+		}
+		
+		// TODO : ADD USER CONFIRMATION
+		boolean result;
+		
+		try {
+		result = backend.deleteBorrowerProfile(id);
+		} catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "Borrower Profile successfully deleted.");
+	}
+	
+	
+	void updateBorrower() {
+		boolean loadBorrower = loadBorrower();
+		
+		if(!loadBorrower) {
+			parent.log(false, "No Borrower Selected.");
+			return;
+		}
+		
+		String[] rawProfile = new String[] {
+				txtMngBorrowerNameF.getText().trim(),
+				txtMngBorrowerNameL.getText().trim(),
+				cmbMngBorrowerType.getSelectedItem().toString().trim(),
+				txtMngBorrowerID.getText().trim(),
+				txtMngBorrowerDept.getText().trim(),
+				txtMngBorrowerContactNo.getText().trim(),
+				txtMngBorrowerEmail.getText().trim()
+				};
+		
+		if (!mailValidator.validate(rawProfile[6])) {
+			parent.log(false, "Invalid Email Format.");
+			return;
+		}
+		
+		if((rawProfile[6].length() < 9 || rawProfile[6].length() > 11)) {
+			parent.log(false, "Invalid Contanct Number Format.");
+			return;
+		}
+		
+		boolean result;
+		
+		try {
+			
+			result = backend.RegisterBorrower(rawProfile);
+			
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "New Borrower successfully registered.");
+		
+	}
+	
 	void registerBorrower() {
 		String[] rawProfile = new String[] {
 		txtNewBorrowNameF.getText().trim(),
@@ -1855,6 +2023,17 @@ public class CustodianDashboard {
 		txtNewBorrowContact.getText().trim(),
 		txtNewBorrowEmail.getText().trim()
 		};
+		
+		if (!mailValidator.validate(rawProfile[6])) {
+			parent.log(false, "Invalid Email Format.");
+			return;
+		}
+		
+		if((rawProfile[6].length() < 9 || rawProfile[6].length() > 11)) {
+			parent.log(false, "Invalid Contanct Number Format.");
+			return;
+		}
+		
 		boolean result;
 		
 		try {

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
 
+import normie.util.SPEARException;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
 import spearsystem.CustodianDatabaseHandler.BorrowerProfile;
@@ -43,6 +44,7 @@ public class CustodianHandler {
 		if(value == null) throw new SPEARException("Something went wrong while trying to fetch Borrower List. Check your connection.");
 		return value;
 	}
+	
 	
 	public String[][] getBorrowPreview() throws SPEARException {
 		String[][] value = db.getBorrowPreview();
@@ -139,7 +141,27 @@ public class CustodianHandler {
 		else return false;
 	}
 	
+	//---------------------------------------------------------------------------------------------------------------------------------
 	// WRITE
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	public boolean deleteBorrowerProfile(int id) throws SPEARException {
+		boolean check = db.checkBorrowerExistance(id);
+		if(!check) throw new SPEARException("Selected Borrower does not exist.");
+		
+		boolean update = db.annihilateBorrower(id); if(!update) throw new SPEARException("Something went wrong while trying to delete this Borrower's profile. Check your connection.");
+		
+		return true;
+	}
+	
+			
+	public boolean UpdateBorrowerProfile(String[] details) throws SPEARException {
+		BorrowerProfile prof = ValidateRegistration(details);
+		
+		boolean updateProfile = db.updateBorrowerProfile(prof); if (!updateProfile) throw new SPEARException("");
+		
+		return true;
+	}
 	
 	public boolean RegisterBorrower(String[] details) throws SPEARException {
 		BorrowerProfile prof = ValidateRegistration(details);
