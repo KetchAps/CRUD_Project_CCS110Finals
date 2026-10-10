@@ -1,4 +1,4 @@
-package spearsystem;
+package normie.util;
 
 public class SPEARException extends Exception {
 
@@ -10,5 +10,9 @@ public class SPEARException extends Exception {
 	public SPEARException(String msg) {
 		super(msg);
 	}
+	
+	@Override
+	public synchronized Throwable fillInStackTrace()  { return this; }
+	
 	
 }

@@ -5,6 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
+import normie.util.SPEARException;
+
 import java.sql.Date;
 
 public class CustodianDatabaseHandler {
@@ -208,14 +211,15 @@ public class CustodianDatabaseHandler {
 	public boolean registerNewBorrower(BorrowerProfile dt) throws SPEARException {
 		
 		try(Connection conn = ConnectionHandler.tryConnect();
-			PreparedStatement st = conn.prepareStatement("insert into borrowers values (borrowerID, ?, ? ,?, ?, ?, ?)")) {
+			PreparedStatement st = conn.prepareStatement("insert into borrowers values (borrowerID, ?, ? ,?, ?, ?, ?, ?)")) {
 			
 			st.setString(1, dt.firstName());
 			st.setString(2, dt.lastName());
-			st.setString(3, dt.idNumber());
-			st.setString(4, dt.deptOrGrade());
-			st.setString(5, dt.contactNo);
-			st.setString(6, dt.email());
+			st.setString(3, dt.BorrowType());
+			st.setString(4, dt.idNumber());
+			st.setString(5, dt.deptOrGrade());
+			st.setString(6, dt.contactNo());
+			st.setString(7, dt.email());
 			
 			st.executeUpdate();
 			return true;
@@ -229,7 +233,52 @@ public class CustodianDatabaseHandler {
 		
 	}
 	
+	public boolean updateBorrowerProfile(BorrowerProfile dt) throws SPEARException {
+		
+		try(Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("update borrowers SET "
+					+ "firstName = ?, lastName = ?, borrowType = ?, idNumber = ?, department_or_grade = ?, contactNumber = ?, email = ? WHERE borrowerID = ?")) {
+			
+			st.setString(1, dt.firstName());
+			st.setString(2, dt.lastName());
+			st.setString(3, dt.BorrowType());
+			st.setString(4, dt.idNumber());
+			st.setString(5, dt.deptOrGrade());
+			st.setString(6, dt.contactNo());
+			st.setString(7, dt.email());
+			
+			st.setInt(8, dt.borrowerID());
+			
+			st.executeUpdate();
+			return true;
+		} catch(SQLException e) {
+			
+			e.printStackTrace();
+			return false;
+		}
+		
+		
+		
+	}
 	
+	/* !HIGHLY DANGEROUS AREA!
+	 * ALL PERSONNEL ARE REQUIRED TO WEAR COMPANY-ISSUED 'WHERE' CLAUSES WHEN ENTERING THE ZONE.
+	*/
+	public boolean annihilateBorrower(int id) {
+		try(Connection conn = ConnectionHandler.tryConnect();
+				PreparedStatement st = conn.prepareStatement("DELETE FROM borrowers WHERE borrowerID = ?")) {
+				
+				st.setInt(1, id);
+				
+				st.executeUpdate();
+				return true;
+			} catch(SQLException e) {
+				
+				e.printStackTrace();
+				return false;
+			}
+		
+	}
 	
 	public boolean updateEquipmentAvailability(int value, int id) {
 			String status;
@@ -596,10 +645,12 @@ public class CustodianDatabaseHandler {
 	public BorrowerProfile fetchBorrowerProfile(int id) {
 		
 		try(Connection conn = ConnectionHandler.tryConnect();
-			PreparedStatement st = conn.prepareStatement("select * from borrowers")) {
+			PreparedStatement st = conn.prepareStatement("select * from borrowers WHERE borrowerID = ? LIMIT 1")) {
 			BorrowerProfile profile;
 			
+			st.setInt(1, id);
 			try(ResultSet rs = st.executeQuery()) {
+				if(rs.next()) {
 				profile = new BorrowerProfile(
 						rs.getInt(1),
 						rs.getString(2),
@@ -612,6 +663,8 @@ public class CustodianDatabaseHandler {
 						);
 				
 				return profile;
+				}
+				return null;
 			}
 		} catch(SQLException e) {
 			
@@ -629,9 +682,9 @@ public class CustodianDatabaseHandler {
 			
 			try(ResultSet rs = st.executeQuery()) {
 				while(rs.next()) {
-					String[] temp = new String[9];
+					String[] temp = new String[8];
 					
-					for(int i = 1; i <= 11; i++) {
+					for(int i = 1; i <= 8; i++) {
 					temp[i - 1] = rs.getString(i);
 					}
 					
