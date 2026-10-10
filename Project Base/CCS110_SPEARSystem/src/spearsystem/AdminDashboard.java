@@ -23,6 +23,13 @@ import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.JTable;
+import javax.swing.JPasswordField;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+import java.io.CharArrayReader;
+import java.sql.SQLException;
+import java.util.Arrays;
 
 public class AdminDashboard {
 
@@ -42,7 +49,28 @@ public class AdminDashboard {
 	private JTextField txtLastName;
 	private JTextField txtContactNumber;
 	private JTextField txtUsername;
-	private JTextField txtPassword;
+	private JPasswordField txtPassword;
+	private JComboBox<String> positionCbo;
+	private JComboBox<String> departmentCbo;
+	private DefaultTableModel custodianModel;
+	private JComboBox<String> cboCategory;
+	private JComboBox<AdminHandler.RoomOption> cboRoomLocation;
+	private JComboBox<String> cboCondition;
+	private JComboBox<String> cboAvailability;
+	private JComboBox<String> cboCategory2;
+	private JComboBox<String> cboCondition2;
+	private JComboBox<String> cboAvailability2;
+	private JLabel lblTotalEquipment2Counter;
+	private JLabel lblAvailableCounter;
+	private JLabel lblUnderMaintenanceCounter;
+	private JLabel lblBorrowedCounter;
+	private JTable equipmentTable;
+	private DefaultTableModel equipmentModel;
+	private int editingEquipmentID = -1; // -1 = adding a new item, otherwise the item being edited
+	private int sessionID; // custodianID of the logged-in account (so you can't delete yourself)
+
+	final String[] POSITIONS = { "Admin", "Custodian" };
+	final String[] DEPARTMENTS = { "IT", "Registrar", "MISD", "Library" }; // edit to fit your school
 	private JTextField txtSearch;
 	private JTable table;
 	private JTextField txtPropertyTag;
@@ -501,7 +529,7 @@ public class AdminDashboard {
 		addCustodianPanel.add(lblPosition);
 		
 		// Do not remove
-		JComboBox positionCbo = new JComboBox();
+		positionCbo = new JComboBox<>(POSITIONS);
 		positionCbo.setBounds(10, 211, 215, 25);
 		addCustodianPanel.add(positionCbo);
 		
@@ -511,7 +539,7 @@ public class AdminDashboard {
 		addCustodianPanel.add(lblDepartment);
 		
 		// Do not remove
-		JComboBox departmentCbo = new JComboBox();
+		departmentCbo = new JComboBox<>(DEPARTMENTS);
 		departmentCbo.setBounds(10, 272, 215, 25);
 		addCustodianPanel.add(departmentCbo);
 		
@@ -548,7 +576,7 @@ public class AdminDashboard {
 		lblPassword.setBounds(9, 448, 107, 25);
 		addCustodianPanel.add(lblPassword);
 		
-		txtPassword = new JTextField();
+		txtPassword = new JPasswordField();
 		txtPassword.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtPassword.setColumns(10);
 		txtPassword.setBounds(9, 476, 215, 25);
@@ -561,30 +589,18 @@ public class AdminDashboard {
 		addCustodianPanel.add(btnAdd);
 		
 		ButtonOne btnEdit = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-		btnEdit.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		btnEdit.setText("Edit");
 		btnEdit.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnEdit.setBounds(10, 561, 105, 45);
 		addCustodianPanel.add(btnEdit);
 		
 		ButtonOne btnDelete = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-		btnDelete.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		btnDelete.setText("Delete");
 		btnDelete.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnDelete.setBounds(118, 512, 105, 45);
 		addCustodianPanel.add(btnDelete);
 		
 		ButtonOne btnClear = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-		btnClear.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			}
-		});
 		btnClear.setText("Clear");
 		btnClear.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnClear.setBounds(118, 561, 105, 45);
@@ -643,13 +659,20 @@ public class AdminDashboard {
 		lblAllPositions.setBounds(545, 11, 107, 25);
 		quickAccessPanel.add(lblAllPositions);
 		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(613, 224, 661, 393);
-		custodianManagementPanel.add(scrollPane);
+		custodianModel = new DefaultTableModel(
+				new String[] { "ID", "First Name", "Last Name", "Position", "Department", "Contact", "Username" }, 0) {
+			@Override
+			public boolean isCellEditable(int row, int col) {
+				return false; // editing is done in the form, not in the table
+			}
+		};
+		table = new JTable(custodianModel);
+		table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+		JScrollPane scrollPane = new JScrollPane(table);
+		scrollPane.setBounds(0, 117, 740, 500);
+		custodianRecordsPanel.add(scrollPane); // inside the records panel so it is not covered
 		
-		table = new JTable();
-		table.setBounds(613, 224, 661, 393);
-		custodianManagementPanel.add(table);
 		
 		JPanel inventoryManagementPanel = new JPanel();
 		inventoryManagementPanel.setLayout(null);
@@ -689,7 +712,7 @@ public class AdminDashboard {
 		lblTotalEquipment2.setBounds(51, 0, 122, 34);
 		panel_4.add(lblTotalEquipment2);
 		
-		JLabel lblTotalEquipment2Counter = new JLabel("00");
+		lblTotalEquipment2Counter = new JLabel("00");
 		lblTotalEquipment2Counter.setForeground(new Color(30, 144, 255));
 		lblTotalEquipment2Counter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblTotalEquipment2Counter.setBounds(85, 25, 54, 50);
@@ -720,7 +743,7 @@ public class AdminDashboard {
 		lblAvailable.setBounds(78, 0, 69, 34);
 		availablePanel.add(lblAvailable);
 		
-		JLabel lblAvailableCounter = new JLabel("00");
+		lblAvailableCounter = new JLabel("00");
 		lblAvailableCounter.setForeground(new Color(30, 144, 255));
 		lblAvailableCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblAvailableCounter.setBounds(85, 25, 54, 50);
@@ -737,7 +760,7 @@ public class AdminDashboard {
 		lblUnderMaintenance.setBounds(42, 0, 141, 34);
 		underMaintenancePanel.add(lblUnderMaintenance);
 		
-		JLabel lblUnderMaintenanceCounter = new JLabel("00");
+		lblUnderMaintenanceCounter = new JLabel("00");
 		lblUnderMaintenanceCounter.setForeground(new Color(30, 144, 255));
 		lblUnderMaintenanceCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblUnderMaintenanceCounter.setBounds(85, 25, 54, 50);
@@ -754,7 +777,7 @@ public class AdminDashboard {
 		lblBorrowed.setBounds(75, 0, 75, 34);
 		borrowedPanel.add(lblBorrowed);
 		
-		JLabel lblBorrowedCounter = new JLabel("00");
+		lblBorrowedCounter = new JLabel("00");
 		lblBorrowedCounter.setForeground(new Color(30, 144, 255));
 		lblBorrowedCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblBorrowedCounter.setBounds(85, 25, 54, 50);
@@ -807,7 +830,7 @@ public class AdminDashboard {
 		addCustodianPanel_1.add(lblCategory);
 		
 		// Do not remove
-		JComboBox cboCategory = new JComboBox();
+		cboCategory = new JComboBox<>();
 		cboCategory.setBounds(10, 185, 261, 25);
 		addCustodianPanel_1.add(cboCategory);
 		
@@ -829,7 +852,7 @@ public class AdminDashboard {
 		addCustodianPanel_1.add(lblRoomLocation);
 		
 		// Do not remove
-		JComboBox cboRoomLocation = new JComboBox();
+		cboRoomLocation = new JComboBox<>();
 		cboRoomLocation.setBounds(281, 185, 250, 25);
 		addCustodianPanel_1.add(cboRoomLocation);
 		
@@ -861,7 +884,7 @@ public class AdminDashboard {
 		addCustodianPanel_1.add(lblCondition);
 		
 		// Do not remove
-		JComboBox cboCondition = new JComboBox();
+		cboCondition = new JComboBox<>();
 		cboCondition.setBounds(541, 185, 213, 25);
 		addCustodianPanel_1.add(cboCondition);
 		
@@ -892,7 +915,7 @@ public class AdminDashboard {
 		lblAvailability.setBounds(764, 42, 213, 25);
 		addCustodianPanel_1.add(lblAvailability);
 		
-		JComboBox cboAvailability = new JComboBox();
+		cboAvailability = new JComboBox<>();
 		cboAvailability.setBounds(764, 70, 213, 25);
 		addCustodianPanel_1.add(cboAvailability);
 		
@@ -943,12 +966,26 @@ public class AdminDashboard {
 		hero3.setBounds(0, 0, 987, 47);
 		custodianRecordsPane2.add(hero3);
 		
-		JLabel lblCustodianRecords = new JLabel("Custodian Records");
+		JLabel lblCustodianRecords = new JLabel("Equipment Records");
 		lblCustodianRecords.setForeground(new Color(30, 144, 255));
 		lblCustodianRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
 		lblCustodianRecords.setBackground(new Color(230, 230, 250));
 		lblCustodianRecords.setBounds(10, 0, 306, 47);
 		hero3.add(lblCustodianRecords);
+		equipmentModel = new DefaultTableModel(new String[] { "ID", "Property Tag", "Equipment", "Category", "Brand / Model",
+				"Serial No.", "Room", "Purchase Date", "Cost", "Condition", "Availability" }, 0) {
+			@Override
+			public boolean isCellEditable(int row, int col) {
+				return false; // editing is done in the form, not in the table
+			}
+		};
+		equipmentTable = new JTable(equipmentModel);
+		equipmentTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		equipmentTable.setRowHeight(24);
+
+		JScrollPane equipmentScroll = new JScrollPane(equipmentTable);
+		equipmentScroll.setBounds(0, 47, 987, 245);
+		custodianRecordsPane2.add(equipmentScroll);
 		
 		JPanel quickActions2 = new JPanel();
 		quickActions2.setBackground(new Color(255, 255, 255));
@@ -976,11 +1013,11 @@ public class AdminDashboard {
 		lblAllPositions_1.setBounds(350, 5, 56, 25);
 		quickActions2.add(lblAllPositions_1);
 		
-		JComboBox cboCategory2 = new JComboBox();
+		cboCategory2 = new JComboBox<>();
 		cboCategory2.setBounds(416, 5, 137, 25);
 		quickActions2.add(cboCategory2);
 		
-		JComboBox cboCondition2 = new JComboBox();
+		cboCondition2 = new JComboBox<>();
 		cboCondition2.setBounds(629, 7, 117, 25);
 		quickActions2.add(cboCondition2);
 		
@@ -994,7 +1031,7 @@ public class AdminDashboard {
 		lblAvailability2.setBounds(756, 5, 76, 25);
 		quickActions2.add(lblAvailability2);
 		
-		JComboBox cboAvailability2 = new JComboBox();
+		cboAvailability2 = new JComboBox<>();
 		cboAvailability2.setBounds(842, 5, 135, 25);
 		quickActions2.add(cboAvailability2);
 
@@ -1046,12 +1083,418 @@ public class AdminDashboard {
 			}
 		});
 
+		// ===========================================
+		// CUSTODIAN MANAGER (talks to AdminHandler)
+		// ===========================================
+		refreshCustodianTable();
+
+		// click a row -> fill the form
+		table.getSelectionModel().addListSelectionListener(e -> {
+			if (e.getValueIsAdjusting())
+				return;
+			int id = selectedCustodianID();
+			if (id < 0)
+				return;
+			try {
+				AdminHandler.CustodianProfile p = AdminHandler.fetchCustodian(id);
+				if (p == null)
+					return;
+				txtFirstName.setText(p.firstName());
+				txtLastName.setText(p.lastName());
+				positionCbo.setSelectedItem(p.position());
+				departmentCbo.setSelectedItem(p.department());
+				txtContactNumber.setText(p.contactNumber());
+				txtUsername.setText(p.username());
+				txtPassword.setText("");
+				txtUsername.setEnabled(false); // updateCustodian does not change these
+				txtPassword.setEnabled(false);
+			} catch (SQLException ex) {
+				showError(ex);
+			}
+		});
+
+		btnAdd.addActionListener(e -> {
+			char[] pw = txtPassword.getPassword();
+			try {
+				String result = AdminHandler.registerCustodian(txtFirstName.getText(), txtLastName.getText(),
+						(String) positionCbo.getSelectedItem(), (String) departmentCbo.getSelectedItem(),
+						txtContactNumber.getText(), txtUsername.getText(), new CharArrayReader(pw));
+				showResult(result);
+				if (result.equals(AdminHandler.SUCCESS)) {
+					refreshCustodianTable();
+					clearForm();
+				}
+			} catch (SQLException ex) {
+				showError(ex);
+			} finally {
+				Arrays.fill(pw, ' ');
+			}
+		});
+
+		btnEdit.addActionListener(e -> {
+			int id = selectedCustodianID();
+			if (id < 0) {
+				JOptionPane.showMessageDialog(adminDashboard, "Select a custodian from the table first.");
+				return;
+			}
+			try {
+				String result = AdminHandler.updateCustodian(id, txtFirstName.getText(), txtLastName.getText(),
+						(String) positionCbo.getSelectedItem(), (String) departmentCbo.getSelectedItem(),
+						txtContactNumber.getText());
+				showResult(result);
+				if (result.equals(AdminHandler.SUCCESS)) {
+					refreshCustodianTable();
+					clearForm();
+				}
+			} catch (SQLException ex) {
+				showError(ex);
+			}
+		});
+
+		btnDelete.addActionListener(e -> {
+			int id = selectedCustodianID();
+			if (id < 0) {
+				JOptionPane.showMessageDialog(adminDashboard, "Select a custodian from the table first.");
+				return;
+			}
+			int choice = JOptionPane.showConfirmDialog(adminDashboard, "Delete this custodian and their login account?",
+					"Confirm delete", JOptionPane.YES_NO_OPTION);
+			if (choice != JOptionPane.YES_OPTION)
+				return;
+			try {
+				String result = AdminHandler.deleteCustodian(id, sessionID);
+				showResult(result);
+				if (result.equals(AdminHandler.SUCCESS)) {
+					refreshCustodianTable();
+					clearForm();
+				}
+			} catch (SQLException ex) {
+				showError(ex);
+			}
+		});
+
+		btnClear.addActionListener(e -> clearForm());
+		// ===========================================
+		// INVENTORY MANAGER (talks to AdminHandler)
+		// ===========================================
+		loadInventoryLists();
+		refreshInventory();
+
+		// search + filters
+		btnSearch2.addActionListener(e -> refreshEquipmentTable());
+		txtSearch2.addActionListener(e -> refreshEquipmentTable());
+		cboCategory2.addActionListener(e -> refreshEquipmentTable());
+		cboCondition2.addActionListener(e -> refreshEquipmentTable());
+		cboAvailability2.addActionListener(e -> refreshEquipmentTable());
+
+		// Add = start a blank form, Edit = load the selected row into the form,
+		// Save Equipment = save whichever one you are doing
+		btnAdd2.addActionListener(e -> {
+			resetEquipmentForm();
+			txtPropertyTag.requestFocusInWindow();
+		});
+
+		btnEdit2.addActionListener(e -> {
+			int id = selectedEquipmentID();
+			if (id < 0) {
+				JOptionPane.showMessageDialog(adminDashboard, "Select an item from the table first.");
+				return;
+			}
+			loadEquipmentIntoForm(id);
+		});
+
+		btnView2.addActionListener(e -> viewEquipment());
+
+		btnDelete2.addActionListener(e -> deleteSelectedEquipment());
+
+		btnClear_1.addActionListener(e -> saveEquipment());   // the "Save Equipment" button
+
+		btnClear_2_1.addActionListener(e -> resetEquipmentForm());   // the "Reset" button
 		// frame.setVisible(true);
 
 	}
 	// Change the first parameter from Object to MainClient, and call initialize()
-	public AdminDashboard(MainClient mainClient, CustodianHandler custodianHandler) {
+	public AdminDashboard(MainClient mainClient, int sessionID) {
+		this.sessionID = sessionID;
 		initialize();
+	}
+	// ===========================================
+	// CUSTODIAN HELPERS
+	// ===========================================
+	private void refreshCustodianTable() {
+		try {
+			String[][] rows = AdminHandler.getCustodianList();
+			custodianModel.setRowCount(0);
+			for (String[] row : rows)
+				custodianModel.addRow(row);
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	// returns -1 when no row is selected
+	private int selectedCustodianID() {
+		int row = table.getSelectedRow();
+		if (row < 0)
+			return -1;
+		return Integer.parseInt((String) custodianModel.getValueAt(row, 0));
+	}
+
+	private void clearForm() {
+		txtFirstName.setText("");
+		txtLastName.setText("");
+		txtContactNumber.setText("");
+		txtUsername.setText("");
+		txtPassword.setText("");
+		positionCbo.setSelectedIndex(0);
+		departmentCbo.setSelectedIndex(0);
+		txtUsername.setEnabled(true);
+		txtPassword.setEnabled(true);
+		table.clearSelection();
+	}
+
+	private void showResult(String code) {
+		String msg = switch (code) {
+		case AdminHandler.SUCCESS -> "Done!";
+		case AdminHandler.REQUIRED -> "Please fill in all fields.";
+		case AdminHandler.DUPLICATE -> "A custodian with that name and contact number already exists.";
+		case AdminHandler.USERNAME_TAKEN -> "That username is already taken.";
+		case AdminHandler.TOO_LONG -> "One of the fields is too long.";
+		case AdminHandler.NOT_FOUND -> "That custodian no longer exists.";
+		case AdminHandler.PROTECTED -> "Admin accounts and your own account can't be deleted.";
+		default -> "Unexpected result: " + code;
+		};
+		int type = code.equals(AdminHandler.SUCCESS) ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE;
+		JOptionPane.showMessageDialog(adminDashboard, msg, "Custodian Manager", type);
+	}
+
+	private void showError(SQLException ex) {
+		ex.printStackTrace();
+		JOptionPane.showMessageDialog(adminDashboard, "Database error: " + ex.getMessage(), "Error",
+				JOptionPane.ERROR_MESSAGE);
+	}
+	// ===========================================
+	// INVENTORY HELPERS
+	// ===========================================
+	private void loadInventoryLists() {
+		try {
+			String[] categories = AdminHandler.getCategories();
+			cboCategory.setModel(new DefaultComboBoxModel<>(categories));
+			cboCategory2.setModel(withAll("All Categories", categories));
+
+			DefaultComboBoxModel<AdminHandler.RoomOption> rooms = new DefaultComboBoxModel<>();
+			rooms.addElement(AdminHandler.NO_ROOM);
+			for (AdminHandler.RoomOption r : AdminHandler.getRooms())
+				rooms.addElement(r);
+			cboRoomLocation.setModel(rooms);
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+
+		cboCondition.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
+		cboAvailability.setModel(new DefaultComboBoxModel<>(EQUIPAVAILABILITY));
+		cboCondition2.setModel(withAll("All Conditions", EQUIPCONDITIONS));
+		cboAvailability2.setModel(withAll("All Availability", EQUIPAVAILABILITY));
+	}
+
+	private DefaultComboBoxModel<String> withAll(String first, String[] items) {
+		DefaultComboBoxModel<String> model = new DefaultComboBoxModel<>();
+		model.addElement(first);
+		for (String item : items)
+			model.addElement(item);
+		return model;
+	}
+
+	private String filterValue(JComboBox<String> cbo) {
+		if (cbo.getSelectedIndex() <= 0)
+			return null;
+		return (String) cbo.getSelectedItem();
+	}
+
+	private void refreshInventory() {
+		refreshEquipmentTable();
+		refreshEquipmentCounts();
+	}
+
+	private void refreshEquipmentTable() {
+		try {
+			String[][] rows = AdminHandler.getEquipmentList(txtSearch2.getText(), filterValue(cboCategory2),
+					filterValue(cboCondition2), filterValue(cboAvailability2));
+			equipmentModel.setRowCount(0);
+			for (String[] row : rows)
+				equipmentModel.addRow(row);
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	private void refreshEquipmentCounts() {
+		try {
+			int[] c = AdminHandler.getCounts();
+			lblTotalEquipment2Counter.setText(String.format("%02d", c[0]));
+			lblAvailableCounter.setText(String.format("%02d", c[1]));
+			lblUnderMaintenanceCounter.setText(String.format("%02d", c[2]));
+			lblBorrowedCounter.setText(String.format("%02d", c[3]));
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	private int selectedEquipmentID() {
+		int row = equipmentTable.getSelectedRow();
+		if (row < 0)
+			return -1;
+		return Integer.parseInt((String) equipmentModel.getValueAt(row, 0));
+	}
+
+	private String nz(String s) {
+		return s == null ? "" : s;
+	}
+
+	private void loadEquipmentIntoForm(int id) {
+		try {
+			AdminHandler.Equipment item = AdminHandler.fetchEquipment(id);
+			if (item == null) {
+				JOptionPane.showMessageDialog(adminDashboard, "That item no longer exists.");
+				refreshInventory();
+				return;
+			}
+			txtPropertyTag.setText(nz(item.propertyTag()));
+			txtEquipmentName.setText(nz(item.equipmentName()));
+			cboCategory.setSelectedItem(item.categoryName());
+			txtBrandModel.setText(nz(item.brandModel()));
+			txtSerialNumber.setText(nz(item.serialNumber()));
+			txtPurchaseDate.setText(nz(item.purchaseDate()));
+			txtPurchaseCost.setText(nz(item.purchaseCost()));
+			cboCondition.setSelectedItem(item.condition());
+			cboAvailability.setSelectedItem(item.availability());
+			txtDescription.setText(nz(item.description()));
+			for (int i = 0; i < cboRoomLocation.getItemCount(); i++) {
+				if (cboRoomLocation.getItemAt(i).roomID() == item.roomID()) {
+					cboRoomLocation.setSelectedIndex(i);
+					break;
+				}
+			}
+			editingEquipmentID = id;
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	private void saveEquipment() {
+		AdminHandler.RoomOption room = (AdminHandler.RoomOption) cboRoomLocation.getSelectedItem();
+		int roomID = room == null ? 0 : room.roomID();
+		try {
+			String result;
+			if (editingEquipmentID < 0) {
+				result = AdminHandler.addEquipment(txtPropertyTag.getText(), txtEquipmentName.getText(),
+						(String) cboCategory.getSelectedItem(), txtBrandModel.getText(), txtSerialNumber.getText(),
+						txtDescription.getText(), roomID, txtPurchaseDate.getText(), txtPurchaseCost.getText(),
+						(String) cboCondition.getSelectedItem(), (String) cboAvailability.getSelectedItem());
+			} else {
+				result = AdminHandler.updateEquipment(editingEquipmentID, txtPropertyTag.getText(),
+						txtEquipmentName.getText(), (String) cboCategory.getSelectedItem(), txtBrandModel.getText(),
+						txtSerialNumber.getText(), txtDescription.getText(), roomID, txtPurchaseDate.getText(),
+						txtPurchaseCost.getText(), (String) cboCondition.getSelectedItem(),
+						(String) cboAvailability.getSelectedItem());
+			}
+			showEquipmentResult(result);
+			if (result.equals(AdminHandler.SUCCESS)) {
+				refreshInventory();
+				resetEquipmentForm();
+			}
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	private void viewEquipment() {
+		int id = selectedEquipmentID();
+		if (id < 0) {
+			JOptionPane.showMessageDialog(adminDashboard, "Select an item from the table first.");
+			return;
+		}
+		try {
+			AdminHandler.Equipment item = AdminHandler.fetchEquipment(id);
+			if (item == null) {
+				showEquipmentResult(AdminHandler.NOT_FOUND);
+				refreshInventory();
+				return;
+			}
+			String text = "Property Tag: " + nz(item.propertyTag()) + "\n"
+					+ "Equipment: " + nz(item.equipmentName()) + "\n"
+					+ "Category: " + nz(item.categoryName()) + "\n"
+					+ "Brand / Model: " + nz(item.brandModel()) + "\n"
+					+ "Serial Number: " + nz(item.serialNumber()) + "\n"
+					+ "Room: " + nz(item.roomName()) + "\n"
+					+ "Purchase Date: " + nz(item.purchaseDate()) + "\n"
+					+ "Purchase Cost: " + nz(item.purchaseCost()) + "\n"
+					+ "Condition: " + nz(item.condition()) + "\n"
+					+ "Availability: " + nz(item.availability()) + "\n"
+					+ "Description: " + nz(item.description());
+			JOptionPane.showMessageDialog(adminDashboard, text, "Equipment Details", JOptionPane.INFORMATION_MESSAGE);
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	private void deleteSelectedEquipment() {
+		int id = selectedEquipmentID();
+		if (id < 0) {
+			JOptionPane.showMessageDialog(adminDashboard, "Select an item from the table first.");
+			return;
+		}
+		int choice = JOptionPane.showConfirmDialog(adminDashboard, "Delete this equipment record?", "Confirm delete",
+				JOptionPane.YES_NO_OPTION);
+		if (choice != JOptionPane.YES_OPTION)
+			return;
+		try {
+			String result = AdminHandler.deleteEquipment(id);
+			showEquipmentResult(result);
+			if (result.equals(AdminHandler.SUCCESS)) {
+				refreshInventory();
+				resetEquipmentForm();
+			}
+		} catch (SQLException ex) {
+			showError(ex);
+		}
+	}
+
+	private void resetEquipmentForm() {
+		txtPropertyTag.setText("");
+		txtEquipmentName.setText("");
+		txtBrandModel.setText("");
+		txtSerialNumber.setText("");
+		txtPurchaseDate.setText("");
+		txtPurchaseCost.setText("");
+		txtDescription.setText("");
+		if (cboCategory.getItemCount() > 0)
+			cboCategory.setSelectedIndex(0);
+		if (cboRoomLocation.getItemCount() > 0)
+			cboRoomLocation.setSelectedIndex(0);
+		if (cboCondition.getItemCount() > 0)
+			cboCondition.setSelectedIndex(0);
+		if (cboAvailability.getItemCount() > 0)
+			cboAvailability.setSelectedIndex(0);
+		editingEquipmentID = -1;
+		equipmentTable.clearSelection();
+	}
+
+	private void showEquipmentResult(String code) {
+		String msg = switch (code) {
+		case AdminHandler.SUCCESS -> "Saved!";
+		case AdminHandler.REQUIRED -> "Property Tag, Equipment Name and Category are required.";
+		case AdminHandler.DUPLICATE -> "That property tag is already used by another item.";
+		case AdminHandler.TOO_LONG -> "One of the fields is too long.";
+		case AdminHandler.NOT_FOUND -> "That item no longer exists.";
+		case AdminHandler.INVALID_DATE -> "Purchase Date must look like 2023-05-12 (yyyy-mm-dd).";
+		case AdminHandler.INVALID_COST -> "Purchase Cost must be a positive number, like 15000.50.";
+		case AdminHandler.HAS_RECORDS ->
+			"This item has borrow or maintenance records, so it can't be deleted. Change its availability instead.";
+		default -> "Unexpected result: " + code;
+		};
+		int type = code.equals(AdminHandler.SUCCESS) ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE;
+		JOptionPane.showMessageDialog(adminDashboard, msg, "Inventory Manager", type);
 	}
 	public Component getPanel() {
 		// TODO Auto-generated method stub
