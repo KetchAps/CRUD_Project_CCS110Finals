@@ -37,6 +37,13 @@ public class CustodianHandler {
 		return value;
 	}
 	
+	public String[][] getRegisteredBorrowersList() throws SPEARException {
+		String[][] value = db.getBorrowerDetailsList();
+		
+		if(value == null) throw new SPEARException("Something went wrong while trying to fetch Borrower List. Check your connection.");
+		return value;
+	}
+	
 	public String[][] getBorrowPreview() throws SPEARException {
 		String[][] value = db.getBorrowPreview();
 		
@@ -93,6 +100,16 @@ public class CustodianHandler {
 		return result;
 	}
 	
+	public BorrowerProfile fetchBorrowerProfile(int id) throws SPEARException {
+		boolean validate = db.checkBorrowerExistance(id);
+		
+		if(!validate) throw new SPEARException("Selected Profile does not exist.");
+		
+		BorrowerProfile result = db.fetchBorrowerProfile(id);
+		if(result == null) throw new SPEARException("Something went wrong while trying to fetch Borrower Profile. Check your connection and try again.");
+		return result;
+	}
+	
 	public BorrowerList fetchBorrowers() throws SPEARException {
 		String[] name = db.getBorrowerList();
 		Integer[] id = db.getBorrowerIDList();
@@ -142,7 +159,7 @@ public class CustodianHandler {
 				throw new SPEARException("All fields must be field in.");
 		}
 		
-		BorrowerProfile profile = new BorrowerProfile(-1, details[0], details[1], details[2], details[3], details[4], details[5]);
+		BorrowerProfile profile = new BorrowerProfile(-1, details[0], details[1], details[2], details[3], details[4], details[5], details[6]);
 		return profile;
 		}
 	

@@ -56,6 +56,7 @@ public class CustodianDatabaseHandler {
 			int borrowerID,
 		    String firstName,
 		    String lastName,
+		    String BorrowType,
 		    String idNumber,
 		    String deptOrGrade,
 		    String contactNo,
@@ -228,6 +229,8 @@ public class CustodianDatabaseHandler {
 		
 	}
 	
+	
+	
 	public boolean updateEquipmentAvailability(int value, int id) {
 			String status;
 			switch (value) {
@@ -382,7 +385,6 @@ public class CustodianDatabaseHandler {
 			return null;
 		}
 	}
-	
 	
 	
 	
@@ -588,6 +590,66 @@ public class CustodianDatabaseHandler {
 		}
 		
 	}
+
+
+	
+	public BorrowerProfile fetchBorrowerProfile(int id) {
+		
+		try(Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("select * from borrowers")) {
+			BorrowerProfile profile;
+			
+			try(ResultSet rs = st.executeQuery()) {
+				profile = new BorrowerProfile(
+						rs.getInt(1),
+						rs.getString(2),
+						rs.getString(3),
+						rs.getString(4),
+						rs.getString(5),
+						rs.getString(6),
+						rs.getString(7),
+						rs.getString(8)
+						);
+				
+				return profile;
+			}
+		} catch(SQLException e) {
+			
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+
+	public String[][] getBorrowerDetailsList() {
+		
+		try(Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("select * from borrowers")) {
+			ArrayList<String[]> list = new ArrayList<String[]>();
+			
+			try(ResultSet rs = st.executeQuery()) {
+				while(rs.next()) {
+					String[] temp = new String[9];
+					
+					for(int i = 1; i <= 11; i++) {
+					temp[i - 1] = rs.getString(i);
+					}
+					
+					list.add(temp);
+				}
+				}
+				String[][] array = list.toArray(new String[0][]);
+				
+				return array;
+			
+		} catch(SQLException e) {
+			
+			e.printStackTrace();
+			return null;
+		}
+		
+	}
+	
 	
 	public Integer[] getBorrowerIDList() {
 		
@@ -611,6 +673,8 @@ public class CustodianDatabaseHandler {
 			return null;
 		}
 	}
+	
+	
 	
 	public BorrowRecord fetchBorrowRecord(int id) {
 		

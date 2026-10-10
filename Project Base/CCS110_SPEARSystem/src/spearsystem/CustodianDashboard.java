@@ -4,12 +4,10 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Image;
-import java.awt.Toolkit;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.sql.Date;
 import java.time.LocalDate;
 
 import javax.swing.DefaultComboBoxModel;
@@ -25,7 +23,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.RowFilter;
 import javax.swing.SwingConstants;
-import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.text.AbstractDocument;
@@ -36,10 +33,9 @@ import javax.swing.text.DocumentFilter;
 import kenUI.ButtonOne;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
+import spearsystem.CustodianDatabaseHandler.BorrowerProfile;
 import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
 import spearsystem.CustodianDatabaseHandler.MaintenanceReport;
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
 
 
 public class CustodianDashboard {
@@ -47,6 +43,7 @@ public class CustodianDashboard {
 	final String[] RECORDSTATUS = {"Returned", "Borrowed"};
 	final String[] REPORTSTATUS = {"In Progress", "Resolved"};
 	
+	final String[] BORROWERTYPES = {"Student", "Staff"};
 	final String[] EQUIPCONDITIONS = {"Good", "Worn", "Damaged"};
 	final String[] EQUIPAVAILABILITY = {"Available", "Borrowed", "Maintenance"}; 
 	private Integer[] borrowerIDs;
@@ -54,6 +51,7 @@ public class CustodianDashboard {
 	private EquipmentDetails loadedEquip;
 	private BorrowRecord loadedRecord;
 	private MaintenanceReport loadedReport;
+	private BorrowerProfile loadedProfile;
 	
 	private int activeScreen = 0;
 	
@@ -72,6 +70,8 @@ public class CustodianDashboard {
 	private JComboBox<String> cmbBorrowerName;
 	private JComboBox<String> cmbCondOnReturn;
 	private JComboBox<String> cmbStatusMnt;
+	private JComboBox<String> cmbNewBorrowType;
+	private JComboBox<String> cmbBorrowType;
 	
 	private JPanel cardContainer;
 	private JPanel formCreator; // JPanel of the Forms
@@ -234,7 +234,7 @@ public class CustodianDashboard {
 	private JTextField txtMntUpdReport;
 	private JTextField txtMntUpdDate;
 	private JTextField txtMntUpdEquipID;
-	private JTable table;
+	private JTable tblBorrowers;
 	private JTextField textField;
 	private JTextField txtNewBorrowNameF;
 	private JTextField txtNewBorrowNameL;
@@ -242,6 +242,13 @@ public class CustodianDashboard {
 	private JTextField txtNewBorrowDept;
 	private JTextField txtNewBorrowContact;
 	private JTextField txtNewBorrowEmail;
+	private JTextField txtMngBorrowerEmail;
+	private JTextField txtMngBorrowerContactNo;
+	private JTextField txtMngBorrowerDept;
+	private JTextField txtMngBorrowerID;
+	private JTextField txtMngBorrowerNameL;
+	private JTextField txtMngBorrowerNameF;
+	private JTextField txtMngBorrowerTransaction;
 	
 	
 	
@@ -1054,7 +1061,7 @@ public class CustodianDashboard {
 		updateMaintenance.add(lblMntUpdIssue);
 		
 		JButton btnMntUpdate = new JButton("Update Record");
-		btnMntUpdate.addActionListener(e -> { updateMaintenanceReport(); });
+		btnMntUpdate.addActionListener(e -> { updateMaintenanceReport();  });
 		btnMntUpdate.setBounds(10, 506, 274, 23);
 		updateMaintenance.add(btnMntUpdate);
 		
@@ -1075,10 +1082,10 @@ public class CustodianDashboard {
 		cardContainer.add(addBorrower, "borrowerRegistration");
 		addBorrower.setLayout(null);
 		
-		table = new JTable();
-		table.setFillsViewportHeight(true);
-		table.setBounds(315, 44, 1074, 509);
-		addBorrower.add(table);
+		tblBorrowers = new JTable();
+		tblBorrowers.setFillsViewportHeight(true);
+		tblBorrowers.setBounds(315, 44, 1074, 509);
+		addBorrower.add(tblBorrowers);
 		
 		JButton btnUpdMntRefresh_1 = new JButton("⟳");
 		btnUpdMntRefresh_1.setBounds(1328, 10, 62, 23);
@@ -1086,78 +1093,216 @@ public class CustodianDashboard {
 		
 		textField = new JTextField();
 		textField.setColumns(10);
-		textField.setBounds(324, 11, 115, 20);
+		textField.setBounds(316, 11, 123, 20);
 		addBorrower.add(textField);
 		
+		cmbBorrowType = new JComboBox<String>();
+		cmbBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbBorrowType.setBounds(714, 10, 97, 22);
+		addBorrower.add(cmbBorrowType);
+		
+		JButton btnFilter_1_1_1 = new JButton("⌕");
+		btnFilter_1_1_1.setBounds(821, 10, 62, 23);
+		addBorrower.add(btnFilter_1_1_1);
+		
+		JButton btnClearFilter_1_1_1 = new JButton("Clear");
+		btnClearFilter_1_1_1.setBounds(893, 10, 75, 23);
+		addBorrower.add(btnClearFilter_1_1_1);
+		
+		JPanel borrowerManager = new JPanel();
+		borrowerManager.setBounds(10, 10, 292, 546);
+		addBorrower.add(borrowerManager);
+		borrowerManager.setLayout(new CardLayout(0, 0));
+		
+		JPanel register = new JPanel();
+		borrowerManager.add(register, "name_362001567932800");
+		register.setLayout(null);
+		
 		JSeparator sprtrBrwTop_2_1_1 = new JSeparator();
-		sprtrBrwTop_2_1_1.setBounds(10, 37, 274, 6);
-		addBorrower.add(sprtrBrwTop_2_1_1);
+		sprtrBrwTop_2_1_1.setBounds(10, 31, 264, 2);
+		register.add(sprtrBrwTop_2_1_1);
 		
 		JLabel lblBorrowerRegistration = new JLabel("Register New Borrower");
+		lblBorrowerRegistration.setBounds(0, 0, 274, 30);
+		register.add(lblBorrowerRegistration);
 		lblBorrowerRegistration.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBorrowerRegistration.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		lblBorrowerRegistration.setBounds(10, 10, 274, 30);
-		addBorrower.add(lblBorrowerRegistration);
 		
 		JLabel lblBrwrFirstName = new JLabel("First Name");
-		lblBrwrFirstName.setBounds(10, 53, 67, 12);
-		addBorrower.add(lblBrwrFirstName);
+		lblBrwrFirstName.setBounds(10, 43, 67, 12);
+		register.add(lblBrwrFirstName);
 		
 		txtNewBorrowNameF = new JTextField();
-		txtNewBorrowNameF.setBounds(134, 50, 150, 18);
-		addBorrower.add(txtNewBorrowNameF);
+		txtNewBorrowNameF.setBounds(124, 40, 150, 18);
+		register.add(txtNewBorrowNameF);
 		txtNewBorrowNameF.setColumns(10);
 		
 		JLabel lblBrwrLastName = new JLabel("Last Name");
-		lblBrwrLastName.setBounds(10, 78, 67, 12);
-		addBorrower.add(lblBrwrLastName);
+		lblBrwrLastName.setBounds(10, 68, 67, 12);
+		register.add(lblBrwrLastName);
 		
 		txtNewBorrowNameL = new JTextField();
+		txtNewBorrowNameL.setBounds(124, 65, 150, 18);
+		register.add(txtNewBorrowNameL);
 		txtNewBorrowNameL.setColumns(10);
-		txtNewBorrowNameL.setBounds(134, 75, 150, 18);
-		addBorrower.add(txtNewBorrowNameL);
 		
 		JLabel lblBrwrIDNumber = new JLabel("ID Number");
-		lblBrwrIDNumber.setBounds(10, 103, 67, 12);
-		addBorrower.add(lblBrwrIDNumber);
+		lblBrwrIDNumber.setBounds(10, 121, 67, 12);
+		register.add(lblBrwrIDNumber);
 		
 		txtNewBorrowID = new JTextField();
+		txtNewBorrowID.setBounds(124, 118, 150, 18);
+		register.add(txtNewBorrowID);
 		txtNewBorrowID.setColumns(10);
-		txtNewBorrowID.setBounds(134, 100, 150, 18);
-		addBorrower.add(txtNewBorrowID);
 		
 		JLabel lblBrwrDepartment = new JLabel("Department / Grade");
-		lblBrwrDepartment.setBounds(10, 131, 114, 12);
-		addBorrower.add(lblBrwrDepartment);
+		lblBrwrDepartment.setBounds(10, 149, 114, 12);
+		register.add(lblBrwrDepartment);
 		
 		txtNewBorrowDept = new JTextField();
+		txtNewBorrowDept.setBounds(124, 146, 150, 18);
+		register.add(txtNewBorrowDept);
 		txtNewBorrowDept.setColumns(10);
-		txtNewBorrowDept.setBounds(134, 128, 150, 18);
-		addBorrower.add(txtNewBorrowDept);
 		
 		JLabel lblContactNo = new JLabel("Contact No.");
-		lblContactNo.setBounds(10, 156, 67, 12);
-		addBorrower.add(lblContactNo);
+		lblContactNo.setBounds(10, 174, 67, 12);
+		register.add(lblContactNo);
 		
 		txtNewBorrowContact = new JTextField();
+		txtNewBorrowContact.setBounds(124, 171, 150, 18);
+		register.add(txtNewBorrowContact);
 		txtNewBorrowContact.setColumns(10);
-		txtNewBorrowContact.setBounds(134, 153, 150, 18);
-		addBorrower.add(txtNewBorrowContact);
 		
 		JLabel lblEmail = new JLabel("Email");
-		lblEmail.setBounds(10, 181, 67, 12);
-		addBorrower.add(lblEmail);
+		lblEmail.setBounds(10, 199, 67, 12);
+		register.add(lblEmail);
 		
 		txtNewBorrowEmail = new JTextField();
+		txtNewBorrowEmail.setBounds(124, 196, 150, 18);
+		register.add(txtNewBorrowEmail);
 		txtNewBorrowEmail.setColumns(10);
-		txtNewBorrowEmail.setBounds(134, 178, 150, 18);
-		addBorrower.add(txtNewBorrowEmail);
 		
 		JButton btnMntUpdateCancel_1 = new JButton("Cancel");
-		btnMntUpdateCancel_1.setBounds(10, 530, 274, 23);
-		addBorrower.add(btnMntUpdateCancel_1);
+		btnMntUpdateCancel_1.setBounds(0, 520, 274, 23);
+		register.add(btnMntUpdateCancel_1);
 		
 		JButton btnRegisterBorrower = new JButton("Register Borrower");
+		btnRegisterBorrower.setBounds(0, 495, 274, 23);
+		register.add(btnRegisterBorrower);
+		
+		JLabel lblBrwrType = new JLabel("Borrower Type");
+		lblBrwrType.setBounds(10, 93, 114, 12);
+		register.add(lblBrwrType);
+		
+		cmbNewBorrowType = new JComboBox<>();
+		cmbNewBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbNewBorrowType.setBounds(124, 89, 150, 20);
+		register.add(cmbNewBorrowType);
+		
+		JPanel delete = new JPanel();
+		borrowerManager.add(delete, "name_362243642496800");
+		delete.setLayout(null);
+		
+		JSeparator sprtrBrwTop_2_1_1_1 = new JSeparator();
+		sprtrBrwTop_2_1_1_1.setBounds(20, 41, 264, 2);
+		delete.add(sprtrBrwTop_2_1_1_1);
+		
+		JLabel lblBorrowerManage = new JLabel("Manage Borrowers");
+		lblBorrowerManage.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorrowerManage.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblBorrowerManage.setBounds(10, 10, 264, 30);
+		delete.add(lblBorrowerManage);
+		
+		JLabel lblBrwrFirstName_1 = new JLabel("First Name");
+		lblBrwrFirstName_1.setBounds(10, 85, 67, 12);
+		delete.add(lblBrwrFirstName_1);
+		
+		JLabel lblBrwrLastName_1 = new JLabel("Last Name");
+		lblBrwrLastName_1.setBounds(10, 110, 67, 12);
+		delete.add(lblBrwrLastName_1);
+		
+		JLabel lblBrwrType_1 = new JLabel("Borrower Type");
+		lblBrwrType_1.setBounds(10, 135, 114, 12);
+		delete.add(lblBrwrType_1);
+		
+		JLabel lblBrwrIDNumber_1 = new JLabel("ID Number");
+		lblBrwrIDNumber_1.setBounds(10, 163, 67, 12);
+		delete.add(lblBrwrIDNumber_1);
+		
+		JLabel lblBrwrDepartment_1 = new JLabel("Department / Grade");
+		lblBrwrDepartment_1.setBounds(10, 191, 114, 12);
+		delete.add(lblBrwrDepartment_1);
+		
+		JLabel lblContactNo_1 = new JLabel("Contact No.");
+		lblContactNo_1.setBounds(10, 216, 67, 12);
+		delete.add(lblContactNo_1);
+		
+		JLabel lblEmail_1 = new JLabel("Email");
+		lblEmail_1.setBounds(10, 241, 67, 12);
+		delete.add(lblEmail_1);
+		
+		txtMngBorrowerEmail = new JTextField();
+		txtMngBorrowerEmail.setColumns(10);
+		txtMngBorrowerEmail.setBounds(124, 238, 150, 18);
+		delete.add(txtMngBorrowerEmail);
+		
+		txtMngBorrowerContactNo = new JTextField();
+		txtMngBorrowerContactNo.setColumns(10);
+		txtMngBorrowerContactNo.setBounds(124, 213, 150, 18);
+		delete.add(txtMngBorrowerContactNo);
+		
+		txtMngBorrowerDept = new JTextField();
+		txtMngBorrowerDept.setColumns(10);
+		txtMngBorrowerDept.setBounds(124, 188, 150, 18);
+		delete.add(txtMngBorrowerDept);
+		
+		txtMngBorrowerID = new JTextField();
+		txtMngBorrowerID.setEditable(false);
+		txtMngBorrowerID.setColumns(10);
+		txtMngBorrowerID.setBounds(124, 160, 150, 18);
+		delete.add(txtMngBorrowerID);
+		
+		JComboBox<String> cmbMngBorrowerType = new JComboBox<String>();
+		cmbMngBorrowerType.setEnabled(false);
+		cmbMngBorrowerType.setBounds(124, 131, 150, 20);
+		delete.add(cmbMngBorrowerType);
+		
+		txtMngBorrowerNameL = new JTextField();
+		txtMngBorrowerNameL.setEditable(false);
+		txtMngBorrowerNameL.setColumns(10);
+		txtMngBorrowerNameL.setBounds(124, 107, 150, 18);
+		delete.add(txtMngBorrowerNameL);
+		
+		txtMngBorrowerNameF = new JTextField();
+		txtMngBorrowerNameF.setEditable(false);
+		txtMngBorrowerNameF.setColumns(10);
+		txtMngBorrowerNameF.setBounds(124, 82, 150, 18);
+		delete.add(txtMngBorrowerNameF);
+		
+		JButton btnMntUpdateCancel_1_1 = new JButton("Cancel");
+		btnMntUpdateCancel_1_1.setBounds(10, 513, 264, 23);
+		delete.add(btnMntUpdateCancel_1_1);
+		
+		JButton btnPublishEdit = new JButton("Publish Update");
+		btnPublishEdit.setBounds(10, 464, 264, 23);
+		delete.add(btnPublishEdit);
+		
+		JButton btnDeleteProfile = new JButton("Delete");
+		btnDeleteProfile.setBounds(10, 487, 264, 23);
+		delete.add(btnDeleteProfile);
+		
+		txtMngBorrowerTransaction = new JTextField();
+		txtMngBorrowerTransaction.setColumns(10);
+		txtMngBorrowerTransaction.setBounds(124, 57, 75, 18);
+		delete.add(txtMngBorrowerTransaction);
+		
+		JLabel lblBrwrID = new JLabel("Borrower ID");
+		lblBrwrID.setBounds(10, 60, 67, 12);
+		delete.add(lblBrwrID);
+		
+		JButton btnNewButton = new JButton("Select");
+		btnNewButton.setBounds(209, 56, 67, 20);
+		delete.add(btnNewButton);
 		btnRegisterBorrower.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			
@@ -1165,12 +1310,6 @@ public class CustodianDashboard {
 			
 			}
 		});
-		btnRegisterBorrower.setBounds(10, 505, 274, 23);
-		addBorrower.add(btnRegisterBorrower);
-		
-		JPanel panel = new JPanel();
-		panel.setBounds(10, 10, 292, 546);
-		addBorrower.add(panel);
 		
 		//frame.setVisible(true);
 		
@@ -1339,7 +1478,7 @@ public class CustodianDashboard {
 			for (int c = 0; c < list[r].length; c++)
 				maintenancePreview.setValueAt(list[r][c], r, c);
 		
-		tblMaintenancePreview.setModel(borrowPreview);
+		tblMaintenancePreview.setModel(maintenancePreview);
 		tblMaintenancePreview.getTableHeader().setReorderingAllowed(false);
 		
 	}
@@ -1613,6 +1752,35 @@ public class CustodianDashboard {
 		
 	}
 	
+	boolean loadBorrower() {
+		int id;
+		
+		try {
+			id = Integer.parseInt(txtMngBorrowerTransaction.getText().trim());
+		} catch (NumberFormatException e) {
+			
+			parent.log(false, "ID field is empty.");
+			return false;
+		}
+		try {
+			loadedProfile = backend.fetchBorrowerProfile(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return false;
+		}
+		
+		BorrowerLoadValues(String.valueOf(loadedProfile.borrowerID()), loadedProfile.firstName(), loadedProfile.lastName(), loadedProfile.BorrowType(),
+				loadedProfile.idNumber(), loadedProfile.deptOrGrade(), loadedProfile.contactNo(), loadedProfile.email());
+		
+		return true;
+	}
+	
+	void BorrowerLoadValues(String borrowerID,
+							String firstName, String lastName, String borrowType, String id, String dept, String contact, String email) {
+		txtMngBorrowerNameF.setText(firstName);
+		txtMngBorrowerNameL.setText(lastName);
+		cmbMngBorrowerType.se
+	}
 	
 	void loadBorrowers() {
 		parent.log(true, "Updating Borrower List...");
@@ -1681,6 +1849,7 @@ public class CustodianDashboard {
 		String[] rawProfile = new String[] {
 		txtNewBorrowNameF.getText().trim(),
 		txtNewBorrowNameL.getText().trim(),
+		cmbNewBorrowType.getSelectedItem().toString().trim(),
 		txtNewBorrowID.getText().trim(),
 		txtNewBorrowDept.getText().trim(),
 		txtNewBorrowContact.getText().trim(),
@@ -1746,6 +1915,7 @@ public class CustodianDashboard {
 		}
 		
 		if(result) parent.log(true, "Borrow Record sucessfully updated.");
+		initialiseDisplays();
 	}
 	
 	boolean verifyRecordIntegrity(int ID) throws SPEARException {
@@ -1792,7 +1962,7 @@ public class CustodianDashboard {
 		}
 		
 		if(result) parent.log(result, "Borrow Record successfully published to Database.");
-		
+		initialiseDisplays();
 	}
 	
 	Integer getSelectedBorrower() {
@@ -1840,7 +2010,9 @@ public class CustodianDashboard {
 		}
 		
 		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
+		initialiseDisplays();
 	}
+	
 	
 	
 	/* Report Constructor Parametres:
@@ -1877,6 +2049,7 @@ public class CustodianDashboard {
 		}
 		
 		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
+		initialiseDisplays();
 	}
 	
 	boolean verifyReportIntegrity(int ID) throws SPEARException {
@@ -1885,5 +2058,6 @@ public class CustodianDashboard {
 		if(!equip.availability().equals("Maintenance")) return true;
 		
 		return false;
+	
 	}
 }
