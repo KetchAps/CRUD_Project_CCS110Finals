@@ -66,6 +66,7 @@ public class AdminDashboard {
 	private DefaultTableModel equipmentModel;
 	private int editingEquipmentID = -1; // -1 = adding a new item, otherwise the item being edited
 	private int sessionID; // custodianID of the logged-in account (so you can't delete yourself)
+	private MainClient parent;
 	private JLabel lblUsernameDashboard;
 	private JLabel lblTotalEquipmentCounter;
 	private JLabel lblCurrentlyBorrowedCounter;
@@ -239,7 +240,7 @@ public class AdminDashboard {
 		lblUsernameDashboard.setBounds(10, 11, 554, 62);
 		greet.add(lblUsernameDashboard);
 
-		JLabel lblDescription = new JLabel("Here's an overview of the school's property and equipemnt.");
+		JLabel lblDescription = new JLabel("Here's an overview of the school's property and equipment.");
 		lblDescription.setForeground(new Color(30, 144, 255));
 		lblDescription.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 20));
 		lblDescription.setBounds(10, 65, 554, 27);
@@ -1233,6 +1234,7 @@ public class AdminDashboard {
 
 	// Change the first parameter from Object to MainClient, and call initialize()
 	public AdminDashboard(MainClient mainClient, int sessionID) {
+		this.parent = mainClient;
 		this.sessionID = sessionID;
 		initialize();
 	}
@@ -1268,12 +1270,8 @@ public class AdminDashboard {
 		int hour = java.time.LocalTime.now().getHour();
 		String when = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
 
-		String name = null;
-		try {
-			name = AdminDashboardHandler.getDisplayName(sessionID);
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
+		String name = parent.getSessionUser();
+
 		if (name == null || name.isBlank())
 			name = "Admin";
 
