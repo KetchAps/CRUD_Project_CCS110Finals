@@ -311,7 +311,6 @@ public class CustodianDashboard {
 		cmbCategoryModel = new DefaultComboBoxModel<String>();
 		cmbCategoryModel.addElement("[Category]");
 
-		// ===== LEFT SIDEBAR (same as Custodian Manager) =====
 		GradientPanel bfSidebar = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
 		bfSidebar.setLayout(null);
 		bfSidebar.setBounds(0, 0, 277, 628);
@@ -346,7 +345,6 @@ public class CustodianDashboard {
 		btnBfGoBack.setBounds(26, 561, 224, 45);
 		bfSidebar.add(btnBfGoBack);
 
-		// ===== RIGHT PANEL: INVENTORY RECORDS =====
 		JPanel inventoryTable = new JPanel();
 		inventoryTable.setBackground(Color.WHITE);
 		inventoryTable.setBounds(592, 0, 681, 617);
@@ -406,10 +404,9 @@ public class CustodianDashboard {
 		inventoryTable.add(scrollPane);
 
 		searchResult = new JTable();
-		searchResult.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);   // optional: horizontal scroll instead of squished columns
+		searchResult.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		scrollPane.setViewportView(searchResult);
 
-		// ===== MIDDLE PANEL: THE FORM =====
 		formCreator = new JPanel();
 		formCreator.setBackground(Color.WHITE);
 		formCreator.setBounds(287, 0, 295, 617);
@@ -1474,7 +1471,7 @@ public class CustodianDashboard {
 	void displayNewBorrow() {
 		card.show(cardContainer, "creation");
 		formCard.show(formCreator, "borrowForm");
-		lblCreationTitle.setText("Borrow Manager");   // NEW
+		lblCreationTitle.setText("Borrow Manager");
 		refreshBorrowCreator();
 	}
 	
@@ -1486,7 +1483,7 @@ public class CustodianDashboard {
 	void displayNewMaintenance() {
 		card.show(cardContainer, "creation");
 		formCard.show(formCreator, "maintenanceForm");
-		lblCreationTitle.setText("Maintenance Manager");   // NEW
+		lblCreationTitle.setText("Maintenance Manager");
 		refreshMaintenanceCreator();
 	}
 	
