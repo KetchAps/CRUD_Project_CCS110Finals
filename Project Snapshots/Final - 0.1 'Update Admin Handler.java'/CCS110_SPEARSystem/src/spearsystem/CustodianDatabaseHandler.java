@@ -372,7 +372,36 @@ public class CustodianDatabaseHandler {
 	// QUERIES / READ
 	//---------------------------------------------------------------------------------------------------------------------------------
 	
-	
+	public String[][] getBorrowerPreview() {
+		
+		try(Connection conn = ConnectionHandler.tryConnect();
+				PreparedStatement st = conn.prepareStatement("SELECT borrowerID, CONCAT(firstName, ' ', lastname), borrowerType from borrowers")) {
+				ArrayList<String[]> list = new ArrayList<>();
+				
+				try
+				(ResultSet rs = st.executeQuery())
+						{
+				while(rs.next()) {
+					String[] temp = new String[3];
+					
+					for(int i = 1; i <= 3; i++) {
+					temp[i - 1] = rs.getString(i);
+				
+					}
+					
+					list.add(temp);
+				}
+				}
+				String[][] array = list.toArray(new String[0][]);
+				return array;
+				
+			} catch (SQLException e) {
+				e.printStackTrace();
+				
+				return null;
+			}
+		
+	} 
 	
 	public String[][] getBorrowPreview() {
 		
@@ -476,21 +505,22 @@ public class CustodianDatabaseHandler {
 			String[] values;
 			int categorySize = 1;
 			
-			ResultSet cs = catC.executeQuery();
+			try (ResultSet cs = catC.executeQuery()){
 			if(cs.next()) categorySize = cs.getInt(1);
+			}
 			
 			values = new String[categorySize];
-			ResultSet rs = cat.executeQuery();
+			
+			try (ResultSet rs = cat.executeQuery()) {
 			
 			for (int i = 0; i < values.length; i++) {
 				if(rs.next()) 
 				values[i] = rs.getString(1);
 				
 				else break;
+				}
 			}
 			
-			cs.close();
-			rs.close();
 			return values;
 			
 		} catch(SQLException e) {
@@ -509,10 +539,11 @@ public class CustodianDatabaseHandler {
 				
 				st.setInt(1, id);
 				
-				ResultSet rs = st.executeQuery();
+				try (ResultSet rs = st.executeQuery()) {
 				
 				if(rs.next()) return true;
 				else return false;
+				}
 			}
 		 catch (SQLException e) {
 			
@@ -709,7 +740,7 @@ public class CustodianDatabaseHandler {
 		try (Connection conn = ConnectionHandler.tryConnect();
 				PreparedStatement st = conn.prepareStatement("select borrowerID from borrowers")) {
 				
-				ResultSet rs = st.executeQuery();
+				try(ResultSet rs = st.executeQuery()) {
 				
 				ArrayList<Integer> list = new ArrayList<>();
 				while(rs.next()) {
@@ -718,7 +749,7 @@ public class CustodianDatabaseHandler {
 				}
 				
 				return list.toArray(new Integer[0]);
-				
+				}
 			}
 		 catch (SQLException e) {
 			
