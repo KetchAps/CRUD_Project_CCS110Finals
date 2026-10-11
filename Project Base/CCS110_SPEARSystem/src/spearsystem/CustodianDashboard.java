@@ -280,9 +280,7 @@ public class CustodianDashboard {
 		
 		custodianDashboard = new JPanel();
 		custodianDashboard.setLayout(null);
-		custodianDashboard.setBounds(10, 54, 1400, 620);
-		
-		
+		custodianDashboard.setBounds(10, 54, 1283, 700);
 		
 		JLabel lblCustodian = new JLabel("Custodian");
 		lblCustodian.setForeground(new Color(0, 153, 255));
@@ -633,10 +631,10 @@ public class CustodianDashboard {
 		spearLogo.setForeground(new Color(30, 144, 255));
 		spearLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
 		spearLogo.setIcon(new ImageIcon(resizedImage));
-		spearLogo.setBounds(10, 10, 249, 64);
+		spearLogo.setBounds(0, 10, 259, 64);
 		sideBar.add(spearLogo);
 		
-		ButtonOne btnRegister = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnRegister = new ButtonOne(new Color(0, 82, 255), new Color(0, 65, 204));
 		btnRegister.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			
@@ -649,7 +647,7 @@ public class CustodianDashboard {
 		btnRegister.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnRegister.setText("Register Borrowers");
 		
-		ButtonOne btnNewBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnNewBorrowRecord = new ButtonOne(new Color(0, 223, 137), new Color(0, 184, 113));
 		btnNewBorrowRecord.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
@@ -662,7 +660,7 @@ public class CustodianDashboard {
 		btnNewBorrowRecord.setBounds(27, 246, 225, 55);
 		sideBar.add(btnNewBorrowRecord);
 		
-		ButtonOne btnUpdateBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnUpdateBorrowRecord = new ButtonOne(new Color(255, 90, 0), new Color(214, 75, 0));
 		btnUpdateBorrowRecord.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				displayUpdateBorrow();
@@ -674,7 +672,7 @@ public class CustodianDashboard {
 		btnUpdateBorrowRecord.setBounds(27, 317, 225, 55);
 		sideBar.add(btnUpdateBorrowRecord);
 		
-		ButtonOne btnNewMaintenanceReport = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnNewMaintenanceReport = new ButtonOne(new Color(255, 184, 0), new Color(219, 158, 0));
 		btnNewMaintenanceReport.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				displayNewMaintenance();
@@ -685,7 +683,7 @@ public class CustodianDashboard {
 		btnNewMaintenanceReport.setBounds(27, 382, 225, 55);
 		sideBar.add(btnNewMaintenanceReport);
 		
-		ButtonOne btnUpdateMaintenanceReport_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnUpdateMaintenanceReport_1 = new ButtonOne(new Color(255, 0, 85), new Color(214, 0, 71));
 		btnUpdateMaintenanceReport_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				displayUpdateMaintenance();
@@ -696,7 +694,7 @@ public class CustodianDashboard {
 		btnUpdateMaintenanceReport_1.setBounds(27, 447, 225, 55);
 		sideBar.add(btnUpdateMaintenanceReport_1);
 		
-		ButtonOne btnManage = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnManage = new ButtonOne(new Color(121, 40, 202), new Color(97, 32, 161));
 		btnManage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			
@@ -708,6 +706,11 @@ public class CustodianDashboard {
 		btnManage.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnManage.setBounds(27, 180, 225, 55);
 		sideBar.add(btnManage);
+		
+		JSeparator separator_2 = new JSeparator();
+		separator_2.setBackground(new Color(30, 144, 255));
+		separator_2.setBounds(27, 85, 225, 2);
+		sideBar.add(separator_2);
 		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 41, 1380, 2);
