@@ -729,14 +729,14 @@ public class AdminDashboard {
 		lblTotalEquipment2Counter.setBounds(85, 25, 54, 50);
 		panel_4.add(lblTotalEquipment2Counter);
 
-		ButtonOne btnGoBack_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnGoBack_1 = new ButtonOne(new Color(255, 127, 80), new Color(235, 94, 40));
 
 		btnGoBack_1.setText("Go Back");
 		btnGoBack_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnGoBack_1.setBounds(26, 561, 224, 45);
 		imSidebar.add(btnGoBack_1);
 
-		ButtonOne btnViewInventory_1_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnViewInventory_1_1 = new ButtonOne(new Color(0, 210, 211), new Color(1, 163, 164));
 
 		btnViewInventory_1_1.setText("View Custodian");
 		btnViewInventory_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
@@ -845,17 +845,17 @@ public class AdminDashboard {
 		cboCategory.setBounds(10, 185, 261, 25);
 		addCustodianPanel_1.add(cboCategory);
 
-		ButtonOne btnClear_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-		btnClear_1.setText("Save Equipment");
-		btnClear_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnClear_1.setBounds(647, 221, 215, 45);
-		addCustodianPanel_1.add(btnClear_1);
+		ButtonOne btnSaveEquipment = new ButtonOne(new Color(108, 92, 231), new Color(91, 75, 205));
+		btnSaveEquipment.setText("Save Equipment");
+		btnSaveEquipment.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnSaveEquipment.setBounds(647, 221, 215, 45);
+		addCustodianPanel_1.add(btnSaveEquipment);
 
-		ButtonOne btnClear_2_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-		btnClear_2_1.setText("Reset");
-		btnClear_2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
-		btnClear_2_1.setBounds(872, 221, 105, 45);
-		addCustodianPanel_1.add(btnClear_2_1);
+		ButtonOne btnReset = new ButtonOne(new Color(243, 104, 224), new Color(218, 77, 198));
+		btnReset.setText("Reset");
+		btnReset.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnReset.setBounds(872, 221, 105, 45);
+		addCustodianPanel_1.add(btnReset);
 
 		JLabel lblRoomLocation = new JLabel("Room / Location");
 		lblRoomLocation.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
@@ -941,25 +941,25 @@ public class AdminDashboard {
 		txtDescription.setBounds(764, 129, 213, 81);
 		addCustodianPanel_1.add(txtDescription);
 
-		ButtonOne btnAdd2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnAdd2 = new ButtonOne(new Color(0, 224, 150), new Color(0, 184, 120));
 		btnAdd2.setText("Add");
 		btnAdd2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnAdd2.setBounds(10, 221, 89, 45);
 		addCustodianPanel_1.add(btnAdd2);
 
-		ButtonOne btnDelete2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnDelete2 = new ButtonOne(new Color(232, 67, 147), new Color(214, 48, 49));
 		btnDelete2.setText("Delete");
 		btnDelete2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnDelete2.setBounds(109, 221, 89, 45);
 		addCustodianPanel_1.add(btnDelete2);
 
-		ButtonOne btnView2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnView2 = new ButtonOne(new Color(0, 168, 255), new Color(0, 136, 214));
 		btnView2.setText("View");
 		btnView2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnView2.setBounds(208, 221, 89, 45);
 		addCustodianPanel_1.add(btnView2);
 
-		ButtonOne btnEdit2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnEdit2 = new ButtonOne(new Color(255, 190, 11), new Color(230, 162, 0));
 		btnEdit2.setText("Edit");
 		btnEdit2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnEdit2.setBounds(307, 221, 89, 45);
@@ -1220,9 +1220,9 @@ public class AdminDashboard {
 
 		btnDelete2.addActionListener(e -> deleteSelectedEquipment());
 
-		btnClear_1.addActionListener(e -> saveEquipment()); // the "Save Equipment" button
+		btnSaveEquipment.addActionListener(e -> saveEquipment()); // the "Save Equipment" button
 
-		btnClear_2_1.addActionListener(e -> resetEquipmentForm()); // the "Reset" button
+		btnReset.addActionListener(e -> resetEquipmentForm()); // the "Reset" button
 		// ===========================================
 		// DASHBOARD (talks to AdminDashboardHandler)
 		// ===========================================
