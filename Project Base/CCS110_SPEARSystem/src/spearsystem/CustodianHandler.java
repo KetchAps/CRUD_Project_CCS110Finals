@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.sql.Date;
 
-import normie.util.SPEARException;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
 import spearsystem.CustodianDatabaseHandler.BorrowerProfile;

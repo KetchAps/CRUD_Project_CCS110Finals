@@ -5,9 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
-import normie.util.SPEARException;
-
 import java.sql.Date;
 
 public class CustodianDatabaseHandler {

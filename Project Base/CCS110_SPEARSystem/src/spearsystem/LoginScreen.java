@@ -111,7 +111,4 @@ public class LoginScreen {
 	
 	// Helper Methods
 	
-		
-	
-	
 }

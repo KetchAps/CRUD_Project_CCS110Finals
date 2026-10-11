@@ -117,7 +117,7 @@ public class MainClient {
 		CustodianDashboard dashB = new CustodianDashboard(this, custodianHandler);
 		userArea.add(dashB.getPanel(), "custodian");
 		
-		AdminDashboard dashC = new AdminDashboard(this, custodianHandler);
+		AdminDashboard dashC = new AdminDashboard(this, 0);
 		userArea.add(dashC.getPanel(), "admin");
 		
 		lblFeedback = new JLabel("-");

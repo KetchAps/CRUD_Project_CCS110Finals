@@ -1,4 +1,4 @@
-package normie.util;
+package spearsystem;
 
 public class SPEARException extends Exception {
 

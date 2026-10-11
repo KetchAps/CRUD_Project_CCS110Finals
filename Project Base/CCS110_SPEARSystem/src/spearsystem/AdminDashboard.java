@@ -6,16 +6,18 @@ import java.awt.Component;
 import java.awt.Font;
 import java.awt.Image;
 
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 
+
 import kenUI.ButtonOne;
 import kenUI.GradientPanel;
 import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
+import java.awt.event.ActionEvent; 
 import javax.swing.ImageIcon;
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
@@ -52,7 +54,7 @@ public class AdminDashboard {
 	private JComboBox<String> departmentCbo;
 	private DefaultTableModel custodianModel;
 	private JComboBox<String> cboCategory;
-	private JComboBox<AdminInventoryHandler.RoomOption> cboRoomLocation;
+	private JComboBox<AdminHandler.RoomOption> cboRoomLocation;
 	private JComboBox<String> cboCondition;
 	private JComboBox<String> cboAvailability;
 	private JComboBox<String> cboCategory2;
@@ -66,14 +68,6 @@ public class AdminDashboard {
 	private DefaultTableModel equipmentModel;
 	private int editingEquipmentID = -1; // -1 = adding a new item, otherwise the item being edited
 	private int sessionID; // custodianID of the logged-in account (so you can't delete yourself)
-	private JLabel lblUsernameDashboard;
-	private JLabel lblTotalEquipmentCounter;
-	private JLabel lblCurrentlyBorrowedCounter;
-	private JLabel lblPendingReturnsCounter;
-	private JLabel lblTotalUsersCounter;
-	private DefaultTableModel recentEquipmentModel;
-	private DefaultTableModel recentBorrowingsModel;
-	final int RECENT_ROWS = 5; // how many rows the two "Recent" tables show
 
 	final String[] POSITIONS = { "Admin", "Custodian" };
 	final String[] DEPARTMENTS = { "IT", "Registrar", "MISD", "Library" }; // edit to fit your school
@@ -186,35 +180,35 @@ public class AdminDashboard {
 		separator4.setForeground(new Color(30, 144, 255));
 		separator4.setBounds(25, 332, 225, 2);
 		sidebarMain.add(separator4);
-
+		
 		JSeparator separator5 = new JSeparator();
 		separator5.setForeground(new Color(30, 144, 255));
 		separator5.setBounds(25, 455, 225, 2);
 		sidebarMain.add(separator5);
-
+		
 		ButtonOne btnBorrowManager = new ButtonOne(new Color(230, 126, 34), new Color(211, 84, 0));
 		btnBorrowManager.setText("Borrow Manager");
 		btnBorrowManager.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnBorrowManager.setBounds(24, 389, 225, 55);
 		sidebarMain.add(btnBorrowManager);
-
+		
 		JLabel lblBorrowManagement = new JLabel("Borrow Manager");
 		lblBorrowManagement.setForeground(new Color(30, 144, 255));
 		lblBorrowManagement.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblBorrowManagement.setBounds(59, 347, 158, 27);
 		sidebarMain.add(lblBorrowManagement);
-
+		
 		JSeparator separator6 = new JSeparator();
 		separator6.setForeground(new Color(30, 144, 255));
 		separator6.setBounds(25, 576, 225, 2);
 		sidebarMain.add(separator6);
-
+		
 		ButtonOne btnMaintenanceManager = new ButtonOne(new Color(230, 126, 34), new Color(211, 84, 0));
 		btnMaintenanceManager.setText("Maintenance Manager");
 		btnMaintenanceManager.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnMaintenanceManager.setBounds(24, 510, 225, 55);
 		sidebarMain.add(btnMaintenanceManager);
-
+		
 		JLabel lblMaintenanceManagement = new JLabel("Maintenance Manager");
 		lblMaintenanceManagement.setForeground(new Color(30, 144, 255));
 		lblMaintenanceManagement.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
@@ -233,7 +227,7 @@ public class AdminDashboard {
 		main.add(greet);
 		greet.setLayout(null);
 
-		lblUsernameDashboard = new JLabel("Good Morning!");
+		JLabel lblUsernameDashboard = new JLabel("Good Morning, Losamia!");
 		lblUsernameDashboard.setForeground(new Color(30, 144, 255));
 		lblUsernameDashboard.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
 		lblUsernameDashboard.setBounds(10, 11, 554, 62);
@@ -256,7 +250,7 @@ public class AdminDashboard {
 		lblTotalEquipment.setBounds(55, 11, 127, 27);
 		totalEquipmentPanel.add(lblTotalEquipment);
 
-		lblTotalEquipmentCounter = new JLabel("00");
+		JLabel lblTotalEquipmentCounter = new JLabel("00");
 		lblTotalEquipmentCounter.setForeground(new Color(30, 144, 255));
 		lblTotalEquipmentCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
 		lblTotalEquipmentCounter.setBounds(77, 39, 72, 62);
@@ -272,8 +266,8 @@ public class AdminDashboard {
 		lblTotalUsers.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblTotalUsers.setBounds(79, 11, 88, 27);
 		totalUsersPanel.add(lblTotalUsers);
-
-		lblTotalUsersCounter = new JLabel("00");
+		
+		JLabel lblTotalUsersCounter = new JLabel("00");
 		lblTotalUsersCounter.setForeground(new Color(30, 144, 255));
 		lblTotalUsersCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
 		lblTotalUsersCounter.setBounds(87, 39, 72, 62);
@@ -289,8 +283,8 @@ public class AdminDashboard {
 		lblPendingReturns.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblPendingReturns.setBounds(59, 11, 121, 27);
 		pendingReturnsPanel.add(lblPendingReturns);
-
-		lblPendingReturnsCounter = new JLabel("00");
+		
+		JLabel lblPendingReturnsCounter = new JLabel("00");
 		lblPendingReturnsCounter.setForeground(new Color(30, 144, 255));
 		lblPendingReturnsCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
 		lblPendingReturnsCounter.setBounds(84, 39, 72, 62);
@@ -306,8 +300,8 @@ public class AdminDashboard {
 		lblCurrentlyBorrowed.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblCurrentlyBorrowed.setBounds(43, 11, 148, 27);
 		currentlyBorrowedPanel.add(lblCurrentlyBorrowed);
-
-		lblCurrentlyBorrowedCounter = new JLabel("00");
+		
+		JLabel lblCurrentlyBorrowedCounter = new JLabel("00");
 		lblCurrentlyBorrowedCounter.setForeground(new Color(30, 144, 255));
 		lblCurrentlyBorrowedCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
 		lblCurrentlyBorrowedCounter.setBounds(81, 39, 72, 62);
@@ -322,15 +316,12 @@ public class AdminDashboard {
 		reTablePanel.setBounds(0, 53, 481, 284);
 		recentEquipmentPanel.add(reTablePanel);
 
-		recentEquipmentModel = new DefaultTableModel(new String[] { "ItemName", "Category", "Status" }, 0) {
-			@Override
-			public boolean isCellEditable(int row, int col) {
-				return false;
-			}
-		};
+		Object[][] testData = { { "Laser Cutter", "ICT equipment", "Active" },
+				{ "3D Printer", "AV Equipment", "Maintenance" }, { "CNC Router", "Photography", "Idle" } };
+		String[] columnNames = { "ItemName", "Category", "Status" };
 		reTablePanel.setLayout(null);
 
-		org.jdesktop.swingx.JXTable testTable = new org.jdesktop.swingx.JXTable(recentEquipmentModel);
+		org.jdesktop.swingx.JXTable testTable = new org.jdesktop.swingx.JXTable(testData, columnNames);
 		testTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		testTable.setColumnControlVisible(true);
 		testTable.setHighlighters(org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping());
@@ -362,14 +353,12 @@ public class AdminDashboard {
 		recentBorrowingsPanel.add(ebBorrowingTablePanel);
 		ebBorrowingTablePanel.setLayout(null);
 
-		recentBorrowingsModel = new DefaultTableModel(new String[] { "Item", "Borrower", "Date", "Status" }, 0) {
-			@Override
-			public boolean isCellEditable(int row, int col) {
-				return false;
-			}
-		};
+		Object[][] borrowingData = { { "Laser Cutter", "Felonia", "2026-10-08", "Pending" },
+				{ "3D Printer", "Losamia", "2026-10-07", "Approved" },
+				{ "CNC Router", "Paz", "2026-10-05", "Returned" } };
+		String[] borrowingColumns = { "Item", "Borrower", "Date", "Status" };
 
-		org.jdesktop.swingx.JXTable borrowingTable = new org.jdesktop.swingx.JXTable(recentBorrowingsModel);
+		org.jdesktop.swingx.JXTable borrowingTable = new org.jdesktop.swingx.JXTable(borrowingData, borrowingColumns);
 		borrowingTable.setFont(new Font("Segoe UI", Font.PLAIN, 12));
 		borrowingTable.setColumnControlVisible(true);
 		borrowingTable.setHighlighters(org.jdesktop.swingx.decorator.HighlighterFactory.createSimpleStriping());
@@ -427,249 +416,249 @@ public class AdminDashboard {
 		separator7.setForeground(new Color(30, 144, 255));
 		separator7.setBounds(26, 94, 225, 2);
 		cmSidebar.add(separator7);
-
+		
 		JPanel totalCustomerPanel = new JPanel();
 		totalCustomerPanel.setBounds(25, 147, 225, 110);
 		cmSidebar.add(totalCustomerPanel);
 		totalCustomerPanel.setLayout(null);
-
+		
 		JLabel lblTotalCustomer = new JLabel("Total Customers");
 		lblTotalCustomer.setForeground(new Color(30, 144, 255));
 		lblTotalCustomer.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblTotalCustomer.setBounds(36, 11, 153, 27);
 		totalCustomerPanel.add(lblTotalCustomer);
-
+		
 		JLabel lblTotalCustomerCounter = new JLabel("00");
 		lblTotalCustomerCounter.setForeground(new Color(30, 144, 255));
 		lblTotalCustomerCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 55));
 		lblTotalCustomerCounter.setBounds(79, 38, 66, 61);
 		totalCustomerPanel.add(lblTotalCustomerCounter);
-
+		
 		JPanel administratorPanel = new JPanel();
 		administratorPanel.setBounds(26, 268, 225, 110);
 		cmSidebar.add(administratorPanel);
 		administratorPanel.setLayout(null);
-
+		
 		JLabel lblAdministrator = new JLabel("Administrators");
 		lblAdministrator.setForeground(new Color(30, 144, 255));
 		lblAdministrator.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblAdministrator.setBounds(36, 11, 153, 27);
 		administratorPanel.add(lblAdministrator);
-
+		
 		JLabel lblAdministratorCounter = new JLabel("00");
 		lblAdministratorCounter.setForeground(new Color(30, 144, 255));
 		lblAdministratorCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 55));
 		lblAdministratorCounter.setBounds(79, 38, 66, 61);
 		administratorPanel.add(lblAdministratorCounter);
-
+		
 		JPanel staffPanel = new JPanel();
 		staffPanel.setBounds(25, 389, 225, 110);
 		cmSidebar.add(staffPanel);
 		staffPanel.setLayout(null);
-
+		
 		JLabel lblStaff = new JLabel("Staff");
 		lblStaff.setForeground(new Color(30, 144, 255));
 		lblStaff.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblStaff.setBounds(89, 11, 46, 27);
 		staffPanel.add(lblStaff);
-
+		
 		JLabel lblStaffCounter = new JLabel("00");
 		lblStaffCounter.setForeground(new Color(30, 144, 255));
 		lblStaffCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 55));
 		lblStaffCounter.setBounds(79, 38, 66, 61);
 		staffPanel.add(lblStaffCounter);
-
+		
 		ButtonOne btnGoBack = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-
+		
 		btnGoBack.setText("Go Back");
 		btnGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnGoBack.setBounds(26, 561, 224, 45);
 		cmSidebar.add(btnGoBack);
-
+		
 		ButtonOne btnViewInventory2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-
+		
 		btnViewInventory2.setText("View Inventory");
 		btnViewInventory2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnViewInventory2.setBounds(26, 510, 224, 45);
 		cmSidebar.add(btnViewInventory2);
-
+		
 		JPanel addCustodianPanel = new JPanel();
 		addCustodianPanel.setBounds(287, 0, 237, 617);
 		addCustodianPanel.setBackground(new Color(255, 255, 255));
 		custodianManagementPanel.add(addCustodianPanel);
 		addCustodianPanel.setLayout(null);
-
+		
 		JPanel addCustodianPane = new JPanel();
 		addCustodianPane.setBounds(0, 0, 237, 47);
 		addCustodianPane.setBackground(new Color(240, 248, 255));
 		addCustodianPanel.add(addCustodianPane);
 		addCustodianPane.setLayout(null);
-
+		
 		JLabel lblNewLabel_1_2 = new JLabel("Add Custodian");
 		lblNewLabel_1_2.setBackground(new Color(230, 230, 250));
 		lblNewLabel_1_2.setBounds(10, 0, 227, 47);
 		lblNewLabel_1_2.setForeground(new Color(30, 144, 255));
 		lblNewLabel_1_2.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
 		addCustodianPane.add(lblNewLabel_1_2);
-
+		
 		JLabel lblFirstName = new JLabel("First Name");
 		lblFirstName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblFirstName.setBounds(10, 58, 107, 25);
 		addCustodianPanel.add(lblFirstName);
-
+		
 		txtFirstName = new JTextField();
 		txtFirstName.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtFirstName.setBounds(10, 86, 215, 25);
 		addCustodianPanel.add(txtFirstName);
 		txtFirstName.setColumns(10);
-
+		
 		JLabel lblLastName = new JLabel("Last Name");
 		lblLastName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblLastName.setBounds(10, 122, 107, 25);
 		addCustodianPanel.add(lblLastName);
-
+		
 		txtLastName = new JTextField();
 		txtLastName.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtLastName.setColumns(10);
 		txtLastName.setBounds(10, 150, 215, 25);
 		addCustodianPanel.add(txtLastName);
-
+		
 		JLabel lblPosition = new JLabel("Position");
 		lblPosition.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblPosition.setBounds(10, 186, 107, 25);
 		addCustodianPanel.add(lblPosition);
-
+		
 		// Do not remove
 		positionCbo = new JComboBox<>(POSITIONS);
 		positionCbo.setBounds(10, 211, 215, 25);
 		addCustodianPanel.add(positionCbo);
-
+		
 		JLabel lblDepartment = new JLabel("Department");
 		lblDepartment.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblDepartment.setBounds(10, 247, 107, 25);
 		addCustodianPanel.add(lblDepartment);
-
+		
 		// Do not remove
 		departmentCbo = new JComboBox<>(DEPARTMENTS);
 		departmentCbo.setBounds(10, 272, 215, 25);
 		addCustodianPanel.add(departmentCbo);
-
+		
 		JLabel lblContactnumber = new JLabel("ContactNumber");
 		lblContactnumber.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblContactnumber.setBounds(10, 308, 107, 25);
 		addCustodianPanel.add(lblContactnumber);
-
+		
 		txtContactNumber = new JTextField();
 		txtContactNumber.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtContactNumber.setColumns(10);
 		txtContactNumber.setBounds(10, 336, 215, 25);
 		addCustodianPanel.add(txtContactNumber);
-
+		
 		JLabel lblCreateLoginAccount = new JLabel("Create Login Account");
 		lblCreateLoginAccount.setForeground(new Color(30, 144, 255));
 		lblCreateLoginAccount.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblCreateLoginAccount.setBounds(51, 368, 135, 27);
 		addCustodianPanel.add(lblCreateLoginAccount);
-
+		
 		txtUsername = new JTextField();
 		txtUsername.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtUsername.setColumns(10);
 		txtUsername.setBounds(10, 420, 215, 25);
 		addCustodianPanel.add(txtUsername);
-
+		
 		JLabel lblUsername = new JLabel("Username");
 		lblUsername.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblUsername.setBounds(10, 392, 107, 25);
 		addCustodianPanel.add(lblUsername);
-
+		
 		JLabel lblPassword = new JLabel("Password");
 		lblPassword.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblPassword.setBounds(9, 448, 107, 25);
 		addCustodianPanel.add(lblPassword);
-
+		
 		txtPassword = new JPasswordField();
 		txtPassword.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtPassword.setColumns(10);
 		txtPassword.setBounds(9, 476, 215, 25);
 		addCustodianPanel.add(txtPassword);
-
+		
 		ButtonOne btnAdd = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnAdd.setText("Add");
 		btnAdd.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnAdd.setBounds(9, 510, 105, 45);
 		addCustodianPanel.add(btnAdd);
-
+		
 		ButtonOne btnEdit = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnEdit.setText("Edit");
 		btnEdit.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnEdit.setBounds(10, 561, 105, 45);
 		addCustodianPanel.add(btnEdit);
-
+		
 		ButtonOne btnDelete = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnDelete.setText("Delete");
 		btnDelete.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnDelete.setBounds(118, 512, 105, 45);
 		addCustodianPanel.add(btnDelete);
-
+		
 		ButtonOne btnClear = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnClear.setText("Clear");
 		btnClear.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnClear.setBounds(118, 561, 105, 45);
 		addCustodianPanel.add(btnClear);
-
+		
 		JSeparator separator_2_2_2 = new JSeparator();
 		separator_2_2_2.setForeground(new Color(30, 144, 255));
 		separator_2_2_2.setBounds(11, 387, 215, 2);
-
+		
 		JPanel custodianRecordsPanel = new JPanel();
 		custodianRecordsPanel.setBackground(new Color(255, 255, 255));
 		custodianRecordsPanel.setBounds(534, 0, 740, 617);
 		custodianManagementPanel.add(custodianRecordsPanel);
 		custodianRecordsPanel.setLayout(null);
-
+		
 		JPanel custodianRecordsHero = new JPanel();
 		custodianRecordsHero.setLayout(null);
 		custodianRecordsHero.setBackground(new Color(240, 248, 255));
 		custodianRecordsHero.setBounds(0, 0, 740, 47);
 		custodianRecordsPanel.add(custodianRecordsHero);
-
+		
 		JLabel lblCustodiansRecords = new JLabel("Custodian Records");
 		lblCustodiansRecords.setForeground(new Color(30, 144, 255));
 		lblCustodiansRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
 		lblCustodiansRecords.setBackground(new Color(230, 230, 250));
 		lblCustodiansRecords.setBounds(10, 0, 306, 47);
 		custodianRecordsHero.add(lblCustodiansRecords);
-
+		
 		JPanel quickAccessPanel = new JPanel();
 		quickAccessPanel.setLayout(null);
 		quickAccessPanel.setBackground(new Color(255, 255, 255));
 		quickAccessPanel.setBounds(0, 45, 740, 72);
 		custodianRecordsPanel.add(quickAccessPanel);
-
+		
 		txtSearch = new JTextField();
 		txtSearch.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtSearch.setColumns(10);
 		txtSearch.setBounds(10, 36, 227, 25);
 		quickAccessPanel.add(txtSearch);
-
+		
 		JButton btnSearch = new JButton("Q");
 		btnSearch.setBounds(247, 36, 51, 25);
 		quickAccessPanel.add(btnSearch);
-
+		
 		JComboBox allPositionsCbo = new JComboBox();
 		allPositionsCbo.setBounds(545, 37, 185, 25);
 		quickAccessPanel.add(allPositionsCbo);
-
+		
 		JLabel lblSearch = new JLabel("Search");
 		lblSearch.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblSearch.setBounds(10, 11, 107, 25);
 		quickAccessPanel.add(lblSearch);
-
+		
 		JLabel lblAllPositions = new JLabel("All Positions");
 		lblAllPositions.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblAllPositions.setBounds(545, 11, 107, 25);
 		quickAccessPanel.add(lblAllPositions);
-
+		
 		custodianModel = new DefaultTableModel(
 				new String[] { "ID", "First Name", "Last Name", "Position", "Department", "Contact", "Username" }, 0) {
 			@Override
@@ -683,307 +672,308 @@ public class AdminDashboard {
 		JScrollPane scrollPane = new JScrollPane(table);
 		scrollPane.setBounds(0, 117, 740, 500);
 		custodianRecordsPanel.add(scrollPane); // inside the records panel so it is not covered
-
+		
+		
 		JPanel inventoryManagementPanel = new JPanel();
 		inventoryManagementPanel.setLayout(null);
 		cardContainer.add(inventoryManagementPanel, "inventoryManagementPanel");
-
+		
 		GradientPanel imSidebar = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
 		imSidebar.setLayout(null);
 		imSidebar.setBounds(0, 0, 277, 639);
 		inventoryManagementPanel.add(imSidebar);
-
+		
 		JLabel spearLogo3 = new JLabel("S.P.E.A.R");
 		spearLogo3.setForeground(new Color(30, 144, 255));
 		spearLogo3.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
 		spearLogo3.setBounds(0, 11, 250, 64);
 		spearLogo3.setIcon(new ImageIcon(resizedImage));
 		imSidebar.add(spearLogo3);
-
+		
 		JLabel lblInventoryManager = new JLabel("Inventory Manager");
 		lblInventoryManager.setForeground(new Color(30, 144, 255));
 		lblInventoryManager.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
 		lblInventoryManager.setBounds(47, 107, 183, 27);
 		imSidebar.add(lblInventoryManager);
-
+		
 		JSeparator separator8 = new JSeparator();
 		separator8.setForeground(new Color(30, 144, 255));
 		separator8.setBounds(26, 94, 225, 2);
 		imSidebar.add(separator8);
-
+		
 		JPanel panel_4 = new JPanel();
 		panel_4.setLayout(null);
 		panel_4.setBounds(25, 147, 225, 80);
 		imSidebar.add(panel_4);
-
+		
 		JLabel lblTotalEquipment2 = new JLabel("Total Equipment");
 		lblTotalEquipment2.setForeground(new Color(30, 144, 255));
 		lblTotalEquipment2.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblTotalEquipment2.setBounds(51, 0, 122, 34);
 		panel_4.add(lblTotalEquipment2);
-
+		
 		lblTotalEquipment2Counter = new JLabel("00");
 		lblTotalEquipment2Counter.setForeground(new Color(30, 144, 255));
 		lblTotalEquipment2Counter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblTotalEquipment2Counter.setBounds(85, 25, 54, 50);
 		panel_4.add(lblTotalEquipment2Counter);
-
+		
 		ButtonOne btnGoBack_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-
+		
 		btnGoBack_1.setText("Go Back");
 		btnGoBack_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnGoBack_1.setBounds(26, 561, 224, 45);
 		imSidebar.add(btnGoBack_1);
-
+		
 		ButtonOne btnViewInventory_1_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
-
+		
 		btnViewInventory_1_1.setText("View Custodian");
 		btnViewInventory_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnViewInventory_1_1.setBounds(26, 510, 224, 45);
 		imSidebar.add(btnViewInventory_1_1);
-
+		
 		JPanel availablePanel = new JPanel();
 		availablePanel.setLayout(null);
 		availablePanel.setBounds(26, 238, 225, 80);
 		imSidebar.add(availablePanel);
-
+		
 		JLabel lblAvailable = new JLabel("Available");
 		lblAvailable.setForeground(new Color(30, 144, 255));
 		lblAvailable.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblAvailable.setBounds(78, 0, 69, 34);
 		availablePanel.add(lblAvailable);
-
+		
 		lblAvailableCounter = new JLabel("00");
 		lblAvailableCounter.setForeground(new Color(30, 144, 255));
 		lblAvailableCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblAvailableCounter.setBounds(85, 25, 54, 50);
 		availablePanel.add(lblAvailableCounter);
-
+		
 		JPanel underMaintenancePanel = new JPanel();
 		underMaintenancePanel.setLayout(null);
 		underMaintenancePanel.setBounds(26, 329, 225, 80);
 		imSidebar.add(underMaintenancePanel);
-
+		
 		JLabel lblUnderMaintenance = new JLabel("Under Maintenance");
 		lblUnderMaintenance.setForeground(new Color(30, 144, 255));
 		lblUnderMaintenance.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblUnderMaintenance.setBounds(42, 0, 141, 34);
 		underMaintenancePanel.add(lblUnderMaintenance);
-
+		
 		lblUnderMaintenanceCounter = new JLabel("00");
 		lblUnderMaintenanceCounter.setForeground(new Color(30, 144, 255));
 		lblUnderMaintenanceCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblUnderMaintenanceCounter.setBounds(85, 25, 54, 50);
 		underMaintenancePanel.add(lblUnderMaintenanceCounter);
-
+		
 		JPanel borrowedPanel = new JPanel();
 		borrowedPanel.setLayout(null);
 		borrowedPanel.setBounds(26, 420, 225, 80);
 		imSidebar.add(borrowedPanel);
-
+		
 		JLabel lblBorrowed = new JLabel("Borrowed");
 		lblBorrowed.setForeground(new Color(30, 144, 255));
 		lblBorrowed.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblBorrowed.setBounds(75, 0, 75, 34);
 		borrowedPanel.add(lblBorrowed);
-
+		
 		lblBorrowedCounter = new JLabel("00");
 		lblBorrowedCounter.setForeground(new Color(30, 144, 255));
 		lblBorrowedCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 45));
 		lblBorrowedCounter.setBounds(85, 25, 54, 50);
 		borrowedPanel.add(lblBorrowedCounter);
-
+		
 		JPanel addCustodianPanel_1 = new JPanel();
 		addCustodianPanel_1.setLayout(null);
 		addCustodianPanel_1.setBackground(Color.WHITE);
 		addCustodianPanel_1.setBounds(287, 347, 987, 270);
 		inventoryManagementPanel.add(addCustodianPanel_1);
-
+		
 		JPanel hero2 = new JPanel();
 		hero2.setLayout(null);
 		hero2.setBackground(new Color(240, 248, 255));
 		hero2.setBounds(0, 0, 987, 31);
 		addCustodianPanel_1.add(hero2);
-
+		
 		JLabel lblAddOrEditEquipment = new JLabel("Add / Edit Equipment");
 		lblAddOrEditEquipment.setForeground(new Color(30, 144, 255));
 		lblAddOrEditEquipment.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
 		lblAddOrEditEquipment.setBackground(new Color(230, 230, 250));
 		lblAddOrEditEquipment.setBounds(10, 0, 158, 31);
 		hero2.add(lblAddOrEditEquipment);
-
+		
 		JLabel lblPropertyTag = new JLabel("Property Tag*");
 		lblPropertyTag.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblPropertyTag.setBounds(10, 42, 261, 25);
 		addCustodianPanel_1.add(lblPropertyTag);
-
+		
 		txtPropertyTag = new JTextField();
 		txtPropertyTag.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtPropertyTag.setColumns(10);
 		txtPropertyTag.setBounds(10, 70, 261, 25);
 		addCustodianPanel_1.add(txtPropertyTag);
-
+		
 		JLabel lblEquipmentName = new JLabel("Equipment Name*");
 		lblEquipmentName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblEquipmentName.setBounds(10, 98, 261, 25);
 		addCustodianPanel_1.add(lblEquipmentName);
-
+		
 		txtEquipmentName = new JTextField();
 		txtEquipmentName.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtEquipmentName.setColumns(10);
 		txtEquipmentName.setBounds(10, 126, 261, 25);
 		addCustodianPanel_1.add(txtEquipmentName);
-
+		
 		JLabel lblCategory = new JLabel("Category*");
 		lblCategory.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblCategory.setBounds(10, 157, 261, 25);
 		addCustodianPanel_1.add(lblCategory);
-
+		
 		// Do not remove
 		cboCategory = new JComboBox<>();
 		cboCategory.setBounds(10, 185, 261, 25);
 		addCustodianPanel_1.add(cboCategory);
-
+		
 		ButtonOne btnClear_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnClear_1.setText("Save Equipment");
 		btnClear_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnClear_1.setBounds(647, 221, 215, 45);
 		addCustodianPanel_1.add(btnClear_1);
-
+		
 		ButtonOne btnClear_2_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnClear_2_1.setText("Reset");
 		btnClear_2_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnClear_2_1.setBounds(872, 221, 105, 45);
 		addCustodianPanel_1.add(btnClear_2_1);
-
+		
 		JLabel lblRoomLocation = new JLabel("Room / Location");
 		lblRoomLocation.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblRoomLocation.setBounds(281, 157, 250, 25);
 		addCustodianPanel_1.add(lblRoomLocation);
-
+		
 		// Do not remove
 		cboRoomLocation = new JComboBox<>();
 		cboRoomLocation.setBounds(281, 185, 250, 25);
 		addCustodianPanel_1.add(cboRoomLocation);
-
+		
 		txtSerialNumber = new JTextField();
 		txtSerialNumber.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtSerialNumber.setColumns(10);
 		txtSerialNumber.setBounds(281, 126, 250, 25);
 		addCustodianPanel_1.add(txtSerialNumber);
-
+		
 		JLabel lblSerialNumber = new JLabel("Serial Number");
 		lblSerialNumber.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblSerialNumber.setBounds(281, 98, 250, 25);
 		addCustodianPanel_1.add(lblSerialNumber);
-
+		
 		txtBrandModel = new JTextField();
 		txtBrandModel.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtBrandModel.setColumns(10);
 		txtBrandModel.setBounds(281, 70, 250, 25);
 		addCustodianPanel_1.add(txtBrandModel);
-
+		
 		JLabel lblBrandModel = new JLabel("Brand / Model");
 		lblBrandModel.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblBrandModel.setBounds(281, 42, 250, 25);
 		addCustodianPanel_1.add(lblBrandModel);
-
+		
 		JLabel lblCondition = new JLabel("Condition");
 		lblCondition.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblCondition.setBounds(541, 157, 213, 25);
 		addCustodianPanel_1.add(lblCondition);
-
+		
 		// Do not remove
 		cboCondition = new JComboBox<>();
 		cboCondition.setBounds(541, 185, 213, 25);
 		addCustodianPanel_1.add(cboCondition);
-
+		
 		txtPurchaseCost = new JTextField();
 		txtPurchaseCost.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtPurchaseCost.setColumns(10);
 		txtPurchaseCost.setBounds(541, 126, 213, 25);
 		addCustodianPanel_1.add(txtPurchaseCost);
-
+		
 		JLabel lblPurchaseCost = new JLabel("Purchase Cost");
 		lblPurchaseCost.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblPurchaseCost.setBounds(541, 98, 213, 25);
 		addCustodianPanel_1.add(lblPurchaseCost);
-
+		
 		txtPurchaseDate = new JTextField();
 		txtPurchaseDate.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtPurchaseDate.setColumns(10);
 		txtPurchaseDate.setBounds(541, 70, 213, 25);
 		addCustodianPanel_1.add(txtPurchaseDate);
-
+		
 		JLabel lblPurchaseDate = new JLabel("Purchase Date");
 		lblPurchaseDate.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblPurchaseDate.setBounds(541, 42, 213, 25);
 		addCustodianPanel_1.add(lblPurchaseDate);
-
+		
 		JLabel lblAvailability = new JLabel("Availability");
 		lblAvailability.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblAvailability.setBounds(764, 42, 213, 25);
 		addCustodianPanel_1.add(lblAvailability);
-
+		
 		cboAvailability = new JComboBox<>();
 		cboAvailability.setBounds(764, 70, 213, 25);
 		addCustodianPanel_1.add(cboAvailability);
-
+		
 		JLabel lblDescription2 = new JLabel("Description");
 		lblDescription2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
 		lblDescription2.setBounds(764, 106, 213, 25);
 		addCustodianPanel_1.add(lblDescription2);
-
+		
 		txtDescription = new JTextField();
 		txtDescription.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtDescription.setColumns(10);
 		txtDescription.setBounds(764, 129, 213, 81);
 		addCustodianPanel_1.add(txtDescription);
-
+		
 		ButtonOne btnAdd2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnAdd2.setText("Add");
 		btnAdd2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnAdd2.setBounds(10, 221, 89, 45);
 		addCustodianPanel_1.add(btnAdd2);
-
+		
 		ButtonOne btnDelete2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnDelete2.setText("Delete");
 		btnDelete2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnDelete2.setBounds(109, 221, 89, 45);
 		addCustodianPanel_1.add(btnDelete2);
-
+		
 		ButtonOne btnView2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnView2.setText("View");
 		btnView2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnView2.setBounds(208, 221, 89, 45);
 		addCustodianPanel_1.add(btnView2);
-
+		
 		ButtonOne btnEdit2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnEdit2.setText("Edit");
 		btnEdit2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnEdit2.setBounds(307, 221, 89, 45);
 		addCustodianPanel_1.add(btnEdit2);
-
+		
 		JPanel custodianRecordsPane2 = new JPanel();
 		custodianRecordsPane2.setLayout(null);
 		custodianRecordsPane2.setBackground(Color.WHITE);
 		custodianRecordsPane2.setBounds(287, 44, 987, 292);
 		inventoryManagementPanel.add(custodianRecordsPane2);
-
+		
 		JPanel hero3 = new JPanel();
 		hero3.setLayout(null);
 		hero3.setBackground(new Color(240, 248, 255));
 		hero3.setBounds(0, 0, 987, 47);
 		custodianRecordsPane2.add(hero3);
-
+		
 		JLabel lblCustodianRecords = new JLabel("Equipment Records");
 		lblCustodianRecords.setForeground(new Color(30, 144, 255));
 		lblCustodianRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
 		lblCustodianRecords.setBackground(new Color(230, 230, 250));
 		lblCustodianRecords.setBounds(10, 0, 306, 47);
 		hero3.add(lblCustodianRecords);
-		equipmentModel = new DefaultTableModel(new String[] { "ID", "Property Tag", "Equipment", "Category",
-				"Brand / Model", "Serial No.", "Room", "Purchase Date", "Cost", "Condition", "Availability" }, 0) {
+		equipmentModel = new DefaultTableModel(new String[] { "ID", "Property Tag", "Equipment", "Category", "Brand / Model",
+				"Serial No.", "Room", "Purchase Date", "Cost", "Condition", "Availability" }, 0) {
 			@Override
 			public boolean isCellEditable(int row, int col) {
 				return false; // editing is done in the form, not in the table
@@ -996,51 +986,51 @@ public class AdminDashboard {
 		JScrollPane equipmentScroll = new JScrollPane(equipmentTable);
 		equipmentScroll.setBounds(0, 47, 987, 245);
 		custodianRecordsPane2.add(equipmentScroll);
-
+		
 		JPanel quickActions2 = new JPanel();
 		quickActions2.setBackground(new Color(255, 255, 255));
 		quickActions2.setBounds(287, 0, 987, 36);
 		inventoryManagementPanel.add(quickActions2);
 		quickActions2.setLayout(null);
-
+		
 		txtSearch2 = new JTextField();
 		txtSearch2.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		txtSearch2.setColumns(10);
 		txtSearch2.setBounds(57, 5, 227, 25);
 		quickActions2.add(txtSearch2);
-
+		
 		JButton btnSearch2 = new JButton("Q");
 		btnSearch2.setBounds(289, 6, 51, 23);
 		quickActions2.add(btnSearch2);
-
+		
 		JLabel lblSearch2 = new JLabel("Search");
 		lblSearch2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblSearch2.setBounds(10, 5, 51, 25);
 		quickActions2.add(lblSearch2);
-
+		
 		JLabel lblAllPositions_1 = new JLabel("Category");
 		lblAllPositions_1.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblAllPositions_1.setBounds(350, 5, 56, 25);
 		quickActions2.add(lblAllPositions_1);
-
+		
 		cboCategory2 = new JComboBox<>();
 		cboCategory2.setBounds(416, 5, 137, 25);
 		quickActions2.add(cboCategory2);
-
+		
 		cboCondition2 = new JComboBox<>();
 		cboCondition2.setBounds(629, 7, 117, 25);
 		quickActions2.add(cboCondition2);
-
+		
 		JLabel lblCondition2 = new JLabel("Condition");
 		lblCondition2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblCondition2.setBounds(563, 5, 68, 25);
 		quickActions2.add(lblCondition2);
-
+		
 		JLabel lblAvailability2 = new JLabel("Availability");
 		lblAvailability2.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 14));
 		lblAvailability2.setBounds(756, 5, 76, 25);
 		quickActions2.add(lblAvailability2);
-
+		
 		cboAvailability2 = new JComboBox<>();
 		cboAvailability2.setBounds(842, 5, 135, 25);
 		quickActions2.add(cboAvailability2);
@@ -1064,30 +1054,28 @@ public class AdminDashboard {
 			card.show(cardContainer, "inventoryManagementPanel");
 			lblAdmin.setText("Inventory Manager");
 		});
-
+		
 		btnGoBack.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				card.show(cardContainer, "dashboard");
 				lblAdmin.setText("Admin Dashboard");
-				refreshDashboard();
 			}
 		});
-
+		
 		btnGoBack_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				card.show(cardContainer, "dashboard");
 				lblAdmin.setText("Admin Dashboard");
-				refreshDashboard();
 			}
 		});
-
+		
 		btnViewInventory2.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				card.show(cardContainer, "inventoryManagementPanel");
 				lblAdmin.setText("Inventory Manager");
 			}
 		});
-
+		
 		btnViewInventory_1_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				card.show(cardContainer, "custodianManagement");
@@ -1187,7 +1175,7 @@ public class AdminDashboard {
 
 		btnClear.addActionListener(e -> clearForm());
 		// ===========================================
-		// INVENTORY MANAGER (talks to AdminInventoryHandler)
+		// INVENTORY MANAGER (talks to AdminHandler)
 		// ===========================================
 		loadInventoryLists();
 		refreshInventory();
@@ -1219,73 +1207,17 @@ public class AdminDashboard {
 
 		btnDelete2.addActionListener(e -> deleteSelectedEquipment());
 
-		btnClear_1.addActionListener(e -> saveEquipment()); // the "Save Equipment" button
+		btnClear_1.addActionListener(e -> saveEquipment());   // the "Save Equipment" button
 
-		btnClear_2_1.addActionListener(e -> resetEquipmentForm()); // the "Reset" button
-		// ===========================================
-		// DASHBOARD (talks to AdminDashboardHandler)
-		// ===========================================
-		refreshDashboard();
-
+		btnClear_2_1.addActionListener(e -> resetEquipmentForm());   // the "Reset" button
 		// frame.setVisible(true);
 
 	}
-
 	// Change the first parameter from Object to MainClient, and call initialize()
 	public AdminDashboard(MainClient mainClient, int sessionID) {
 		this.sessionID = sessionID;
 		initialize();
 	}
-
-	// call this after login, because the dashboard may be built before anyone logs
-	// in
-	public void setSessionID(int sessionID) {
-		this.sessionID = sessionID;
-		refreshDashboard();
-	}
-
-	// ===========================================
-	// DASHBOARD HELPERS
-	// ===========================================
-	// reloads the greeting, the four counters and the two "Recent" tables
-	public void refreshDashboard() {
-		try {
-			AdminDashboardHandler.Summary summary = AdminDashboardHandler.getSummary();
-			lblTotalEquipmentCounter.setText(String.format("%02d", summary.totalEquipment()));
-			lblCurrentlyBorrowedCounter.setText(String.format("%02d", summary.currentlyBorrowed()));
-			lblPendingReturnsCounter.setText(String.format("%02d", summary.pendingReturns()));
-			lblTotalUsersCounter.setText(String.format("%02d", summary.totalUsers()));
-
-			fillModel(recentEquipmentModel, AdminDashboardHandler.getRecentEquipment(RECENT_ROWS));
-			fillModel(recentBorrowingsModel, AdminDashboardHandler.getRecentBorrowings(RECENT_ROWS));
-		} catch (SQLException ex) {
-			showError(ex);
-		}
-		refreshGreeting();
-	}
-
-	private void refreshGreeting() {
-		int hour = java.time.LocalTime.now().getHour();
-		String when = hour < 12 ? "Morning" : hour < 18 ? "Afternoon" : "Evening";
-
-		String name = null;
-		try {
-			name = AdminDashboardHandler.getDisplayName(sessionID);
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-		}
-		if (name == null || name.isBlank())
-			name = "Admin";
-
-		lblUsernameDashboard.setText("Good " + when + ", " + name + "!");
-	}
-
-	private void fillModel(DefaultTableModel model, String[][] rows) {
-		model.setRowCount(0);
-		for (String[] row : rows)
-			model.addRow(row);
-	}
-
 	// ===========================================
 	// CUSTODIAN HELPERS
 	// ===========================================
@@ -1341,19 +1273,18 @@ public class AdminDashboard {
 		JOptionPane.showMessageDialog(adminDashboard, "Database error: " + ex.getMessage(), "Error",
 				JOptionPane.ERROR_MESSAGE);
 	}
-
 	// ===========================================
 	// INVENTORY HELPERS
 	// ===========================================
 	private void loadInventoryLists() {
 		try {
-			String[] categories = AdminInventoryHandler.getCategories();
+			String[] categories = AdminHandler.getCategories();
 			cboCategory.setModel(new DefaultComboBoxModel<>(categories));
 			cboCategory2.setModel(withAll("All Categories", categories));
 
-			DefaultComboBoxModel<AdminInventoryHandler.RoomOption> rooms = new DefaultComboBoxModel<>();
-			rooms.addElement(AdminInventoryHandler.NO_ROOM);
-			for (AdminInventoryHandler.RoomOption r : AdminInventoryHandler.getRooms())
+			DefaultComboBoxModel<AdminHandler.RoomOption> rooms = new DefaultComboBoxModel<>();
+			rooms.addElement(AdminHandler.NO_ROOM);
+			for (AdminHandler.RoomOption r : AdminHandler.getRooms())
 				rooms.addElement(r);
 			cboRoomLocation.setModel(rooms);
 		} catch (SQLException ex) {
@@ -1387,7 +1318,7 @@ public class AdminDashboard {
 
 	private void refreshEquipmentTable() {
 		try {
-			String[][] rows = AdminInventoryHandler.getEquipmentList(txtSearch2.getText(), filterValue(cboCategory2),
+			String[][] rows = AdminHandler.getEquipmentList(txtSearch2.getText(), filterValue(cboCategory2),
 					filterValue(cboCondition2), filterValue(cboAvailability2));
 			equipmentModel.setRowCount(0);
 			for (String[] row : rows)
@@ -1399,7 +1330,7 @@ public class AdminDashboard {
 
 	private void refreshEquipmentCounts() {
 		try {
-			int[] c = AdminInventoryHandler.getCounts();
+			int[] c = AdminHandler.getCounts();
 			lblTotalEquipment2Counter.setText(String.format("%02d", c[0]));
 			lblAvailableCounter.setText(String.format("%02d", c[1]));
 			lblUnderMaintenanceCounter.setText(String.format("%02d", c[2]));
@@ -1422,7 +1353,7 @@ public class AdminDashboard {
 
 	private void loadEquipmentIntoForm(int id) {
 		try {
-			AdminInventoryHandler.Equipment item = AdminInventoryHandler.fetchEquipment(id);
+			AdminHandler.Equipment item = AdminHandler.fetchEquipment(id);
 			if (item == null) {
 				JOptionPane.showMessageDialog(adminDashboard, "That item no longer exists.");
 				refreshInventory();
@@ -1451,24 +1382,24 @@ public class AdminDashboard {
 	}
 
 	private void saveEquipment() {
-		AdminInventoryHandler.RoomOption room = (AdminInventoryHandler.RoomOption) cboRoomLocation.getSelectedItem();
+		AdminHandler.RoomOption room = (AdminHandler.RoomOption) cboRoomLocation.getSelectedItem();
 		int roomID = room == null ? 0 : room.roomID();
 		try {
 			String result;
 			if (editingEquipmentID < 0) {
-				result = AdminInventoryHandler.addEquipment(txtPropertyTag.getText(), txtEquipmentName.getText(),
+				result = AdminHandler.addEquipment(txtPropertyTag.getText(), txtEquipmentName.getText(),
 						(String) cboCategory.getSelectedItem(), txtBrandModel.getText(), txtSerialNumber.getText(),
 						txtDescription.getText(), roomID, txtPurchaseDate.getText(), txtPurchaseCost.getText(),
 						(String) cboCondition.getSelectedItem(), (String) cboAvailability.getSelectedItem());
 			} else {
-				result = AdminInventoryHandler.updateEquipment(editingEquipmentID, txtPropertyTag.getText(),
+				result = AdminHandler.updateEquipment(editingEquipmentID, txtPropertyTag.getText(),
 						txtEquipmentName.getText(), (String) cboCategory.getSelectedItem(), txtBrandModel.getText(),
 						txtSerialNumber.getText(), txtDescription.getText(), roomID, txtPurchaseDate.getText(),
 						txtPurchaseCost.getText(), (String) cboCondition.getSelectedItem(),
 						(String) cboAvailability.getSelectedItem());
 			}
 			showEquipmentResult(result);
-			if (result.equals(AdminInventoryHandler.SUCCESS)) {
+			if (result.equals(AdminHandler.SUCCESS)) {
 				refreshInventory();
 				resetEquipmentForm();
 			}
@@ -1484,18 +1415,23 @@ public class AdminDashboard {
 			return;
 		}
 		try {
-			AdminInventoryHandler.Equipment item = AdminInventoryHandler.fetchEquipment(id);
+			AdminHandler.Equipment item = AdminHandler.fetchEquipment(id);
 			if (item == null) {
-				showEquipmentResult(AdminInventoryHandler.NOT_FOUND);
+				showEquipmentResult(AdminHandler.NOT_FOUND);
 				refreshInventory();
 				return;
 			}
-			String text = "Property Tag: " + nz(item.propertyTag()) + "\n" + "Equipment: " + nz(item.equipmentName())
-					+ "\n" + "Category: " + nz(item.categoryName()) + "\n" + "Brand / Model: " + nz(item.brandModel())
-					+ "\n" + "Serial Number: " + nz(item.serialNumber()) + "\n" + "Room: " + nz(item.roomName()) + "\n"
-					+ "Purchase Date: " + nz(item.purchaseDate()) + "\n" + "Purchase Cost: " + nz(item.purchaseCost())
-					+ "\n" + "Condition: " + nz(item.condition()) + "\n" + "Availability: " + nz(item.availability())
-					+ "\n" + "Description: " + nz(item.description());
+			String text = "Property Tag: " + nz(item.propertyTag()) + "\n"
+					+ "Equipment: " + nz(item.equipmentName()) + "\n"
+					+ "Category: " + nz(item.categoryName()) + "\n"
+					+ "Brand / Model: " + nz(item.brandModel()) + "\n"
+					+ "Serial Number: " + nz(item.serialNumber()) + "\n"
+					+ "Room: " + nz(item.roomName()) + "\n"
+					+ "Purchase Date: " + nz(item.purchaseDate()) + "\n"
+					+ "Purchase Cost: " + nz(item.purchaseCost()) + "\n"
+					+ "Condition: " + nz(item.condition()) + "\n"
+					+ "Availability: " + nz(item.availability()) + "\n"
+					+ "Description: " + nz(item.description());
 			JOptionPane.showMessageDialog(adminDashboard, text, "Equipment Details", JOptionPane.INFORMATION_MESSAGE);
 		} catch (SQLException ex) {
 			showError(ex);
@@ -1513,9 +1449,9 @@ public class AdminDashboard {
 		if (choice != JOptionPane.YES_OPTION)
 			return;
 		try {
-			String result = AdminInventoryHandler.deleteEquipment(id);
+			String result = AdminHandler.deleteEquipment(id);
 			showEquipmentResult(result);
-			if (result.equals(AdminInventoryHandler.SUCCESS)) {
+			if (result.equals(AdminHandler.SUCCESS)) {
 				refreshInventory();
 				resetEquipmentForm();
 			}
@@ -1546,22 +1482,20 @@ public class AdminDashboard {
 
 	private void showEquipmentResult(String code) {
 		String msg = switch (code) {
-		case AdminInventoryHandler.SUCCESS -> "Saved!";
-		case AdminInventoryHandler.REQUIRED -> "Property Tag, Equipment Name and Category are required.";
-		case AdminInventoryHandler.DUPLICATE -> "That property tag is already used by another item.";
-		case AdminInventoryHandler.TOO_LONG -> "One of the fields is too long.";
-		case AdminInventoryHandler.NOT_FOUND -> "That item no longer exists.";
-		case AdminInventoryHandler.INVALID_DATE -> "Purchase Date must look like 2023-05-12 (yyyy-mm-dd).";
-		case AdminInventoryHandler.INVALID_COST -> "Purchase Cost must be a positive number, like 15000.50.";
-		case AdminInventoryHandler.HAS_RECORDS ->
+		case AdminHandler.SUCCESS -> "Saved!";
+		case AdminHandler.REQUIRED -> "Property Tag, Equipment Name and Category are required.";
+		case AdminHandler.DUPLICATE -> "That property tag is already used by another item.";
+		case AdminHandler.TOO_LONG -> "One of the fields is too long.";
+		case AdminHandler.NOT_FOUND -> "That item no longer exists.";
+		case AdminHandler.INVALID_DATE -> "Purchase Date must look like 2023-05-12 (yyyy-mm-dd).";
+		case AdminHandler.INVALID_COST -> "Purchase Cost must be a positive number, like 15000.50.";
+		case AdminHandler.HAS_RECORDS ->
 			"This item has borrow or maintenance records, so it can't be deleted. Change its availability instead.";
 		default -> "Unexpected result: " + code;
 		};
-		int type = code.equals(AdminInventoryHandler.SUCCESS) ? JOptionPane.INFORMATION_MESSAGE
-				: JOptionPane.WARNING_MESSAGE;
+		int type = code.equals(AdminHandler.SUCCESS) ? JOptionPane.INFORMATION_MESSAGE : JOptionPane.WARNING_MESSAGE;
 		JOptionPane.showMessageDialog(adminDashboard, msg, "Inventory Manager", type);
 	}
-
 	public Component getPanel() {
 		// TODO Auto-generated method stub
 		return adminDashboard;
