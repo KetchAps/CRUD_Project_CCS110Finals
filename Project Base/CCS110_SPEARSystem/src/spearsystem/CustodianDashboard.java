@@ -347,7 +347,7 @@ public class CustodianDashboard {
 		inventoryTable.add(btnClearFilter);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(0, 33, 1076, 511);
+		scrollPane.setBounds(35, 33, 1076, 511);
 		inventoryTable.add(scrollPane);
 		
 		searchResult = new JTable();
@@ -363,6 +363,8 @@ public class CustodianDashboard {
 		createBorrow.setLayout(null);
 		
 		JLabel lblBorrowForm = new JLabel("New Borrow Form");
+		lblBorrowForm.setForeground(new Color(0, 0, 255));
+		lblBorrowForm.setBackground(new Color(0, 0, 255));
 		lblBorrowForm.setFont(new Font("Segoe UI", Font.BOLD, 25));
 		lblBorrowForm.setHorizontalAlignment(SwingConstants.CENTER);
 		lblBorrowForm.setBounds(10, 10, 274, 30);
