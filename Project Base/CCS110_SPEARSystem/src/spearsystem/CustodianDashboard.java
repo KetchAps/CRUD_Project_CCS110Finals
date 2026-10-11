@@ -282,18 +282,23 @@ public class CustodianDashboard {
 		custodianDashboard.setLayout(null);
 		custodianDashboard.setBounds(10, 54, 1283, 700);
 		
-		JLabel lblCustodian = new JLabel("Custodian");
+		// IMAGE
+		ImageIcon custodianIcon = new ImageIcon(LoginScreen.class.getResource("/ui/custodian2.png"));
+		Image custodianIconResized = custodianIcon.getImage().getScaledInstance(40, 40, Image.SCALE_SMOOTH);
+		
+		JLabel lblCustodian = new JLabel("Custodian Dashboard");
+		lblCustodian.setIcon(new ImageIcon(custodianIconResized));
 		lblCustodian.setForeground(new Color(0, 153, 255));
 		lblCustodian.setFont(new Font("Tahoma", Font.BOLD, 30));
 		lblCustodian.setHorizontalAlignment(SwingConstants.LEFT);
-		lblCustodian.setBounds(10, 11, 343, 32);
+		lblCustodian.setBounds(10, 0, 437, 56);
 		custodianDashboard.add(lblCustodian);
 		
 		query = new DefaultTableModel();
 		inventorySorter.setRowFilter(null);
 		
 		cardContainer = new JPanel();
-		cardContainer.setBounds(0, 54, 1400, 566);
+		cardContainer.setBounds(0, 61, 1273, 628);
 		custodianDashboard.add(cardContainer);
 		cardContainer.setLayout(card);
 		
@@ -326,7 +331,7 @@ public class CustodianDashboard {
 		
 		JButton btnRefresh = new JButton("⟳");
 		btnRefresh.addActionListener(e -> { displayInventoryValues();});
-		btnRefresh.setBounds(1014, 0, 62, 23);
+		btnRefresh.setBounds(893, 0, 62, 23);
 		inventoryTable.add(btnRefresh);
 		
 		cmbAvailability = new JComboBox<String>();
@@ -341,11 +346,11 @@ public class CustodianDashboard {
 		
 		JButton btnClearFilter = new JButton("Clear");
 		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
-		btnClearFilter.setBounds(929, 0, 75, 23);
+		btnClearFilter.setBounds(808, 0, 75, 23);
 		inventoryTable.add(btnClearFilter);
 		
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(0, 33, 1076, 511);
+		scrollPane.setBounds(0, 33, 962, 591);
 		inventoryTable.add(scrollPane);
 		
 		searchResult = new JTable();
@@ -353,7 +358,7 @@ public class CustodianDashboard {
 		scrollPane.setViewportView(searchResult);
 		
 		formCreator = new JPanel();
-		formCreator.setBounds(10, 11, 294, 544);
+		formCreator.setBounds(10, 11, 294, 624);
 		borrowFormCreation.add(formCreator);
 		formCreator.setLayout(formCard);
 		
@@ -713,7 +718,7 @@ public class CustodianDashboard {
 		sideBar.add(separator_2);
 		
 		JSeparator separator = new JSeparator();
-		separator.setBounds(10, 41, 1380, 2);
+		separator.setBounds(10, 54, 1380, 2);
 		custodianDashboard.add(separator);
 		
 		cardContainer.add(main, "dashboard");
