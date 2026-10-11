@@ -480,14 +480,14 @@ public class AdminDashboard {
 		lblStaffCounter.setBounds(79, 38, 66, 61);
 		staffPanel.add(lblStaffCounter);
 
-		ButtonOne btnGoBack = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnGoBack = new ButtonOne(new Color(255, 127, 80), new Color(235, 94, 40));
 
 		btnGoBack.setText("Go Back");
 		btnGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnGoBack.setBounds(26, 561, 224, 45);
 		cmSidebar.add(btnGoBack);
 
-		ButtonOne btnViewInventory2 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnViewInventory2 = new ButtonOne(new Color(255, 190, 11), new Color(230, 162, 0));
 
 		btnViewInventory2.setText("View Inventory");
 		btnViewInventory2.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
@@ -594,25 +594,25 @@ public class AdminDashboard {
 		txtPassword.setBounds(9, 476, 215, 25);
 		addCustodianPanel.add(txtPassword);
 
-		ButtonOne btnAdd = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnAdd = new ButtonOne(new Color(0, 224, 150), new Color(0, 184, 120));
 		btnAdd.setText("Add");
 		btnAdd.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnAdd.setBounds(9, 510, 105, 45);
 		addCustodianPanel.add(btnAdd);
 
-		ButtonOne btnEdit = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnEdit = new ButtonOne(new Color(243, 104, 224), new Color(218, 77, 198));
 		btnEdit.setText("Edit");
 		btnEdit.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnEdit.setBounds(10, 561, 105, 45);
 		addCustodianPanel.add(btnEdit);
 
-		ButtonOne btnDelete = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnDelete = new ButtonOne(new Color(232, 67, 147), new Color(214, 48, 49));
 		btnDelete.setText("Delete");
 		btnDelete.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnDelete.setBounds(118, 512, 105, 45);
 		addCustodianPanel.add(btnDelete);
 
-		ButtonOne btnClear = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		ButtonOne btnClear = new ButtonOne(new Color(0, 168, 255), new Color(0, 136, 214));
 		btnClear.setText("Clear");
 		btnClear.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnClear.setBounds(118, 561, 105, 45);
