@@ -500,12 +500,21 @@ public class CustodianDashboard {
 		
 		JPanel createMaintenance = new JPanel();
 		createMaintenance.setLayout(null);
+<<<<<<< Updated upstream
 		
+=======
+		createMaintenance.setBackground(Color.WHITE);
+
+>>>>>>> Stashed changes
 		JLabel lblMaintenanceForm = new JLabel("New Maintenance Report");
-		lblMaintenanceForm.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMaintenanceForm.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		lblMaintenanceForm.setBounds(10, 11, 274, 30);
+		lblMaintenanceForm.setFont(new Font("Segoe UI Black", Font.PLAIN, 17));
+		lblMaintenanceForm.setForeground(new Color(30, 144, 255));
+		lblMaintenanceForm.setOpaque(true);
+		lblMaintenanceForm.setBackground(new Color(240, 248, 255));
+		lblMaintenanceForm.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0));
+		lblMaintenanceForm.setBounds(0, 0, 295, 47);
 		createMaintenance.add(lblMaintenanceForm);
+<<<<<<< Updated upstream
 		
 		JSeparator sprtrBrwTop_2 = new JSeparator();
 		sprtrBrwTop_2.setBounds(10, 38, 274, 6);
@@ -521,86 +530,103 @@ public class CustodianDashboard {
 		lblMntEquipID.setBounds(10, 63, 96, 12);
 		createMaintenance.add(lblMntEquipID);
 		
+=======
+
+		// ----- labels -----
+		JLabel lblNmEquipID = new JLabel("Equipment ID");
+		lblNmEquipID.setFont(lblFont);
+		lblNmEquipID.setBounds(10, 57, 130, 14);
+		createMaintenance.add(lblNmEquipID);
+
+		JLabel lblNmEquipName = new JLabel("Equipment Name");
+		lblNmEquipName.setFont(lblFont);
+		lblNmEquipName.setBounds(10, 112, 170, 14);
+		createMaintenance.add(lblNmEquipName);
+
+		JLabel lblNmTag = new JLabel("Property Tag");
+		lblNmTag.setFont(lblFont);
+		lblNmTag.setBounds(190, 112, 95, 14);
+		createMaintenance.add(lblNmTag);
+
+		JLabel lblNmCondition = new JLabel("Condition");
+		lblNmCondition.setFont(lblFont);
+		lblNmCondition.setBounds(10, 163, 130, 14);
+		createMaintenance.add(lblNmCondition);
+
+		JLabel lblNmDate = new JLabel("Date Reported");
+		lblNmDate.setFont(lblFont);
+		lblNmDate.setBounds(150, 163, 135, 14);
+		createMaintenance.add(lblNmDate);
+
+		JLabel lblNmIssue = new JLabel("Reported Issue");
+		lblNmIssue.setFont(lblFont);
+		lblNmIssue.setBounds(10, 226, 275, 14);
+		createMaintenance.add(lblNmIssue);
+
+		// ----- fields -----
+>>>>>>> Stashed changes
 		txtMntEquipID = new JTextField();
 		txtMntEquipID.addKeyListener(numericalOnly);
-		txtMntEquipID.setColumns(10);
-		txtMntEquipID.setBounds(132, 60, 60, 18);
+		txtMntEquipID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntEquipID.setBounds(10, 73, 130, 25);
 		createMaintenance.add(txtMntEquipID);
-		
-		JLabel lblBrwEquipName_1 = new JLabel("Equipment Name");
-		lblBrwEquipName_1.setBounds(10, 88, 101, 12);
-		createMaintenance.add(lblBrwEquipName_1);
-		
+
+		ButtonOne btnMntLoadID = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnMntLoadID.setText("Select");
+		btnMntLoadID.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
+		btnMntLoadID.addActionListener(e -> { loadItem(1); });
+		btnMntLoadID.setBounds(150, 68, 135, 35);
+		createMaintenance.add(btnMntLoadID);
+
 		txtMntEquipName = new JTextField();
 		txtMntEquipName.setEditable(false);
-		txtMntEquipName.setColumns(10);
-		txtMntEquipName.setBounds(10, 106, 182, 18);
+		txtMntEquipName.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntEquipName.setBounds(10, 128, 170, 25);
 		createMaintenance.add(txtMntEquipName);
-		
-		JLabel lblBrwEquipCondition_1 = new JLabel("Condition");
-		lblBrwEquipCondition_1.setBounds(10, 135, 82, 12);
-		createMaintenance.add(lblBrwEquipCondition_1);
-		
-		txtMntEquipCondition = new JTextField();
-		txtMntEquipCondition.setEditable(false);
-		txtMntEquipCondition.setColumns(10);
-		txtMntEquipCondition.setBounds(10, 153, 82, 18);
-		createMaintenance.add(txtMntEquipCondition);
-		
-		JLabel lblBrwEquipTag_1 = new JLabel("Property Tag");
-		lblBrwEquipTag_1.setBounds(202, 88, 82, 12);
-		createMaintenance.add(lblBrwEquipTag_1);
-		
+
 		txtMntEquipTag = new JTextField();
 		txtMntEquipTag.setEditable(false);
-		txtMntEquipTag.setColumns(10);
-		txtMntEquipTag.setBounds(202, 106, 82, 18);
+		txtMntEquipTag.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntEquipTag.setBounds(190, 128, 95, 25);
 		createMaintenance.add(txtMntEquipTag);
-		
-		JButton btnMntLoadID = new JButton("Select");
-		btnMntLoadID.addActionListener(e -> { loadItem(1); });
-		btnMntLoadID.setBounds(200, 59, 84, 20);
-		createMaintenance.add(btnMntLoadID);
-		
-		JSeparator sprtrBrwTop_1_1 = new JSeparator();
-		sprtrBrwTop_1_1.setBounds(10, 182, 274, 6);
-		createMaintenance.add(sprtrBrwTop_1_1);
-		
-		JLabel lblMaintenanceDetails = new JLabel("Maintenance Details");
-		lblMaintenanceDetails.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblMaintenanceDetails.setBounds(10, 182, 113, 18);
-		createMaintenance.add(lblMaintenanceDetails);
-		
-		JLabel lblDateReported = new JLabel("Date Reported:");
-		lblDateReported.setBounds(171, 135, 113, 14);
-		createMaintenance.add(lblDateReported);
-		
+
+		txtMntEquipCondition = new JTextField();
+		txtMntEquipCondition.setEditable(false);
+		txtMntEquipCondition.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntEquipCondition.setBounds(10, 179, 130, 25);
+		createMaintenance.add(txtMntEquipCondition);
+
 		txtMntDateReported = new JTextField();
 		txtMntDateReported.setEditable(false);
-		txtMntDateReported.setColumns(10);
-		txtMntDateReported.setBounds(171, 149, 113, 20);
+		txtMntDateReported.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntDateReported.setBounds(150, 179, 135, 25);
 		createMaintenance.add(txtMntDateReported);
-		
-		JLabel lblMntIssue = new JLabel("Reported Issue:");
-		lblMntIssue.setBounds(10, 205, 113, 14);
-		createMaintenance.add(lblMntIssue);
-		
+
+		JSeparator sprtrNm = new JSeparator();
+		sprtrNm.setForeground(new Color(30, 144, 255));
+		sprtrNm.setBounds(10, 216, 275, 2);
+		createMaintenance.add(sprtrNm);
+
 		JScrollPane txtMntIssueViewport = new JScrollPane();
-		txtMntIssueViewport.setBounds(10, 224, 274, 95);
+		txtMntIssueViewport.setBounds(10, 242, 275, 120);
 		createMaintenance.add(txtMntIssueViewport);
-		
+
 		txtAMntIssue = new JTextArea();
 		txtMntIssueViewport.setViewportView(txtAMntIssue);
-		
-		
-		JButton btnMntSubmit = new JButton("Create Report");
+
+		// ----- buttons -----
+		ButtonOne btnMntSubmit = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnMntSubmit.setText("Create Report");
+		btnMntSubmit.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnMntSubmit.addActionListener(e -> { createMaintenanceReport(); });
-		btnMntSubmit.setBounds(10, 510, 151, 23);
+		btnMntSubmit.setBounds(10, 505, 275, 45);
 		createMaintenance.add(btnMntSubmit);
-		
-		JButton btnMntCancel = new JButton("Cancel");
+
+		ButtonOne btnMntCancel = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
+		btnMntCancel.setText("Cancel");
+		btnMntCancel.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnMntCancel.addActionListener(e -> { displayDashboard(); });
-		btnMntCancel.setBounds(171, 510, 113, 23);
+		btnMntCancel.setBounds(10, 558, 275, 45);
 		createMaintenance.add(btnMntCancel);
 		
 		JPanel main = new JPanel();
