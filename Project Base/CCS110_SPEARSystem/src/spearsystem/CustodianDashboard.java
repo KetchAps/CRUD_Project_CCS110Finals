@@ -156,6 +156,7 @@ public class CustodianDashboard {
 	private JTextField txtMngBorrowerTransaction;
 	
 	private JLabel lblCreationTitle;
+	private JLabel lblBorrowerTitle;
 	
 	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
@@ -281,6 +282,9 @@ public class CustodianDashboard {
 		
 		backend = new CustodianHandler();
 		
+		Font lblFont = new Font("Segoe UI Semibold", Font.PLAIN, 11);
+		Font hintFont = new Font("Segoe UI", Font.PLAIN, 10);
+		
 		custodianDashboard = new JPanel();
 		custodianDashboard.setLayout(null);
 		custodianDashboard.setBounds(10, 54, 1283, 700);
@@ -366,37 +370,37 @@ public class CustodianDashboard {
 		searchBar = new JTextField();
 		searchBar.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		searchBar.setColumns(10);
-		searchBar.setBounds(10, 57, 150, 25);
+		searchBar.setBounds(10, 57, 136, 25);
 		inventoryTable.add(searchBar);
 
 		JButton btnFilter = new JButton("⌕");
 		btnFilter.addActionListener(e -> { inventorySorter.setRowFilter(inventoryRF); });
-		btnFilter.setBounds(165, 57, 45, 25);
+		btnFilter.setBounds(153, 56, 45, 25);
 		inventoryTable.add(btnFilter);
 
 		cmbCategory = new JComboBox<String>();
 		cmbCategory.setModel(cmbCategoryModel);
-		cmbCategory.setBounds(220, 57, 105, 25);
+		cmbCategory.setBounds(205, 56, 105, 25);
 		inventoryTable.add(cmbCategory);
 
 		cmbCondition = new JComboBox<String>();
 		cmbCondition.setModel(new DefaultComboBoxModel<String>(new String[] {"[Condition]", "Good", "Damaged", "Worn"}));
-		cmbCondition.setBounds(333, 57, 100, 25);
+		cmbCondition.setBounds(316, 57, 100, 25);
 		inventoryTable.add(cmbCondition);
 
 		cmbAvailability = new JComboBox<String>();
 		cmbAvailability.setModel(new DefaultComboBoxModel<>(new String[] {"[Availability]", "Available", "In Use", "In Maintenance"}));
-		cmbAvailability.setBounds(441, 57, 115, 25);
+		cmbAvailability.setBounds(423, 57, 115, 25);
 		inventoryTable.add(cmbAvailability);
 
 		JButton btnClearFilter = new JButton("Clear");
 		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
-		btnClearFilter.setBounds(564, 57, 55, 25);
+		btnClearFilter.setBounds(541, 57, 75, 25);
 		inventoryTable.add(btnClearFilter);
 
 		JButton btnRefresh = new JButton("⟳");
 		btnRefresh.addActionListener(e -> { displayInventoryValues(); });
-		btnRefresh.setBounds(625, 57, 46, 25);
+		btnRefresh.setBounds(620, 57, 51, 25);
 		inventoryTable.add(btnRefresh);
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -478,7 +482,7 @@ public class CustodianDashboard {
 		lblBorrowerDetails.setBounds(102, 202, 96, 18);
 		createBorrow.add(lblBorrowerDetails);
 		
-		// Custom button here
+		// Custom button
 		ButtonOne btnBrwLoadID = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
 		btnBrwLoadID.setText("Select");
 		btnBrwLoadID.setFont(new Font("Segoe UI Semibold", Font.BOLD, 12));
@@ -829,609 +833,785 @@ public class CustodianDashboard {
 		
 		card.show(cardContainer, "dashboard");
 		
+		borrowList = new DefaultTableModel();
+		
 		JPanel updateBorrow = new JPanel();
 		cardContainer.add(updateBorrow, "updateBorrow");
 		updateBorrow.setLayout(null);
-		
-		JScrollPane updtBorrowViewport = new JScrollPane();
-		updtBorrowViewport.setBounds(314, 44, 1076, 511);
-		updateBorrow.add(updtBorrowViewport);
-		
-		borrowList = new DefaultTableModel();
-		
-		tblborrowRecord = new JTable();
-		tblborrowRecord.setFillsViewportHeight(true);
-		updtBorrowViewport.setViewportView(tblborrowRecord);
-		
-		JButton btnRefresh_1 = new JButton("⟳");
-		btnRefresh_1.addActionListener(e -> { displayBorrowRecords(); });
-		btnRefresh_1.setBounds(1328, 11, 62, 23);
-		updateBorrow.add(btnRefresh_1);
-		
-		JButton btnClearFilter_1 = new JButton("Clear");
-		btnClearFilter_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			
-				borrowRecordSorter.setRowFilter(null);
-			
-			}
-		});
-		btnClearFilter_1.setBounds(921, 11, 75, 23);
-		updateBorrow.add(btnClearFilter_1);
-		
-		JButton btnBrwUpdFilter = new JButton("⌕");
-		btnBrwUpdFilter.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				borrowRecordSorter.setRowFilter(borrowRecordRF);
-			}
-		});
-		btnBrwUpdFilter.setBounds(849, 11, 62, 23);
-		updateBorrow.add(btnBrwUpdFilter);
-		
-		cmbStatus = new JComboBox<String>();
-		cmbStatus.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
-		cmbStatus.setBounds(742, 11, 97, 22);
-		updateBorrow.add(cmbStatus);
-		
-		txtbrwSearchBar = new JTextField();
-		txtbrwSearchBar.setColumns(10);
-		txtbrwSearchBar.setBounds(314, 12, 125, 20);
-		updateBorrow.add(txtbrwSearchBar);
-		
-		JSeparator sprtrBrwTop_3 = new JSeparator();
-		sprtrBrwTop_3.setBounds(20, 41, 274, 6);
-		updateBorrow.add(sprtrBrwTop_3);
-		
+
+		GradientPanel ubSidebar = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
+		ubSidebar.setLayout(null);
+		ubSidebar.setBounds(0, 0, 277, 628);
+		updateBorrow.add(ubSidebar);
+
+		ImageIcon ubIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image ubImage = ubIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+
+		JLabel ubLogo = new JLabel("S.P.E.A.R");
+		ubLogo.setForeground(new Color(30, 144, 255));
+		ubLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		ubLogo.setIcon(new ImageIcon(ubImage));
+		ubLogo.setBounds(0, 11, 250, 64);
+		ubSidebar.add(ubLogo);
+
+		JSeparator ubSep = new JSeparator();
+		ubSep.setForeground(new Color(30, 144, 255));
+		ubSep.setBounds(26, 94, 225, 2);
+		ubSidebar.add(ubSep);
+
+		JLabel ubTitle = new JLabel("Borrow Updater");
+		ubTitle.setForeground(new Color(30, 144, 255));
+		ubTitle.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
+		ubTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		ubTitle.setBounds(0, 107, 277, 27);
+		ubSidebar.add(ubTitle);
+
+		ButtonOne btnUbGoBack = new ButtonOne(new Color(255, 127, 80), new Color(230, 100, 60));
+		btnUbGoBack.setText("Go Back");
+		btnUbGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnUbGoBack.addActionListener(e -> { displayDashboard(); });
+		btnUbGoBack.setBounds(26, 561, 224, 45);
+		ubSidebar.add(btnUbGoBack);
+
+		JPanel ubForm = new JPanel();
+		ubForm.setBackground(Color.WHITE);
+		ubForm.setLayout(null);
+		ubForm.setBounds(287, 0, 295, 617);
+		updateBorrow.add(ubForm);
+
 		JLabel lblUpdateBorrow = new JLabel("Update Borrow Form");
-		lblUpdateBorrow.setHorizontalAlignment(SwingConstants.CENTER);
-		lblUpdateBorrow.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		lblUpdateBorrow.setBounds(20, 11, 274, 30);
-		updateBorrow.add(lblUpdateBorrow);
-		
-		JLabel lblTransactionID = new JLabel("Transaction ID");
-		lblTransactionID.setBounds(53, 44, 97, 14);
-		updateBorrow.add(lblTransactionID);
+		lblUpdateBorrow.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblUpdateBorrow.setForeground(new Color(30, 144, 255));
+		lblUpdateBorrow.setOpaque(true);
+		lblUpdateBorrow.setBackground(new Color(240, 248, 255));
+		lblUpdateBorrow.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0));
+		lblUpdateBorrow.setHorizontalAlignment(SwingConstants.LEFT);
+		lblUpdateBorrow.setBounds(0, 0, 295, 47);
+		ubForm.add(lblUpdateBorrow);
+
+		JLabel lblUbTransaction = new JLabel("Transaction ID");
+		lblUbTransaction.setFont(lblFont);
+		lblUbTransaction.setBounds(10, 57, 130, 14);
+		ubForm.add(lblUbTransaction);
+
+		JLabel lblUbReceivedBy = new JLabel("Received By");
+		lblUbReceivedBy.setFont(lblFont);
+		lblUbReceivedBy.setBounds(150, 57, 135, 14);
+		ubForm.add(lblUbReceivedBy);
+
+		JLabel lblUbBorrowerID = new JLabel("Borrower ID");
+		lblUbBorrowerID.setFont(lblFont);
+		lblUbBorrowerID.setBounds(10, 106, 130, 14);
+		ubForm.add(lblUbBorrowerID);
+
+		JLabel lblUbEquipID = new JLabel("Equipment ID");
+		lblUbEquipID.setFont(lblFont);
+		lblUbEquipID.setBounds(150, 106, 135, 14);
+		ubForm.add(lblUbEquipID);
+
+		JLabel lblUbDateBorrowed = new JLabel("Date Borrowed");
+		lblUbDateBorrowed.setFont(lblFont);
+		lblUbDateBorrowed.setBounds(10, 155, 130, 14);
+		ubForm.add(lblUbDateBorrowed);
+
+		JLabel lblUbCondBorrow = new JLabel("Condition on Borrow");
+		lblUbCondBorrow.setFont(lblFont);
+		lblUbCondBorrow.setBounds(150, 155, 135, 14);
+		ubForm.add(lblUbCondBorrow);
+
+		JLabel lblUbReturnBy = new JLabel("Return by Date:");
+		lblUbReturnBy.setFont(lblFont);
+		lblUbReturnBy.setBounds(10, 272, 275, 14);
+		ubForm.add(lblUbReturnBy);
+
+		JLabel lblUbHint1 = new JLabel("(YYYY-MM-DD)");
+		lblUbHint1.setFont(hintFont);
+		lblUbHint1.setForeground(new Color(150, 150, 150));
+		lblUbHint1.setBounds(10, 316, 275, 14);
+		ubForm.add(lblUbHint1);
+
+		JLabel lblUbDateReturned = new JLabel("Date Returned");
+		lblUbDateReturned.setFont(lblFont);
+		lblUbDateReturned.setBounds(10, 340, 275, 14);
+		ubForm.add(lblUbDateReturned);
+
+		JLabel lblUbHint2 = new JLabel("(YYYY-MM-DD)");
+		lblUbHint2.setFont(hintFont);
+		lblUbHint2.setForeground(new Color(150, 150, 150));
+		lblUbHint2.setBounds(10, 384, 275, 14);
+		ubForm.add(lblUbHint2);
+
+		JLabel lblUbCondReturn = new JLabel("Condition On Return");
+		lblUbCondReturn.setFont(lblFont);
+		lblUbCondReturn.setBounds(10, 408, 275, 14);
+		ubForm.add(lblUbCondReturn);
 		
 		txtTransactionID = new JTextField();
-		txtTransactionID.setBounds(53, 57, 97, 20);
-		updateBorrow.add(txtTransactionID);
-		txtTransactionID.setColumns(10);
-		
-		JLabel lblBorrowID = new JLabel("Borrower ID");
-		lblBorrowID.setBounds(53, 88, 97, 14);
-		updateBorrow.add(lblBorrowID);
-		
-		txtUpdBorrowerID = new JTextField();
-		txtUpdBorrowerID.setEditable(false);
-		txtUpdBorrowerID.setColumns(10);
-		txtUpdBorrowerID.setBounds(53, 100, 97, 20);
-		updateBorrow.add(txtUpdBorrowerID);
-		
-		JLabel lblBorrowedEquipID = new JLabel("Equipment ID");
-		lblBorrowedEquipID.setBounds(160, 88, 97, 14);
-		updateBorrow.add(lblBorrowedEquipID);
-		
-		txtUpdBorrowedEquip = new JTextField();
-		txtUpdBorrowedEquip.setEditable(false);
-		txtUpdBorrowedEquip.setColumns(10);
-		txtUpdBorrowedEquip.setBounds(160, 100, 97, 20);
-		updateBorrow.add(txtUpdBorrowedEquip);
-		
-		JLabel lblUpdDateBorrowed = new JLabel("Date Borrowed");
-		lblUpdDateBorrowed.setBounds(53, 126, 97, 14);
-		updateBorrow.add(lblUpdDateBorrowed);
-		
-		txtBorrowDate = new JTextField();
-		txtBorrowDate.setEditable(false);
-		txtBorrowDate.setColumns(10);
-		txtBorrowDate.setBounds(53, 138, 97, 20);
-		updateBorrow.add(txtBorrowDate);
-		
-		JLabel lblUpdCustodian = new JLabel("Received By");
-		lblUpdCustodian.setBounds(160, 45, 97, 14);
-		updateBorrow.add(lblUpdCustodian);
-		
+		txtTransactionID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtTransactionID.setBounds(10, 73, 130, 25);
+		ubForm.add(txtTransactionID);
+
 		txtUpdCustodian = new JTextField();
 		txtUpdCustodian.setEditable(false);
-		txtUpdCustodian.setColumns(10);
-		txtUpdCustodian.setBounds(160, 57, 97, 20);
-		updateBorrow.add(txtUpdCustodian);
-		
-		JLabel lblUpdConditionOnBorrow = new JLabel("Condition on Borrow");
-		lblUpdConditionOnBorrow.setBounds(160, 126, 97, 14);
-		updateBorrow.add(lblUpdConditionOnBorrow);
-		
+		txtUpdCustodian.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtUpdCustodian.setBounds(150, 73, 135, 25);
+		ubForm.add(txtUpdCustodian);
+
+		txtUpdBorrowerID = new JTextField();
+		txtUpdBorrowerID.setEditable(false);
+		txtUpdBorrowerID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtUpdBorrowerID.setBounds(10, 122, 130, 25);
+		ubForm.add(txtUpdBorrowerID);
+
+		txtUpdBorrowedEquip = new JTextField();
+		txtUpdBorrowedEquip.setEditable(false);
+		txtUpdBorrowedEquip.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtUpdBorrowedEquip.setBounds(150, 122, 135, 25);
+		ubForm.add(txtUpdBorrowedEquip);
+
+		txtBorrowDate = new JTextField();
+		txtBorrowDate.setEditable(false);
+		txtBorrowDate.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtBorrowDate.setBounds(10, 171, 130, 25);
+		ubForm.add(txtBorrowDate);
+
 		txtUpdCondOnBorrow = new JTextField();
 		txtUpdCondOnBorrow.setEditable(false);
-		txtUpdCondOnBorrow.setColumns(10);
-		txtUpdCondOnBorrow.setBounds(160, 138, 97, 20);
-		updateBorrow.add(txtUpdCondOnBorrow);
-		
-		JSeparator separator_1 = new JSeparator();
-		separator_1.setBounds(20, 220, 284, 6);
-		updateBorrow.add(separator_1);
-		
-		JButton btnUpdSelect = new JButton("Selecct");
-		btnUpdSelect.addActionListener( e -> { LoadRecord(); });
-		btnUpdSelect.setBounds(111, 190, 89, 23);
-		updateBorrow.add(btnUpdSelect);
-		
+		txtUpdCondOnBorrow.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtUpdCondOnBorrow.setBounds(150, 171, 135, 25);
+		ubForm.add(txtUpdCondOnBorrow);
+
+		ButtonOne btnUpdSelect = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnUpdSelect.setText("Select");
+		btnUpdSelect.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
+		btnUpdSelect.addActionListener(e -> { LoadRecord(); });
+		btnUpdSelect.setBounds(10, 208, 275, 38);
+		ubForm.add(btnUpdSelect);
+
+		JSeparator ubSep2 = new JSeparator();
+		ubSep2.setForeground(new Color(30, 144, 255));
+		ubSep2.setBounds(10, 260, 275, 2);
+		ubForm.add(ubSep2);
+
 		txtExpectedReturnDate = new JTextField();
 		txtExpectedReturnDate.setEditable(false);
-		txtExpectedReturnDate.setBounds(20, 262, 274, 20);
-		updateBorrow.add(txtExpectedReturnDate);
-		txtExpectedReturnDate.setColumns(10);
-		
-		JLabel lblUpdReturnDateBy = new JLabel("Return by Date:");
-		lblUpdReturnDateBy.setBounds(20, 247, 130, 14);
-		updateBorrow.add(lblUpdReturnDateBy);
-		
+		txtExpectedReturnDate.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtExpectedReturnDate.setBounds(10, 290, 275, 25);
+		ubForm.add(txtExpectedReturnDate);
+
 		txtDateReturned = new JTextField();
 		txtDateReturned.setEditable(false);
-		txtDateReturned.setColumns(10);
-		txtDateReturned.setBounds(20, 308, 274, 20);
-		updateBorrow.add(txtDateReturned);
-		
-		JLabel lblUpdDateReturned = new JLabel("Date Returned");
-		lblUpdDateReturned.setBounds(20, 293, 130, 14);
-		updateBorrow.add(lblUpdDateReturned);
-		
-		JLabel lblUpdConditionOnReturn = new JLabel("Condition On Return");
-		lblUpdConditionOnReturn.setBounds(20, 339, 130, 14);
-		updateBorrow.add(lblUpdConditionOnReturn);
-		
+		txtDateReturned.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtDateReturned.setBounds(10, 358, 275, 25);
+		ubForm.add(txtDateReturned);
+
 		cmbCondOnReturn = new JComboBox<>();
 		cmbCondOnReturn.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
-		cmbCondOnReturn.setBounds(20, 353, 274, 22);
-		updateBorrow.add(cmbCondOnReturn);
-		
-		JLabel lbldateformat = new JLabel("(YYYY-MM-DD)");
-		lbldateformat.setHorizontalAlignment(SwingConstants.CENTER);
-		lbldateformat.setForeground(new Color(128, 128, 128));
-		lbldateformat.setBounds(20, 283, 274, 14);
-		updateBorrow.add(lbldateformat);
-		
-		JLabel lbldateformat_1 = new JLabel("(YYYY-MM-DD)");
-		lbldateformat_1.setFont(new Font("Tahoma", Font.PLAIN, 8));
-		lbldateformat_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lbldateformat_1.setForeground(Color.GRAY);
-		lbldateformat_1.setBounds(20, 328, 138, 14);
-		updateBorrow.add(lbldateformat_1);
-		
-		JButton btnBrwUpdCancel = new JButton("Cancel");
-		btnBrwUpdCancel.addActionListener(e -> {displayDashboard();});
-		btnBrwUpdCancel.setBounds(20, 503, 274, 23);
-		updateBorrow.add(btnBrwUpdCancel);
-		
-		JButton btnBrwUpdate = new JButton("Update Record");
+		cmbCondOnReturn.setBounds(10, 426, 275, 25);
+		ubForm.add(cmbCondOnReturn);
+
+		ButtonOne btnBrwUpdate = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnBrwUpdate.setText("Update Record");
+		btnBrwUpdate.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnBrwUpdate.addActionListener(e -> { updateBorrowRecord(); });
-		btnBrwUpdate.setBounds(20, 478, 274, 23);
-		updateBorrow.add(btnBrwUpdate);
+		btnBrwUpdate.setBounds(10, 505, 275, 45);
+		ubForm.add(btnBrwUpdate);
+
+		ButtonOne btnBrwUpdCancel = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
+		btnBrwUpdCancel.setText("Cancel");
+		btnBrwUpdCancel.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnBrwUpdCancel.addActionListener(e -> { displayDashboard(); });
+		btnBrwUpdCancel.setBounds(10, 558, 275, 45);
+		ubForm.add(btnBrwUpdCancel);
+
+		JPanel ubRecords = new JPanel();
+		ubRecords.setBackground(Color.WHITE);
+		ubRecords.setLayout(null);
+		ubRecords.setBounds(592, 0, 681, 617);
+		updateBorrow.add(ubRecords);
+
+		JPanel ubHero = new JPanel();
+		ubHero.setLayout(null);
+		ubHero.setBackground(new Color(240, 248, 255));
+		ubHero.setBounds(0, 0, 681, 47);
+		ubRecords.add(ubHero);
+
+		JLabel lblBorrowRecords = new JLabel("Borrow Records");
+		lblBorrowRecords.setForeground(new Color(30, 144, 255));
+		lblBorrowRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblBorrowRecords.setBounds(10, 0, 306, 47);
+		ubHero.add(lblBorrowRecords);
+
+		txtbrwSearchBar = new JTextField();
+		txtbrwSearchBar.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtbrwSearchBar.setColumns(10);
+		txtbrwSearchBar.setBounds(10, 57, 150, 25);
+		ubRecords.add(txtbrwSearchBar);
+
+		JButton btnBrwUpdFilter = new JButton("⌕");
+		btnBrwUpdFilter.addActionListener(e -> { borrowRecordSorter.setRowFilter(borrowRecordRF); });
+		btnBrwUpdFilter.setBounds(165, 57, 45, 25);
+		ubRecords.add(btnBrwUpdFilter);
+
+		cmbStatus = new JComboBox<String>();
+		cmbStatus.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
+		cmbStatus.setBounds(220, 57, 120, 25);
+		ubRecords.add(cmbStatus);
+
+		JButton btnClearFilter_1 = new JButton("Clear");
+		btnClearFilter_1.addActionListener(e -> { borrowRecordSorter.setRowFilter(null); });
+		btnClearFilter_1.setBounds(348, 57, 80, 25);
+		ubRecords.add(btnClearFilter_1);
+
+		JButton btnRefresh_1 = new JButton("⟳");
+		btnRefresh_1.addActionListener(e -> { displayBorrowRecords(); });
+		btnRefresh_1.setBounds(625, 57, 46, 25);
+		ubRecords.add(btnRefresh_1);
+
+		JScrollPane updtBorrowViewport = new JScrollPane();
+		updtBorrowViewport.setBounds(0, 92, 681, 525);
+		ubRecords.add(updtBorrowViewport);
+
+		borrowList = new DefaultTableModel();
+
+		tblborrowRecord = new JTable();
+		tblborrowRecord.setFillsViewportHeight(true);
+		tblborrowRecord.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		updtBorrowViewport.setViewportView(tblborrowRecord);
 		
 		JPanel updateMaintenance = new JPanel();
 		cardContainer.add(updateMaintenance, "updateMaintenance");
 		updateMaintenance.setLayout(null);
-		
-		txtUpdMntSearch = new JTextField();
-		txtUpdMntSearch.setColumns(10);
-		txtUpdMntSearch.setBounds(324, 12, 115, 20);
-		updateMaintenance.add(txtUpdMntSearch);
-		
-		cmbStatusMnt = new JComboBox<String>();
-		cmbStatusMnt.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
-		cmbStatusMnt.setBounds(742, 11, 97, 22);
-		updateMaintenance.add(cmbStatusMnt);
-		
-		JButton btnFilter_1_1 = new JButton("⌕");
-		btnFilter_1_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				maintenanceSorter.setRowFilter(maintenanceRF);
-			}
-		});
-		btnFilter_1_1.setBounds(849, 11, 62, 23);
-		updateMaintenance.add(btnFilter_1_1);
-		
-		JButton btnClearFilter_1_1 = new JButton("Clear");
-		btnClearFilter_1_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				maintenanceSorter.setRowFilter(null);
-				
-			}
-		});
-		btnClearFilter_1_1.setBounds(921, 11, 75, 23);
-		updateMaintenance.add(btnClearFilter_1_1);
-		
-		JButton btnUpdMntRefresh = new JButton("⟳");
-		btnUpdMntRefresh.addActionListener(e -> { displayMaintenanceReports(); });
-		btnUpdMntRefresh.setBounds(1328, 11, 62, 23);
-		updateMaintenance.add(btnUpdMntRefresh);
-		
-		JLabel lblMntAction = new JLabel("Actions Taken:");
-		lblMntAction.setBounds(10, 319, 89, 14);
-		updateMaintenance.add(lblMntAction);
-		
-		JLabel lblRepairCost = new JLabel("Maintenance Cost          ₱");
-		lblRepairCost.setBounds(10, 439, 141, 14);
-		updateMaintenance.add(lblRepairCost);
-		
-		txtMntCost = new JTextField();
-		txtMntCost.setColumns(10);
-		txtMntCost.setBounds(151, 436, 133, 20);
-		AbstractDocument mntCostdoc = (AbstractDocument) txtMntCost.getDocument();
-		mntCostdoc.setDocumentFilter(moneyInput);
-		updateMaintenance.add(txtMntCost);
-		
+
+		GradientPanel umSidebar = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
+		umSidebar.setLayout(null);
+		umSidebar.setBounds(0, 0, 277, 628);
+		updateMaintenance.add(umSidebar);
+
+		ImageIcon umIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image umImage = umIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+
+		JLabel umLogo = new JLabel("S.P.E.A.R");
+		umLogo.setForeground(new Color(30, 144, 255));
+		umLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		umLogo.setIcon(new ImageIcon(umImage));
+		umLogo.setBounds(0, 11, 250, 64);
+		umSidebar.add(umLogo);
+
+		JSeparator umSep = new JSeparator();
+		umSep.setForeground(new Color(30, 144, 255));
+		umSep.setBounds(26, 94, 225, 2);
+		umSidebar.add(umSep);
+
+		JLabel umTitle = new JLabel("Maintenance Updater");
+		umTitle.setForeground(new Color(30, 144, 255));
+		umTitle.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
+		umTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		umTitle.setBounds(0, 107, 277, 27);
+		umSidebar.add(umTitle);
+
+		ButtonOne btnUmGoBack = new ButtonOne(new Color(255, 127, 80), new Color(230, 100, 60));
+		btnUmGoBack.setText("Go Back");
+		btnUmGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnUmGoBack.addActionListener(e -> { displayDashboard(); });
+		btnUmGoBack.setBounds(26, 561, 224, 45);
+		umSidebar.add(btnUmGoBack);
+
+		JPanel umForm = new JPanel();
+		umForm.setBackground(Color.WHITE);
+		umForm.setLayout(null);
+		umForm.setBounds(287, 0, 295, 617);
+		updateMaintenance.add(umForm);
+
 		JLabel lblMaintenanceForm_1 = new JLabel("Update Maintenance Report");
-		lblMaintenanceForm_1.setHorizontalAlignment(SwingConstants.CENTER);
-		lblMaintenanceForm_1.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		lblMaintenanceForm_1.setBounds(10, 11, 274, 30);
-		updateMaintenance.add(lblMaintenanceForm_1);
-		
-		JSeparator sprtrBrwTop_2_1 = new JSeparator();
-		sprtrBrwTop_2_1.setBounds(10, 38, 274, 6);
-		updateMaintenance.add(sprtrBrwTop_2_1);
-		
-		JLabel lblEquipDetails_1_1 = new JLabel("Equipment Details");
-		lblEquipDetails_1_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblEquipDetails_1_1.setBounds(10, 39, 113, 18);
-		updateMaintenance.add(lblEquipDetails_1_1);
-		
-		JLabel lblMntTransaction = new JLabel("Transaction ID");
-		lblMntTransaction.setHorizontalAlignment(SwingConstants.LEFT);
-		lblMntTransaction.setBounds(10, 63, 96, 12);
-		updateMaintenance.add(lblMntTransaction);
+		lblMaintenanceForm_1.setFont(new Font("Segoe UI Black", Font.PLAIN, 17));
+		lblMaintenanceForm_1.setForeground(new Color(30, 144, 255));
+		lblMaintenanceForm_1.setOpaque(true);
+		lblMaintenanceForm_1.setBackground(new Color(240, 248, 255));
+		lblMaintenanceForm_1.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0));
+		lblMaintenanceForm_1.setBounds(0, 0, 295, 47);
+		umForm.add(lblMaintenanceForm_1);
+
+		JLabel lblUmTransaction = new JLabel("Transaction ID");
+		lblUmTransaction.setFont(lblFont);
+		lblUmTransaction.setBounds(10, 57, 130, 14);
+		umForm.add(lblUmTransaction);
+
+		JLabel lblUmEquipID = new JLabel("Equipment ID");
+		lblUmEquipID.setFont(lblFont);
+		lblUmEquipID.setBounds(10, 112, 130, 14);
+		umForm.add(lblUmEquipID);
+
+		JLabel lblUmDateReported = new JLabel("Date Reported");
+		lblUmDateReported.setFont(lblFont);
+		lblUmDateReported.setBounds(150, 112, 135, 14);
+		umForm.add(lblUmDateReported);
+
+		JLabel lblUmReportedBy = new JLabel("Reported By");
+		lblUmReportedBy.setFont(lblFont);
+		lblUmReportedBy.setBounds(10, 163, 275, 14);
+		umForm.add(lblUmReportedBy);
+
+		JLabel lblUmIssue = new JLabel("Reported Issue");
+		lblUmIssue.setFont(lblFont);
+		lblUmIssue.setBounds(10, 226, 275, 14);
+		umForm.add(lblUmIssue);
+
+		JLabel lblUmActions = new JLabel("Actions Taken");
+		lblUmActions.setFont(lblFont);
+		lblUmActions.setBounds(10, 337, 275, 14);
+		umForm.add(lblUmActions);
+
+		JLabel lblUmCost = new JLabel("Maintenance Cost (₱)");
+		lblUmCost.setFont(lblFont);
+		lblUmCost.setBounds(10, 448, 275, 14);
+		umForm.add(lblUmCost);
 		
 		txtMntUpdTransactionID = new JTextField();
-		txtMntUpdTransactionID.setColumns(10);
-		txtMntUpdTransactionID.setBounds(132, 60, 60, 18);
-		updateMaintenance.add(txtMntUpdTransactionID);
-		
-		JLabel lblMntUpdReportedBy = new JLabel("Reported By");
-		lblMntUpdReportedBy.setBounds(36, 132, 82, 12);
-		updateMaintenance.add(lblMntUpdReportedBy);
-		
-		txtMntUpdReport = new JTextField();
-		txtMntUpdReport.setEditable(false);
-		txtMntUpdReport.setColumns(10);
-		txtMntUpdReport.setBounds(36, 150, 97, 18);
-		updateMaintenance.add(txtMntUpdReport);
-		
-		JButton btnMntUpdSelect = new JButton("Select");
+		txtMntUpdTransactionID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntUpdTransactionID.setBounds(10, 73, 130, 25);
+		umForm.add(txtMntUpdTransactionID);
+
+		ButtonOne btnMntUpdSelect = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnMntUpdSelect.setText("Select");
+		btnMntUpdSelect.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
 		btnMntUpdSelect.addActionListener(e -> { LoadReport(); });
-		btnMntUpdSelect.setBounds(200, 59, 84, 20);
-		updateMaintenance.add(btnMntUpdSelect);
-		
-		JLabel lblDateReported_1 = new JLabel("Date Reported:");
-		lblDateReported_1.setBounds(142, 89, 113, 14);
-		updateMaintenance.add(lblDateReported_1);
-		
-		txtMntUpdDate = new JTextField();
-		txtMntUpdDate.setEditable(false);
-		txtMntUpdDate.setColumns(10);
-		txtMntUpdDate.setBounds(142, 103, 113, 20);
-		updateMaintenance.add(txtMntUpdDate);
-		
-		JLabel lblBorrowedEquipID_1 = new JLabel("Equipment ID");
-		lblBorrowedEquipID_1.setBounds(36, 89, 97, 14);
-		updateMaintenance.add(lblBorrowedEquipID_1);
-		
+		btnMntUpdSelect.setBounds(150, 68, 135, 35);
+		umForm.add(btnMntUpdSelect);
+
 		txtMntUpdEquipID = new JTextField();
 		txtMntUpdEquipID.setEditable(false);
-		txtMntUpdEquipID.setColumns(10);
-		txtMntUpdEquipID.setBounds(36, 101, 97, 20);
-		updateMaintenance.add(txtMntUpdEquipID);
-		
-		JSeparator sprtrBrwTop_1_1_1 = new JSeparator();
-		sprtrBrwTop_1_1_1.setBounds(10, 177, 274, 6);
-		updateMaintenance.add(sprtrBrwTop_1_1_1);
-		
-		JLabel lblMaintenanceDetails_1 = new JLabel("Maintenance Details");
-		lblMaintenanceDetails_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
-		lblMaintenanceDetails_1.setBounds(10, 177, 113, 18);
-		updateMaintenance.add(lblMaintenanceDetails_1);
-		
-		JScrollPane srllPaneATViewport = new JScrollPane();
-		srllPaneATViewport.setBounds(10, 335, 272, 93);
-		updateMaintenance.add(srllPaneATViewport);
-		
-		
+		txtMntUpdEquipID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntUpdEquipID.setBounds(10, 128, 130, 25);
+		umForm.add(txtMntUpdEquipID);
+
+		txtMntUpdDate = new JTextField();
+		txtMntUpdDate.setEditable(false);
+		txtMntUpdDate.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntUpdDate.setBounds(150, 128, 135, 25);
+		umForm.add(txtMntUpdDate);
+
+		txtMntUpdReport = new JTextField();
+		txtMntUpdReport.setEditable(false);
+		txtMntUpdReport.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntUpdReport.setBounds(10, 179, 275, 25);
+		umForm.add(txtMntUpdReport);
+
+		JSeparator umSep2 = new JSeparator();
+		umSep2.setForeground(new Color(30, 144, 255));
+		umSep2.setBounds(10, 216, 275, 2);
+		umForm.add(umSep2);
+
 		JScrollPane srllPaneIssueViewport = new JScrollPane();
-		srllPaneIssueViewport.setBounds(10, 215, 272, 93);
-		updateMaintenance.add(srllPaneIssueViewport);
+		srllPaneIssueViewport.setBounds(10, 242, 275, 85);
+		umForm.add(srllPaneIssueViewport);
 
 		txtAMntUpdIssueReported = new JTextArea();
 		txtAMntUpdIssueReported.setEditable(false);
 		srllPaneIssueViewport.setViewportView(txtAMntUpdIssueReported);
-		
+
+		JScrollPane srllPaneATViewport = new JScrollPane();
+		srllPaneATViewport.setBounds(10, 353, 275, 85);
+		umForm.add(srllPaneATViewport);
+
 		txtAMntUpdActionTaken = new JTextArea();
 		srllPaneATViewport.setViewportView(txtAMntUpdActionTaken);
-	
-		
-		
-		JLabel lblMntUpdIssue = new JLabel("Reported Issue");
-		lblMntUpdIssue.setBounds(10, 199, 89, 14);
-		updateMaintenance.add(lblMntUpdIssue);
-		
-		JButton btnMntUpdate = new JButton("Update Record");
-		btnMntUpdate.addActionListener(e -> { updateMaintenanceReport();  });
-		btnMntUpdate.setBounds(10, 506, 274, 23);
-		updateMaintenance.add(btnMntUpdate);
-		
-		JButton btnMntUpdateCancel = new JButton("Cancel");
+
+		txtMntCost = new JTextField();
+		txtMntCost.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMntCost.setBounds(10, 464, 275, 25);
+		AbstractDocument mntCostdoc = (AbstractDocument) txtMntCost.getDocument();
+		mntCostdoc.setDocumentFilter(moneyInput);
+		umForm.add(txtMntCost);
+
+		ButtonOne btnMntUpdate = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnMntUpdate.setText("Update Record");
+		btnMntUpdate.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnMntUpdate.addActionListener(e -> { updateMaintenanceReport(); });
+		btnMntUpdate.setBounds(10, 505, 275, 45);
+		umForm.add(btnMntUpdate);
+
+		ButtonOne btnMntUpdateCancel = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
+		btnMntUpdateCancel.setText("Cancel");
+		btnMntUpdateCancel.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnMntUpdateCancel.addActionListener(e -> { displayDashboard(); });
-		btnMntUpdateCancel.setBounds(10, 531, 274, 23);
-		updateMaintenance.add(btnMntUpdateCancel);
-		
+		btnMntUpdateCancel.setBounds(10, 558, 275, 45);
+		umForm.add(btnMntUpdateCancel);
+
+		JPanel umRecords = new JPanel();
+		umRecords.setBackground(Color.WHITE);
+		umRecords.setLayout(null);
+		umRecords.setBounds(592, 0, 681, 617);
+		updateMaintenance.add(umRecords);
+
+		JPanel umHero = new JPanel();
+		umHero.setLayout(null);
+		umHero.setBackground(new Color(240, 248, 255));
+		umHero.setBounds(0, 0, 681, 47);
+		umRecords.add(umHero);
+
+		JLabel lblMntReports = new JLabel("Maintenance Reports");
+		lblMntReports.setForeground(new Color(30, 144, 255));
+		lblMntReports.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblMntReports.setBounds(10, 0, 306, 47);
+		umHero.add(lblMntReports);
+
+		txtUpdMntSearch = new JTextField();
+		txtUpdMntSearch.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtUpdMntSearch.setColumns(10);
+		txtUpdMntSearch.setBounds(10, 57, 150, 25);
+		umRecords.add(txtUpdMntSearch);
+
+		JButton btnFilter_1_1 = new JButton("⌕");
+		btnFilter_1_1.addActionListener(e -> { maintenanceSorter.setRowFilter(maintenanceRF); });
+		btnFilter_1_1.setBounds(165, 57, 45, 25);
+		umRecords.add(btnFilter_1_1);
+
+		cmbStatusMnt = new JComboBox<String>();
+		cmbStatusMnt.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
+		cmbStatusMnt.setBounds(220, 57, 120, 25);
+		umRecords.add(cmbStatusMnt);
+
+		JButton btnClearFilter_1_1 = new JButton("Clear");
+		btnClearFilter_1_1.addActionListener(e -> { maintenanceSorter.setRowFilter(null); });
+		btnClearFilter_1_1.setBounds(348, 57, 83, 25);
+		umRecords.add(btnClearFilter_1_1);
+
+		JButton btnUpdMntRefresh = new JButton("⟳");
+		btnUpdMntRefresh.addActionListener(e -> { displayMaintenanceReports(); });
+		btnUpdMntRefresh.setBounds(625, 57, 46, 25);
+		umRecords.add(btnUpdMntRefresh);
+
 		JScrollPane updtMaintenanceViewport = new JScrollPane();
-		updtMaintenanceViewport.setBounds(314, 44, 1076, 511);
-		updateMaintenance.add(updtMaintenanceViewport);
-		
+		updtMaintenanceViewport.setBounds(0, 92, 681, 525);
+		umRecords.add(updtMaintenanceViewport);
+
 		tblUpdReport = new JTable();
-		updtMaintenanceViewport.setViewportView(tblUpdReport);
 		tblUpdReport.setFillsViewportHeight(true);
+		tblUpdReport.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		updtMaintenanceViewport.setViewportView(tblUpdReport);
 		
 		JPanel addBorrower = new JPanel();
 		cardContainer.add(addBorrower, "borrowerRegistration");
 		addBorrower.setLayout(null);
-		
-		JButton btnUpdMntRefresh_1 = new JButton("⟳");
-		btnUpdMntRefresh_1.setBounds(1328, 10, 62, 23);
-		addBorrower.add(btnUpdMntRefresh_1);
-		
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(316, 11, 123, 20);
-		addBorrower.add(textField);
-		
-		cmbBorrowType = new JComboBox<String>();
-		cmbBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
-		cmbBorrowType.setBounds(714, 10, 97, 22);
-		addBorrower.add(cmbBorrowType);
-		
-		JButton btnFilter_1_1_1 = new JButton("⌕");
-		btnFilter_1_1_1.setBounds(821, 10, 62, 23);
-		addBorrower.add(btnFilter_1_1_1);
-		
-		JButton btnClearFilter_1_1_1 = new JButton("Clear");
-		btnClearFilter_1_1_1.setBounds(893, 10, 75, 23);
-		addBorrower.add(btnClearFilter_1_1_1);
-		
+
+		GradientPanel abSidebar = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
+		abSidebar.setLayout(null);
+		abSidebar.setBounds(0, 0, 277, 628);
+		addBorrower.add(abSidebar);
+
+		ImageIcon abIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image abImage = abIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+
+		JLabel abLogo = new JLabel("S.P.E.A.R");
+		abLogo.setForeground(new Color(30, 144, 255));
+		abLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		abLogo.setIcon(new ImageIcon(abImage));
+		abLogo.setBounds(0, 11, 250, 64);
+		abSidebar.add(abLogo);
+
+		JSeparator abSep = new JSeparator();
+		abSep.setForeground(new Color(30, 144, 255));
+		abSep.setBounds(26, 94, 225, 2);
+		abSidebar.add(abSep);
+
+		lblBorrowerTitle = new JLabel("Borrower Manager");
+		lblBorrowerTitle.setForeground(new Color(30, 144, 255));
+		lblBorrowerTitle.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
+		lblBorrowerTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorrowerTitle.setBounds(0, 107, 277, 27);
+		abSidebar.add(lblBorrowerTitle);
+
+		ButtonOne btnAbGoBack = new ButtonOne(new Color(255, 127, 80), new Color(230, 100, 60));
+		btnAbGoBack.setText("Go Back");
+		btnAbGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnAbGoBack.addActionListener(e -> { displayDashboard(); });
+		btnAbGoBack.setBounds(26, 561, 224, 45);
+		abSidebar.add(btnAbGoBack);
+
 		borrowerManager = new JPanel();
-		borrowerManager.setBounds(10, 10, 292, 546);
+		borrowerManager.setBackground(Color.WHITE);
+		borrowerManager.setBounds(287, 0, 295, 617);
 		addBorrower.add(borrowerManager);
 		borrowerManager.setLayout(borrowManagingCard);
-		
+
 		JPanel register = new JPanel();
-		borrowerManager.add(register, "registerBorrower");
+		register.setBackground(Color.WHITE);
 		register.setLayout(null);
-		
-		JSeparator sprtrBrwTop_2_1_1 = new JSeparator();
-		sprtrBrwTop_2_1_1.setBounds(10, 31, 264, 2);
-		register.add(sprtrBrwTop_2_1_1);
-		
+		borrowerManager.add(register, "registerBorrower");
+
 		JLabel lblBorrowerRegistration = new JLabel("Register New Borrower");
-		lblBorrowerRegistration.setBounds(0, 0, 274, 30);
+		lblBorrowerRegistration.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+		lblBorrowerRegistration.setForeground(new Color(30, 144, 255));
+		lblBorrowerRegistration.setOpaque(true);
+		lblBorrowerRegistration.setBackground(new Color(240, 248, 255));
+		lblBorrowerRegistration.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0));
+		lblBorrowerRegistration.setBounds(0, 0, 295, 47);
 		register.add(lblBorrowerRegistration);
-		lblBorrowerRegistration.setHorizontalAlignment(SwingConstants.CENTER);
-		lblBorrowerRegistration.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		
-		JLabel lblBrwrFirstName = new JLabel("First Name");
-		lblBrwrFirstName.setBounds(10, 43, 67, 12);
-		register.add(lblBrwrFirstName);
+
+		JLabel lblRegFirst = new JLabel("First Name");
+		lblRegFirst.setFont(lblFont);
+		lblRegFirst.setBounds(10, 57, 275, 14);
+		register.add(lblRegFirst);
+
+		JLabel lblRegLast = new JLabel("Last Name");
+		lblRegLast.setFont(lblFont);
+		lblRegLast.setBounds(10, 106, 275, 14);
+		register.add(lblRegLast);
+
+		JLabel lblRegType = new JLabel("Borrower Type");
+		lblRegType.setFont(lblFont);
+		lblRegType.setBounds(10, 155, 275, 14);
+		register.add(lblRegType);
+
+		JLabel lblRegID = new JLabel("ID Number");
+		lblRegID.setFont(lblFont);
+		lblRegID.setBounds(10, 204, 275, 14);
+		register.add(lblRegID);
+
+		JLabel lblRegDept = new JLabel("Department / Grade");
+		lblRegDept.setFont(lblFont);
+		lblRegDept.setBounds(10, 253, 275, 14);
+		register.add(lblRegDept);
+
+		JLabel lblRegContact = new JLabel("Contact No.");
+		lblRegContact.setFont(lblFont);
+		lblRegContact.setBounds(10, 302, 275, 14);
+		register.add(lblRegContact);
+
+		JLabel lblRegEmail = new JLabel("Email");
+		lblRegEmail.setFont(lblFont);
+		lblRegEmail.setBounds(10, 351, 275, 14);
+		register.add(lblRegEmail);
 		
 		txtNewBorrowNameF = new JTextField();
-		txtNewBorrowNameF.setBounds(124, 40, 150, 18);
+		txtNewBorrowNameF.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtNewBorrowNameF.setBounds(10, 73, 275, 25);
 		register.add(txtNewBorrowNameF);
-		txtNewBorrowNameF.setColumns(10);
-		
-		JLabel lblBrwrLastName = new JLabel("Last Name");
-		lblBrwrLastName.setBounds(10, 68, 67, 12);
-		register.add(lblBrwrLastName);
-		
+
 		txtNewBorrowNameL = new JTextField();
-		txtNewBorrowNameL.setBounds(124, 65, 150, 18);
+		txtNewBorrowNameL.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtNewBorrowNameL.setBounds(10, 122, 275, 25);
 		register.add(txtNewBorrowNameL);
-		txtNewBorrowNameL.setColumns(10);
-		
-		JLabel lblBrwrIDNumber = new JLabel("ID Number");
-		lblBrwrIDNumber.setBounds(10, 121, 67, 12);
-		register.add(lblBrwrIDNumber);
-		
-		txtNewBorrowID = new JTextField();
-		txtNewBorrowID.setBounds(124, 118, 150, 18);
-		register.add(txtNewBorrowID);
-		txtNewBorrowID.setColumns(10);
-		
-		JLabel lblBrwrDepartment = new JLabel("Department / Grade");
-		lblBrwrDepartment.setBounds(10, 149, 114, 12);
-		register.add(lblBrwrDepartment);
-		
-		txtNewBorrowDept = new JTextField();
-		txtNewBorrowDept.setBounds(124, 146, 150, 18);
-		register.add(txtNewBorrowDept);
-		txtNewBorrowDept.setColumns(10);
-		
-		JLabel lblContactNo = new JLabel("Contact No.");
-		lblContactNo.setBounds(10, 174, 67, 12);
-		register.add(lblContactNo);
-		
-		txtNewBorrowContact = new JTextField();
-		txtNewBorrowContact.setBounds(124, 171, 150, 18);
-		register.add(txtNewBorrowContact);
-		txtNewBorrowContact.setColumns(10);
-		
-		JLabel lblEmail = new JLabel("Email");
-		lblEmail.setBounds(10, 199, 67, 12);
-		register.add(lblEmail);
-		
-		txtNewBorrowEmail = new JTextField();
-		txtNewBorrowEmail.setBounds(124, 196, 150, 18);
-		register.add(txtNewBorrowEmail);
-		txtNewBorrowEmail.setColumns(10);
-		
-		JButton btnMntUpdateCancel_1 = new JButton("Cancel");
-		btnMntUpdateCancel_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				
-				displayDashboard();
-				
-			}
-		});
-		btnMntUpdateCancel_1.setBounds(0, 520, 274, 23);
-		register.add(btnMntUpdateCancel_1);
-		
-		JButton btnRegisterBorrower = new JButton("Register Borrower");
-		btnRegisterBorrower.setBounds(0, 495, 274, 23);
-		register.add(btnRegisterBorrower);
-		
-		JLabel lblBrwrType = new JLabel("Borrower Type");
-		lblBrwrType.setBounds(10, 93, 114, 12);
-		register.add(lblBrwrType);
-		
+
 		cmbNewBorrowType = new JComboBox<>();
 		cmbNewBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
-		cmbNewBorrowType.setBounds(124, 89, 150, 20);
+		cmbNewBorrowType.setBounds(10, 171, 275, 25);
 		register.add(cmbNewBorrowType);
-		
+
+		txtNewBorrowID = new JTextField();
+		txtNewBorrowID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtNewBorrowID.setBounds(10, 220, 275, 25);
+		register.add(txtNewBorrowID);
+
+		txtNewBorrowDept = new JTextField();
+		txtNewBorrowDept.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtNewBorrowDept.setBounds(10, 269, 275, 25);
+		register.add(txtNewBorrowDept);
+
+		txtNewBorrowContact = new JTextField();
+		txtNewBorrowContact.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtNewBorrowContact.setBounds(10, 318, 275, 25);
+		register.add(txtNewBorrowContact);
+
+		txtNewBorrowEmail = new JTextField();
+		txtNewBorrowEmail.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtNewBorrowEmail.setBounds(10, 367, 275, 25);
+		register.add(txtNewBorrowEmail);
+
+		ButtonOne btnRegisterBorrower = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnRegisterBorrower.setText("Register Borrower");
+		btnRegisterBorrower.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnRegisterBorrower.addActionListener(e -> { registerBorrower(); });
+		btnRegisterBorrower.setBounds(10, 505, 275, 45);
+		register.add(btnRegisterBorrower);
+
+		ButtonOne btnMntUpdateCancel_1 = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
+		btnMntUpdateCancel_1.setText("Cancel");
+		btnMntUpdateCancel_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnMntUpdateCancel_1.addActionListener(e -> { displayDashboard(); });
+		btnMntUpdateCancel_1.setBounds(10, 558, 275, 45);
+		register.add(btnMntUpdateCancel_1);
+
 		JPanel delete = new JPanel();
-		borrowerManager.add(delete, "manageBorrower");
+		delete.setBackground(Color.WHITE);
 		delete.setLayout(null);
-		
-		JSeparator sprtrBrwTop_2_1_1_1 = new JSeparator();
-		sprtrBrwTop_2_1_1_1.setBounds(20, 41, 264, 2);
-		delete.add(sprtrBrwTop_2_1_1_1);
-		
+		borrowerManager.add(delete, "manageBorrower");
+
 		JLabel lblBorrowerManage = new JLabel("Manage Borrowers");
-		lblBorrowerManage.setHorizontalAlignment(SwingConstants.CENTER);
-		lblBorrowerManage.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
-		lblBorrowerManage.setBounds(10, 10, 264, 30);
+		lblBorrowerManage.setFont(new Font("Segoe UI Black", Font.PLAIN, 18));
+		lblBorrowerManage.setForeground(new Color(30, 144, 255));
+		lblBorrowerManage.setOpaque(true);
+		lblBorrowerManage.setBackground(new Color(240, 248, 255));
+		lblBorrowerManage.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0));
+		lblBorrowerManage.setBounds(0, 0, 295, 47);
 		delete.add(lblBorrowerManage);
-		
-		JLabel lblBrwrFirstName_1 = new JLabel("First Name");
-		lblBrwrFirstName_1.setBounds(10, 85, 67, 12);
-		delete.add(lblBrwrFirstName_1);
-		
-		JLabel lblBrwrLastName_1 = new JLabel("Last Name");
-		lblBrwrLastName_1.setBounds(10, 110, 67, 12);
-		delete.add(lblBrwrLastName_1);
-		
-		JLabel lblBrwrType_1 = new JLabel("Borrower Type");
-		lblBrwrType_1.setBounds(10, 135, 114, 12);
-		delete.add(lblBrwrType_1);
-		
-		JLabel lblBrwrIDNumber_1 = new JLabel("ID Number");
-		lblBrwrIDNumber_1.setBounds(10, 163, 67, 12);
-		delete.add(lblBrwrIDNumber_1);
-		
-		JLabel lblBrwrDepartment_1 = new JLabel("Department / Grade");
-		lblBrwrDepartment_1.setBounds(10, 191, 114, 12);
-		delete.add(lblBrwrDepartment_1);
-		
-		JLabel lblContactNo_1 = new JLabel("Contact No.");
-		lblContactNo_1.setBounds(10, 216, 67, 12);
-		delete.add(lblContactNo_1);
-		
-		JLabel lblEmail_1 = new JLabel("Email");
-		lblEmail_1.setBounds(10, 241, 67, 12);
-		delete.add(lblEmail_1);
-		
-		txtMngBorrowerEmail = new JTextField();
-		txtMngBorrowerEmail.setColumns(10);
-		txtMngBorrowerEmail.setBounds(124, 238, 150, 18);
-		delete.add(txtMngBorrowerEmail);
-		
-		txtMngBorrowerContactNo = new JTextField();
-		txtMngBorrowerContactNo.setColumns(10);
-		txtMngBorrowerContactNo.setBounds(124, 213, 150, 18);
-		delete.add(txtMngBorrowerContactNo);
-		
-		txtMngBorrowerDept = new JTextField();
-		txtMngBorrowerDept.setColumns(10);
-		txtMngBorrowerDept.setBounds(124, 188, 150, 18);
-		delete.add(txtMngBorrowerDept);
-		
-		txtMngBorrowerID = new JTextField();
-		txtMngBorrowerID.setEditable(false);
-		txtMngBorrowerID.setColumns(10);
-		txtMngBorrowerID.setBounds(124, 160, 150, 18);
-		delete.add(txtMngBorrowerID);
-		
-		cmbMngBorrowerType = new JComboBox<String>();
-		cmbMngBorrowerType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
-		cmbMngBorrowerType.setBounds(124, 131, 150, 20);
-		delete.add(cmbMngBorrowerType);
-		
-		txtMngBorrowerNameL = new JTextField();
-		txtMngBorrowerNameL.setEditable(false);
-		txtMngBorrowerNameL.setColumns(10);
-		txtMngBorrowerNameL.setBounds(124, 107, 150, 18);
-		delete.add(txtMngBorrowerNameL);
-		
-		txtMngBorrowerNameF = new JTextField();
-		txtMngBorrowerNameF.setEditable(false);
-		txtMngBorrowerNameF.setColumns(10);
-		txtMngBorrowerNameF.setBounds(124, 82, 150, 18);
-		delete.add(txtMngBorrowerNameF);
-		
-		JButton btnMntUpdateCancel_1_1 = new JButton("Cancel");
-		btnMntUpdateCancel_1_1.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				displayDashboard();
-				
-			}
-		});
-		btnMntUpdateCancel_1_1.setBounds(10, 513, 264, 23);
-		delete.add(btnMntUpdateCancel_1_1);
-		
-		JButton btnPublishEdit = new JButton("Publish Update");
-		btnPublishEdit.setBounds(10, 464, 264, 23);
-		delete.add(btnPublishEdit);
-		
-		JButton btnDeleteProfile = new JButton("Delete");
-		btnDeleteProfile.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				deleteBorrower();
-			}
-		});
-		btnDeleteProfile.setBounds(10, 487, 264, 23);
-		delete.add(btnDeleteProfile);
+
+		JLabel lblMngBorrowerID = new JLabel("Borrower ID");
+		lblMngBorrowerID.setFont(lblFont);
+		lblMngBorrowerID.setBounds(10, 57, 130, 14);
+		delete.add(lblMngBorrowerID);
+
+		JLabel lblMngFirst = new JLabel("First Name");
+		lblMngFirst.setFont(lblFont);
+		lblMngFirst.setBounds(10, 122, 275, 14);
+		delete.add(lblMngFirst);
+
+		JLabel lblMngLast = new JLabel("Last Name");
+		lblMngLast.setFont(lblFont);
+		lblMngLast.setBounds(10, 171, 275, 14);
+		delete.add(lblMngLast);
+
+		JLabel lblMngType = new JLabel("Borrower Type");
+		lblMngType.setFont(lblFont);
+		lblMngType.setBounds(10, 220, 275, 14);
+		delete.add(lblMngType);
+
+		JLabel lblMngID = new JLabel("ID Number");
+		lblMngID.setFont(lblFont);
+		lblMngID.setBounds(10, 269, 275, 14);
+		delete.add(lblMngID);
+
+		JLabel lblMngDept = new JLabel("Department / Grade");
+		lblMngDept.setFont(lblFont);
+		lblMngDept.setBounds(10, 318, 275, 14);
+		delete.add(lblMngDept);
+
+		JLabel lblMngContact = new JLabel("Contact No.");
+		lblMngContact.setFont(lblFont);
+		lblMngContact.setBounds(10, 367, 275, 14);
+		delete.add(lblMngContact);
+
+		JLabel lblMngEmail = new JLabel("Email");
+		lblMngEmail.setFont(lblFont);
+		lblMngEmail.setBounds(10, 416, 275, 14);
+		delete.add(lblMngEmail);
 		
 		txtMngBorrowerTransaction = new JTextField();
-		txtMngBorrowerTransaction.setColumns(10);
-		txtMngBorrowerTransaction.setBounds(124, 57, 75, 18);
+		txtMngBorrowerTransaction.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerTransaction.setBounds(10, 73, 130, 25);
 		delete.add(txtMngBorrowerTransaction);
-		
-		JLabel lblBrwrID = new JLabel("Borrower ID");
-		lblBrwrID.setBounds(10, 60, 67, 12);
-		delete.add(lblBrwrID);
-		
-		JButton btnNewButton = new JButton("Select");
-		btnNewButton.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			
-				loadBorrower();
-			
-			}
-		});
-		btnNewButton.setBounds(209, 56, 67, 20);
+
+		ButtonOne btnNewButton = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnNewButton.setText("Select");
+		btnNewButton.setFont(new Font("Segoe UI Semibold", Font.BOLD, 13));
+		btnNewButton.addActionListener(e -> { loadBorrower(); });
+		btnNewButton.setBounds(150, 68, 135, 35);
 		delete.add(btnNewButton);
-		
+
+		JSeparator abSep2 = new JSeparator();
+		abSep2.setForeground(new Color(30, 144, 255));
+		abSep2.setBounds(10, 112, 275, 2);
+		delete.add(abSep2);
+
+		txtMngBorrowerNameF = new JTextField();
+		txtMngBorrowerNameF.setEditable(false);
+		txtMngBorrowerNameF.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerNameF.setBounds(10, 138, 275, 25);
+		delete.add(txtMngBorrowerNameF);
+
+		txtMngBorrowerNameL = new JTextField();
+		txtMngBorrowerNameL.setEditable(false);
+		txtMngBorrowerNameL.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerNameL.setBounds(10, 187, 275, 25);
+		delete.add(txtMngBorrowerNameL);
+
+		cmbMngBorrowerType = new JComboBox<String>();
+		cmbMngBorrowerType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbMngBorrowerType.setBounds(10, 236, 275, 25);
+		delete.add(cmbMngBorrowerType);
+
+		txtMngBorrowerID = new JTextField();
+		txtMngBorrowerID.setEditable(false);
+		txtMngBorrowerID.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerID.setBounds(10, 285, 275, 25);
+		delete.add(txtMngBorrowerID);
+
+		txtMngBorrowerDept = new JTextField();
+		txtMngBorrowerDept.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerDept.setBounds(10, 334, 275, 25);
+		delete.add(txtMngBorrowerDept);
+
+		txtMngBorrowerContactNo = new JTextField();
+		txtMngBorrowerContactNo.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerContactNo.setBounds(10, 383, 275, 25);
+		delete.add(txtMngBorrowerContactNo);
+
+		txtMngBorrowerEmail = new JTextField();
+		txtMngBorrowerEmail.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		txtMngBorrowerEmail.setBounds(10, 432, 275, 25);
+		delete.add(txtMngBorrowerEmail);
+
+		ButtonOne btnPublishEdit = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnPublishEdit.setText("Publish Update");
+		btnPublishEdit.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnPublishEdit.setBounds(10, 470, 275, 40);
+		delete.add(btnPublishEdit);
+
+		ButtonOne btnDeleteProfile = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
+		btnDeleteProfile.setText("Delete");
+		btnDeleteProfile.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnDeleteProfile.addActionListener(e -> { deleteBorrower(); });
+		btnDeleteProfile.setBounds(10, 516, 275, 40);
+		delete.add(btnDeleteProfile);
+
+		ButtonOne btnMntUpdateCancel_1_1 = new ButtonOne(new Color(255, 127, 80), new Color(230, 100, 60));
+		btnMntUpdateCancel_1_1.setText("Cancel");
+		btnMntUpdateCancel_1_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnMntUpdateCancel_1_1.addActionListener(e -> { displayDashboard(); });
+		btnMntUpdateCancel_1_1.setBounds(10, 562, 275, 40);
+		delete.add(btnMntUpdateCancel_1_1);
+
+		JPanel abRecords = new JPanel();
+		abRecords.setBackground(Color.WHITE);
+		abRecords.setLayout(null);
+		abRecords.setBounds(592, 0, 681, 617);
+		addBorrower.add(abRecords);
+
+		JPanel abHero = new JPanel();
+		abHero.setLayout(null);
+		abHero.setBackground(new Color(240, 248, 255));
+		abHero.setBounds(0, 0, 681, 47);
+		abRecords.add(abHero);
+
+		JLabel lblBorrowerRecords = new JLabel("Borrower Records");
+		lblBorrowerRecords.setForeground(new Color(30, 144, 255));
+		lblBorrowerRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblBorrowerRecords.setBounds(10, 0, 306, 47);
+		abHero.add(lblBorrowerRecords);
+
+		textField = new JTextField();
+		textField.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
+		textField.setColumns(10);
+		textField.setBounds(10, 57, 150, 25);
+		abRecords.add(textField);
+
+		JButton btnFilter_1_1_1 = new JButton("⌕");
+		btnFilter_1_1_1.setBounds(165, 57, 45, 25);
+		abRecords.add(btnFilter_1_1_1);
+
+		cmbBorrowType = new JComboBox<String>();
+		cmbBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbBorrowType.setBounds(220, 57, 120, 25);
+		abRecords.add(cmbBorrowType);
+
+		JButton btnClearFilter_1_1_1 = new JButton("Clear");
+		btnClearFilter_1_1_1.setBounds(348, 57, 76, 25);
+		abRecords.add(btnClearFilter_1_1_1);
+
+		JButton btnUpdMntRefresh_1 = new JButton("⟳");
+		btnUpdMntRefresh_1.addActionListener(e -> { displayBorrowerList(); });
+		btnUpdMntRefresh_1.setBounds(625, 57, 46, 25);
+		abRecords.add(btnUpdMntRefresh_1);
+
 		JScrollPane scrlPaneBorrowerViewport = new JScrollPane();
-		scrlPaneBorrowerViewport.setBounds(315, 44, 1074, 509);
-		addBorrower.add(scrlPaneBorrowerViewport);
-		
+		scrlPaneBorrowerViewport.setBounds(0, 92, 681, 525);
+		abRecords.add(scrlPaneBorrowerViewport);
+
 		tblBorrowers = new JTable();
-		scrlPaneBorrowerViewport.setViewportView(tblBorrowers);
 		tblBorrowers.setFillsViewportHeight(true);
-		btnRegisterBorrower.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-			
-				registerBorrower();
-			
-			}
-		});
+		tblBorrowers.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		scrlPaneBorrowerViewport.setViewportView(tblBorrowers);
 		
 		//frame.setVisible(true);
 		
@@ -1495,11 +1675,13 @@ public class CustodianDashboard {
 	void displayBorrowerRegistration() {
 		card.show(cardContainer, "borrowerRegistration");
 		borrowManagingCard.show(borrowerManager, "registerBorrower");
+		lblBorrowerTitle.setText("Register Borrower");
 	}
-	
+
 	void displayManageBorrower() {
 		card.show(cardContainer, "borrowerRegistration");
 		borrowManagingCard.show(borrowerManager, "manageBorrower");
+		lblBorrowerTitle.setText("Manage Borrowers");
 	}
 	
 	void clearAllFields() {
@@ -1613,6 +1795,21 @@ public class CustodianDashboard {
 		
 	}
 	
+	private JLabel formLabel(String text, int x, int y, int w) {
+		JLabel l = new JLabel(text);
+		l.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 11));
+		l.setBounds(x, y, w, 14);
+		return l;
+	}
+
+	private JLabel hintLabel(int x, int y, int w) {
+		JLabel l = new JLabel("(YYYY-MM-DD)");
+		l.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+		l.setForeground(new Color(150, 150, 150));
+		l.setHorizontalAlignment(SwingConstants.LEFT);
+		l.setBounds(x, y, w, 14);
+		return l;
+	}
 	
 	// ----------------------------------------------------------------------------------------------------------------------
 	
