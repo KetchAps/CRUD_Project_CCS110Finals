@@ -31,6 +31,7 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.DocumentFilter;
 
 import kenUI.ButtonOne;
+import kenUI.GradientPanel;
 import normie.util.*;
 import spearsystem.CustodianDatabaseHandler.BorrowRecord;
 import spearsystem.CustodianDatabaseHandler.BorrowerList;
@@ -153,6 +154,8 @@ public class CustodianDashboard {
 	private JTextField txtMngBorrowerNameL;
 	private JTextField txtMngBorrowerNameF;
 	private JTextField txtMngBorrowerTransaction;
+	
+	private JLabel lblCreationTitle;
 	
 	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
@@ -303,72 +306,128 @@ public class CustodianDashboard {
 		cardContainer.setLayout(card);
 		
 		JPanel borrowFormCreation = new JPanel();
-		borrowFormCreation.setBounds(10, 54, 1384, 555);
 		borrowFormCreation.setLayout(null);
-		
+
 		cmbCategoryModel = new DefaultComboBoxModel<String>();
 		cmbCategoryModel.addElement("[Category]");
-		
+
+		// ===== LEFT SIDEBAR (same as Custodian Manager) =====
+		GradientPanel bfSidebar = new GradientPanel(new Color(212, 255, 253), new Color(247, 214, 190));
+		bfSidebar.setLayout(null);
+		bfSidebar.setBounds(0, 0, 277, 628);
+		borrowFormCreation.add(bfSidebar);
+
+		ImageIcon bfIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image bfImage = bfIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+
+		JLabel bfLogo = new JLabel("S.P.E.A.R");
+		bfLogo.setForeground(new Color(30, 144, 255));
+		bfLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		bfLogo.setIcon(new ImageIcon(bfImage));
+		bfLogo.setBounds(0, 11, 250, 64);
+		bfSidebar.add(bfLogo);
+
+		JSeparator bfSep = new JSeparator();
+		bfSep.setForeground(new Color(30, 144, 255));
+		bfSep.setBounds(26, 94, 225, 2);
+		bfSidebar.add(bfSep);
+
+		lblCreationTitle = new JLabel("Borrow Manager");
+		lblCreationTitle.setForeground(new Color(30, 144, 255));
+		lblCreationTitle.setFont(new Font("Segoe UI Black", Font.PLAIN, 19));
+		lblCreationTitle.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCreationTitle.setBounds(0, 107, 277, 27);
+		bfSidebar.add(lblCreationTitle);
+
+		ButtonOne btnBfGoBack = new ButtonOne(new Color(255, 127, 80), new Color(230, 100, 60));
+		btnBfGoBack.setText("Go Back");
+		btnBfGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnBfGoBack.addActionListener(e -> { displayDashboard(); });
+		btnBfGoBack.setBounds(26, 561, 224, 45);
+		bfSidebar.add(btnBfGoBack);
+
+		// ===== RIGHT PANEL: INVENTORY RECORDS =====
 		JPanel inventoryTable = new JPanel();
-		inventoryTable.setBounds(314, 11, 1076, 544);
+		inventoryTable.setBackground(Color.WHITE);
+		inventoryTable.setBounds(592, 0, 681, 617);
 		borrowFormCreation.add(inventoryTable);
 		inventoryTable.setLayout(null);
-		
-		cmbCondition = new JComboBox<String>();
-		cmbCondition.setModel(new DefaultComboBoxModel<String>(new String[] {"[Condition]", "Good", "Damaged", "Worn"}));
-		cmbCondition.setBounds(321, 0, 97, 22);
-		inventoryTable.add(cmbCondition);
-		
-		cmbCategory = new JComboBox<String>();
-		cmbCategory.setModel(cmbCategoryModel);
-		cmbCategory.setBounds(214, 0, 97, 22);
-		inventoryTable.add(cmbCategory);
-		
+
+		JPanel invHero = new JPanel();
+		invHero.setLayout(null);
+		invHero.setBackground(new Color(240, 248, 255));
+		invHero.setBounds(0, 0, 681, 47);
+		inventoryTable.add(invHero);
+
+		JLabel lblInvRecords = new JLabel("Inventory Records");
+		lblInvRecords.setForeground(new Color(30, 144, 255));
+		lblInvRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblInvRecords.setBounds(10, 0, 306, 47);
+		invHero.add(lblInvRecords);
+
 		searchBar = new JTextField();
+		searchBar.setFont(new Font("Segoe UI Light", Font.PLAIN, 12));
 		searchBar.setColumns(10);
-		searchBar.setBounds(10, 1, 115, 20);
+		searchBar.setBounds(10, 57, 150, 25);
 		inventoryTable.add(searchBar);
-		
-		JButton btnRefresh = new JButton("⟳");
-		btnRefresh.addActionListener(e -> { displayInventoryValues();});
-		btnRefresh.setBounds(893, 0, 62, 23);
-		inventoryTable.add(btnRefresh);
-		
-		cmbAvailability = new JComboBox<String>();
-		cmbAvailability.setModel(new DefaultComboBoxModel<>(new String[] {"[Availability]", "Available", "In Use", "In Maintenance"}));
-		cmbAvailability.setBounds(428, 0, 97, 22);
-		inventoryTable.add(cmbAvailability);
-		
+
 		JButton btnFilter = new JButton("⌕");
 		btnFilter.addActionListener(e -> { inventorySorter.setRowFilter(inventoryRF); });
-		btnFilter.setBounds(129, 0, 62, 22);
+		btnFilter.setBounds(165, 57, 45, 25);
 		inventoryTable.add(btnFilter);
-		
+
+		cmbCategory = new JComboBox<String>();
+		cmbCategory.setModel(cmbCategoryModel);
+		cmbCategory.setBounds(220, 57, 105, 25);
+		inventoryTable.add(cmbCategory);
+
+		cmbCondition = new JComboBox<String>();
+		cmbCondition.setModel(new DefaultComboBoxModel<String>(new String[] {"[Condition]", "Good", "Damaged", "Worn"}));
+		cmbCondition.setBounds(333, 57, 100, 25);
+		inventoryTable.add(cmbCondition);
+
+		cmbAvailability = new JComboBox<String>();
+		cmbAvailability.setModel(new DefaultComboBoxModel<>(new String[] {"[Availability]", "Available", "In Use", "In Maintenance"}));
+		cmbAvailability.setBounds(441, 57, 115, 25);
+		inventoryTable.add(cmbAvailability);
+
 		JButton btnClearFilter = new JButton("Clear");
 		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
-		btnClearFilter.setBounds(808, 0, 75, 23);
+		btnClearFilter.setBounds(564, 57, 55, 25);
 		inventoryTable.add(btnClearFilter);
-		
+
+		JButton btnRefresh = new JButton("⟳");
+		btnRefresh.addActionListener(e -> { displayInventoryValues(); });
+		btnRefresh.setBounds(625, 57, 46, 25);
+		inventoryTable.add(btnRefresh);
+
 		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setBounds(0, 33, 962, 591);
+		scrollPane.setBounds(0, 92, 681, 525);
 		inventoryTable.add(scrollPane);
-		
+
 		searchResult = new JTable();
-		
+		searchResult.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);   // optional: horizontal scroll instead of squished columns
 		scrollPane.setViewportView(searchResult);
-		
+
+		// ===== MIDDLE PANEL: THE FORM =====
 		formCreator = new JPanel();
-		formCreator.setBounds(10, 11, 294, 624);
+		formCreator.setBackground(Color.WHITE);
+		formCreator.setBounds(287, 0, 295, 617);
 		borrowFormCreation.add(formCreator);
 		formCreator.setLayout(formCard);
 		
 		JPanel createBorrow = new JPanel();
 		createBorrow.setLayout(null);
+		createBorrow.setBackground(Color.WHITE);
 		
 		JLabel lblBorrowForm = new JLabel("New Borrow Form");
-		lblBorrowForm.setFont(new Font("Segoe UI", Font.BOLD, 25));
-		lblBorrowForm.setHorizontalAlignment(SwingConstants.CENTER);
-		lblBorrowForm.setBounds(10, 10, 274, 30);
+		lblBorrowForm.setFont(new Font("Segoe UI Black", Font.PLAIN, 20));
+		lblBorrowForm.setForeground(new Color(30, 144, 255));
+		lblBorrowForm.setOpaque(true);
+		lblBorrowForm.setBackground(new Color(240, 248, 255));
+		lblBorrowForm.setBorder(javax.swing.BorderFactory.createEmptyBorder(0, 10, 0, 0));
+		lblBorrowForm.setHorizontalAlignment(SwingConstants.LEFT);
+		lblBorrowForm.setBounds(0, 0, 295, 47);
 		createBorrow.add(lblBorrowForm);
 		
 		txtBrwEquipID = new JTextField();
@@ -408,10 +467,6 @@ public class CustodianDashboard {
 		lblBrwEquipTag.setBounds(200, 140, 82, 12);
 		createBorrow.add(lblBrwEquipTag);
 		
-		JSeparator sprtrBrwTop = new JSeparator();
-		sprtrBrwTop.setBounds(10, 40, 274, 6);
-		createBorrow.add(sprtrBrwTop);
-		
 		JLabel lblEquipDetails = new JLabel("Equipment Details");
 		lblEquipDetails.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
 		lblEquipDetails.setBounds(84, 50, 126, 18);
@@ -427,7 +482,9 @@ public class CustodianDashboard {
 		createBorrow.add(lblBorrowerDetails);
 		
 		// Custom button here
-		JButton btnBrwLoadID = new JButton("Select");
+		ButtonOne btnBrwLoadID = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnBrwLoadID.setText("Select");
+		btnBrwLoadID.setFont(new Font("Segoe UI Semibold", Font.BOLD, 12));
 		btnBrwLoadID.addActionListener(e -> { loadItem(0); });
 		btnBrwLoadID.setBounds(213, 99, 71, 29);
 		createBorrow.add(btnBrwLoadID);
@@ -482,15 +539,19 @@ public class CustodianDashboard {
 		createBorrow.add(lblBrwEquipCondition);
 		
 		// Custom Button #2
-		JButton btnBrwSubmit = new JButton("Create Record");
+		ButtonOne btnBrwSubmit = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnBrwSubmit.setText("Create Record");
+		btnBrwSubmit.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnBrwSubmit.addActionListener(e -> { createBorrowRecord(); });
-		btnBrwSubmit.setBounds(10, 510, 151, 23);
+		btnBrwSubmit.setBounds(10, 561, 160, 45);
 		createBorrow.add(btnBrwSubmit);
 		
 		// Custom Button #3
-		JButton btnCancel = new JButton("Cancel");
+		ButtonOne btnCancel = new ButtonOne(new Color(231, 76, 60), new Color(192, 57, 43));
+		btnCancel.setText("Cancel");
+		btnCancel.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnCancel.addActionListener(e -> { displayDashboard(); });
-		btnCancel.setBounds(171, 510, 113, 23);
+		btnCancel.setBounds(178, 561, 104, 45);
 		createBorrow.add(btnCancel);
 		
 		JLabel lblyyyymmdd = new JLabel("(YYYY-MM-DD)");
@@ -501,6 +562,7 @@ public class CustodianDashboard {
 		
 		JPanel createMaintenance = new JPanel();
 		createMaintenance.setLayout(null);
+		createMaintenance.setBackground(Color.WHITE);
 		
 		JLabel lblMaintenanceForm = new JLabel("New Maintenance Report");
 		lblMaintenanceForm.setHorizontalAlignment(SwingConstants.CENTER);
@@ -515,6 +577,8 @@ public class CustodianDashboard {
 		JLabel lblEquipDetails_1 = new JLabel("Equipment Details");
 		lblEquipDetails_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblEquipDetails_1.setBounds(10, 39, 113, 18);
+		lblEquipDetails.setForeground(new Color(30, 144, 255));
+		lblBorrowerDetails.setForeground(new Color(30, 144, 255));
 		createMaintenance.add(lblEquipDetails_1);
 		
 		JLabel lblMntEquipID = new JLabel("Equipment ID");
@@ -750,7 +814,7 @@ public class CustodianDashboard {
 		
 		JLabel lblNote = new JLabel("* : If applicable");
 		lblNote.setForeground(new Color(128, 128, 128));
-		lblNote.setBounds(10, 485, 257, 14);
+		lblNote.setBounds(10, 536, 257, 14);
 		createBorrow.add(lblNote);
 		
 		JLabel lblBorrowStatus = new JLabel("Availability");
@@ -1410,6 +1474,7 @@ public class CustodianDashboard {
 	void displayNewBorrow() {
 		card.show(cardContainer, "creation");
 		formCard.show(formCreator, "borrowForm");
+		lblCreationTitle.setText("Borrow Manager");   // NEW
 		refreshBorrowCreator();
 	}
 	
@@ -1421,6 +1486,7 @@ public class CustodianDashboard {
 	void displayNewMaintenance() {
 		card.show(cardContainer, "creation");
 		formCard.show(formCreator, "maintenanceForm");
+		lblCreationTitle.setText("Maintenance Manager");   // NEW
 		refreshMaintenanceCreator();
 	}
 	
