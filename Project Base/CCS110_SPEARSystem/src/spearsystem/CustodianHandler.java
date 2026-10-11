@@ -45,6 +45,12 @@ public class CustodianHandler {
 		return value;
 	}
 	
+	public String[][] getRegisteredUserPreview() throws SPEARException {
+		String[][] value = db.getBorrowerPreview();
+		
+		if(value == null) throw new SPEARException("Something went wrong while trying to fetch Borrower Data. Check your connection and try again.");
+		return value;
+	}
 	
 	public String[][] getBorrowPreview() throws SPEARException {
 		String[][] value = db.getBorrowPreview();

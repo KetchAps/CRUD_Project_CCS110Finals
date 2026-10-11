@@ -1,0 +1,2242 @@
+package spearsystem;
+
+import java.awt.CardLayout;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.time.LocalDate;
+
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSeparator;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.RowFilter;
+import javax.swing.SwingConstants;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
+import javax.swing.text.AbstractDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.DocumentFilter;
+
+import kenUI.ButtonOne;
+import normie.util.*;
+import spearsystem.CustodianDatabaseHandler.BorrowRecord;
+import spearsystem.CustodianDatabaseHandler.BorrowerList;
+import spearsystem.CustodianDatabaseHandler.BorrowerProfile;
+import spearsystem.CustodianDatabaseHandler.EquipmentDetails;
+import spearsystem.CustodianDatabaseHandler.MaintenanceReport;
+
+
+public class CustodianDashboard {
+	
+	final String[] RECORDSTATUS = {"Returned", "Borrowed"};
+	final String[] REPORTSTATUS = {"In Progress", "Resolved"};
+	
+	final String[] BORROWERTYPES = {"Student", "Staff"};
+	final String[] EQUIPCONDITIONS = {"Good", "Worn", "Damaged"};
+	final String[] EQUIPAVAILABILITY = {"Available", "Borrowed", "Maintenance"}; 
+	private Integer[] borrowerIDs;
+	
+	private EquipmentDetails loadedEquip;
+	private BorrowRecord loadedRecord;
+	private MaintenanceReport loadedReport;
+	private BorrowerProfile loadedProfile;
+	
+	private EmailValidator mailValidator = new EmailValidator();
+	
+	private int activeScreen = 0;
+	
+	
+	private JPanel custodianDashboard;
+	private MainClient parent;
+	private CustodianHandler backend;
+	
+	private CardLayout card = new CardLayout(0,0);
+	private CardLayout formCard = new CardLayout(0,0);
+	private CardLayout borrowManagingCard = new CardLayout(0, 0);
+	private JComboBox<String> cmbCondition;
+	private JComboBox<String> cmbCategory;
+	private JComboBox<String> cmbAvailability;
+	private JComboBox<String> cmbStatus;	
+	private JComboBox<String> cmbBorrowerName;
+	private JComboBox<String> cmbCondOnReturn;
+	private JComboBox<String> cmbStatusMnt;
+	private JComboBox<String> cmbNewBorrowType;
+	private JComboBox<String> cmbBorrowType;
+	private JComboBox<String> cmbMngBorrowerType;
+	
+	private JPanel cardContainer;
+	private JPanel formCreator; // JPanel of the Forms
+	private JPanel borrowerManager;
+
+	private DefaultComboBoxModel<String> cmbCategoryModel;
+	private DefaultComboBoxModel<String> cmbBorrowerModel;
+	
+	private JTextField searchBar;
+	private JTable searchResult;
+	private DefaultTableModel query;
+	
+	private JTable tblBorrowPreview;
+	private DefaultTableModel borrowPreview;
+	
+	private JTable tblMaintenancePreview;
+	private DefaultTableModel maintenancePreview;
+	
+	private JTable tblborrowRecord;
+	private JTable tblUpdReport;
+	
+	private JTable tblBorrowers;
+	private DefaultTableModel registeredUserList;
+	
+	
+	private DefaultTableModel borrowList;
+	private DefaultTableModel reportList;
+	
+	
+	private JTextArea txtAMntIssue;
+	private JTextArea txtAMntUpdIssueReported;
+	private JTextArea txtAMntUpdActionTaken;
+	private JTextField txtBrwEquipID;
+	private JTextField txtBrwEquipName;
+	private JTextField txtBrwEquipTag;
+	private JTextField txtBrwReturnByDate;
+	private JTextField txtDateBorrowed;
+	private JTextField txtBrwEquipCondition;
+
+	private JTextField txtMntEquipID;
+	private JTextField txtMntEquipName;
+	private JTextField txtMntEquipCondition;
+	private JTextField txtMntEquipTag;
+	private JTextField txtMntDateReported;
+	private JTextField txtbrwSearchBar;
+	
+	private JTextField txtTransactionID;
+	private JTextField txtUpdBorrowerID;
+	private JTextField txtUpdBorrowedEquip;
+	private JTextField txtBorrowDate;
+	private JTextField txtUpdCustodian;
+	private JTextField txtUpdCondOnBorrow;
+	private JTextField txtExpectedReturnDate;
+	private JTextField txtDateReturned;
+	private JTextField txtBrwEquipAvail;
+	
+	private JTextField txtUpdMntSearch;
+	private JTextField txtMntCost;
+	private JTextField txtMntUpdTransactionID;
+	private JTextField txtMntUpdReport;
+	private JTextField txtMntUpdDate;
+	private JTextField txtMntUpdEquipID;
+
+	private JTextField textField;
+	private JTextField txtNewBorrowNameF;
+	private JTextField txtNewBorrowNameL;
+	private JTextField txtNewBorrowID;
+	private JTextField txtNewBorrowDept;
+	private JTextField txtNewBorrowContact;
+	private JTextField txtNewBorrowEmail;
+	private JTextField txtMngBorrowerEmail;
+	private JTextField txtMngBorrowerContactNo;
+	private JTextField txtMngBorrowerDept;
+	private JTextField txtMngBorrowerID;
+	private JTextField txtMngBorrowerNameL;
+	private JTextField txtMngBorrowerNameF;
+	private JTextField txtMngBorrowerTransaction;
+	
+	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
+	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean include( Entry entry) {
+			
+			String searchFilter = searchBar.getText();
+			String categoryFilter = cmbCategory.getSelectedItem().toString();
+			String conditionFilter = cmbCondition.getSelectedItem().toString();
+			String availabilityFilter = cmbAvailability.getSelectedItem().toString();
+			
+			// searchBar
+			String id = entry.getStringValue(0);
+			String tag = entry.getStringValue(1);
+			String name = entry.getStringValue(2);
+			
+			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
+				!(id.contains(searchFilter) || tag.contains(searchFilter) || name.contains(searchFilter))) return false;
+			
+			if(!categoryFilter.equals("[Category]") && !entry.getStringValue(3).equals(categoryFilter)) return false;
+			
+			if(!conditionFilter.equals("[Condition]") && !entry.getStringValue(11).equals(conditionFilter)) return false;
+			
+			if(!availabilityFilter.equals("[Availability]") && !entry.getStringValue(12).equals(availabilityFilter)) return false;
+			return true;
+		}
+		
+		
+	};
+	
+	private TableRowSorter<DefaultTableModel> borrowRecordSorter = new TableRowSorter<>(borrowList);
+	private RowFilter<DefaultTableModel, Integer> borrowRecordRF = new RowFilter<>() {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean include( Entry entry) {
+			
+			String searchFilter = txtbrwSearchBar.getText();
+			String statusFilter = cmbStatus.getSelectedItem().toString();
+			
+			// searchBar
+			String id = entry.getStringValue(0);
+//			String tag = entry.getStringValue(1);
+//			String name = entry.getStringValue(2);
+			
+			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
+				!(id.contains(searchFilter))) return false;
+			
+			if(!statusFilter.equals("[Status]") && !entry.getStringValue(9).equals(statusFilter)) return false;
+			return true;
+		}
+		
+		
+	};
+	
+	private TableRowSorter<DefaultTableModel> maintenanceSorter = new TableRowSorter<>(reportList);
+	private RowFilter<DefaultTableModel, Integer> maintenanceRF = new RowFilter<>() {
+		@Override
+		@SuppressWarnings("rawtypes")
+		public boolean include( Entry entry) {
+			
+			String searchFilter = txtUpdMntSearch.getText();
+			String statusFilter = cmbStatusMnt.getSelectedItem().toString();
+			
+			// searchBar
+			String id = entry.getStringValue(0);
+			if(!(searchFilter.isBlank() || searchFilter.isEmpty()) &&
+				!(id.contains(searchFilter))) return false;
+			
+			if(!statusFilter.equals("[Availability]") && !entry.getStringValue(7).equals(statusFilter)) return false;
+			return true;
+		}
+		
+		
+	};
+	
+	
+	
+	KeyAdapter numericalOnly = new KeyAdapter() {
+		@Override
+		public void keyTyped(KeyEvent e) {
+		if(!Character.isDigit(e.getKeyChar())) e.consume();
+		}
+	};
+	
+	
+	DocumentFilter moneyInput = new DocumentFilter() {
+        public void replace(FilterBypass fb, int offset, int length, String str, AttributeSet a) throws BadLocationException {
+
+            String txt = fb.getDocument().getText(0, fb.getDocument().getLength());
+            txt += str;
+            if ((fb.getDocument().getLength() + str.length() - length) <= 20 && txt.matches("^[0-9]+[.]?[0-9]{0,10}$")) {
+                super.replace(fb, offset, length, str, a);
+            }
+        }
+
+        public void insertString(FilterBypass fb, int offset, String str, AttributeSet a) throws BadLocationException {
+
+            String txt = fb.getDocument().getText(0, fb.getDocument().getLength());
+            txt += str;
+            if ((fb.getDocument().getLength() + str.length()) <= 20 && txt.matches("^[0-9]+[.]?[0-9]{0,10}$")) {
+                super.insertString(fb, offset, str, a);
+            }
+        }
+    };
+  
+    
+	
+	
+	
+	
+	/**
+	 * Create the application.
+	 */
+	public CustodianDashboard(MainClient parent, CustodianHandler backend) {
+		this.parent = parent;
+		this.backend = backend;
+		initialize();
+	}
+
+	
+	private void initialize() {
+		
+		backend = new CustodianHandler();
+		
+		custodianDashboard = new JPanel();
+		custodianDashboard.setLayout(null);
+		custodianDashboard.setBounds(10, 54, 1400, 620);
+		
+		
+		
+		JLabel lblCustodian = new JLabel("Custodian");
+		lblCustodian.setForeground(new Color(0, 153, 255));
+		lblCustodian.setFont(new Font("Tahoma", Font.BOLD, 30));
+		lblCustodian.setHorizontalAlignment(SwingConstants.LEFT);
+		lblCustodian.setBounds(10, 11, 343, 32);
+		custodianDashboard.add(lblCustodian);
+		
+		query = new DefaultTableModel();
+		inventorySorter.setRowFilter(null);
+		
+		cardContainer = new JPanel();
+		cardContainer.setBounds(0, 54, 1400, 566);
+		custodianDashboard.add(cardContainer);
+		cardContainer.setLayout(card);
+		
+		JPanel borrowFormCreation = new JPanel();
+		borrowFormCreation.setBounds(10, 54, 1384, 555);
+		borrowFormCreation.setLayout(null);
+		
+		cmbCategoryModel = new DefaultComboBoxModel<String>();
+		cmbCategoryModel.addElement("[Category]");
+		
+		JPanel inventoryTable = new JPanel();
+		inventoryTable.setBounds(314, 11, 1076, 544);
+		borrowFormCreation.add(inventoryTable);
+		inventoryTable.setLayout(null);
+		
+		cmbCondition = new JComboBox<String>();
+		cmbCondition.setModel(new DefaultComboBoxModel<String>(new String[] {"[Condition]", "Good", "Damaged", "Worn"}));
+		cmbCondition.setBounds(321, 0, 97, 22);
+		inventoryTable.add(cmbCondition);
+		
+		cmbCategory = new JComboBox<String>();
+		cmbCategory.setModel(cmbCategoryModel);
+		cmbCategory.setBounds(214, 0, 97, 22);
+		inventoryTable.add(cmbCategory);
+		
+		searchBar = new JTextField();
+		searchBar.setColumns(10);
+		searchBar.setBounds(10, 1, 115, 20);
+		inventoryTable.add(searchBar);
+		
+		JButton btnRefresh = new JButton("⟳");
+		btnRefresh.addActionListener(e -> { displayInventoryValues();});
+		btnRefresh.setBounds(1014, 0, 62, 23);
+		inventoryTable.add(btnRefresh);
+		
+		cmbAvailability = new JComboBox<String>();
+		cmbAvailability.setModel(new DefaultComboBoxModel<>(new String[] {"[Availability]", "Available", "In Use", "In Maintenance"}));
+		cmbAvailability.setBounds(428, 0, 97, 22);
+		inventoryTable.add(cmbAvailability);
+		
+		JButton btnFilter = new JButton("⌕");
+		btnFilter.addActionListener(e -> { inventorySorter.setRowFilter(inventoryRF); });
+		btnFilter.setBounds(129, 0, 62, 22);
+		inventoryTable.add(btnFilter);
+		
+		JButton btnClearFilter = new JButton("Clear");
+		btnClearFilter.addActionListener(e -> { inventorySorter.setRowFilter(null); });
+		btnClearFilter.setBounds(929, 0, 75, 23);
+		inventoryTable.add(btnClearFilter);
+		
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setBounds(0, 33, 1076, 511);
+		inventoryTable.add(scrollPane);
+		
+		searchResult = new JTable();
+		
+		scrollPane.setViewportView(searchResult);
+		
+		formCreator = new JPanel();
+		formCreator.setBounds(10, 11, 294, 544);
+		borrowFormCreation.add(formCreator);
+		formCreator.setLayout(formCard);
+		
+		JPanel createBorrow = new JPanel();
+		createBorrow.setLayout(null);
+		
+		JLabel lblBorrowForm = new JLabel("New Borrow Form");
+		lblBorrowForm.setFont(new Font("Segoe UI", Font.BOLD, 25));
+		lblBorrowForm.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorrowForm.setBounds(10, 10, 274, 30);
+		createBorrow.add(lblBorrowForm);
+		
+		txtBrwEquipID = new JTextField();
+		txtBrwEquipID.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwEquipID.addKeyListener(numericalOnly);
+		txtBrwEquipID.setBounds(171, 99, 39, 28);
+		createBorrow.add(txtBrwEquipID);
+		txtBrwEquipID.setColumns(10);
+		
+		JLabel lblBrowEQuipID = new JLabel("Equipment ID");
+		lblBrowEQuipID.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBrowEQuipID.setHorizontalAlignment(SwingConstants.LEFT);
+		lblBrowEQuipID.setBounds(171, 82, 96, 12);
+		createBorrow.add(lblBrowEQuipID);
+		
+		txtBrwEquipName = new JTextField();
+		txtBrwEquipName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwEquipName.setEditable(false);
+		txtBrwEquipName.setBounds(10, 100, 151, 28);
+		createBorrow.add(txtBrwEquipName);
+		txtBrwEquipName.setColumns(10);
+		
+		JLabel lblBrwEquipName = new JLabel("Equipment Name");
+		lblBrwEquipName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBrwEquipName.setBounds(10, 82, 101, 12);
+		createBorrow.add(lblBrwEquipName);
+		
+		txtBrwEquipTag = new JTextField();
+		txtBrwEquipTag.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwEquipTag.setEditable(false);
+		txtBrwEquipTag.setBounds(200, 158, 82, 22);
+		createBorrow.add(txtBrwEquipTag);
+		txtBrwEquipTag.setColumns(10);
+		
+		JLabel lblBrwEquipTag = new JLabel("Property Tag");
+		lblBrwEquipTag.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBrwEquipTag.setBounds(200, 140, 82, 12);
+		createBorrow.add(lblBrwEquipTag);
+		
+		JSeparator sprtrBrwTop = new JSeparator();
+		sprtrBrwTop.setBounds(10, 40, 274, 6);
+		createBorrow.add(sprtrBrwTop);
+		
+		JLabel lblEquipDetails = new JLabel("Equipment Details");
+		lblEquipDetails.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 15));
+		lblEquipDetails.setBounds(84, 50, 126, 18);
+		createBorrow.add(lblEquipDetails);
+		
+		JSeparator sprtrBrwTop_1 = new JSeparator();
+		sprtrBrwTop_1.setBounds(9, 196, 274, 6);
+		createBorrow.add(sprtrBrwTop_1);
+		
+		JLabel lblBorrowerDetails = new JLabel("Borrower Details");
+		lblBorrowerDetails.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		lblBorrowerDetails.setBounds(102, 202, 96, 18);
+		createBorrow.add(lblBorrowerDetails);
+		
+		// Custom button here
+		JButton btnBrwLoadID = new JButton("Select");
+		btnBrwLoadID.addActionListener(e -> { loadItem(0); });
+		btnBrwLoadID.setBounds(213, 99, 71, 29);
+		createBorrow.add(btnBrwLoadID);
+		
+		cmbBorrowerModel = new DefaultComboBoxModel<String>();
+		
+		cmbBorrowerName = new JComboBox<String>();
+		cmbBorrowerName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		cmbBorrowerName.setModel(cmbBorrowerModel);
+		cmbBorrowerName.setBounds(10, 233, 274, 26);
+		createBorrow.add(cmbBorrowerName);
+		
+		JLabel lblBorrowerName = new JLabel("Borrower");
+		lblBorrowerName.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBorrowerName.setBounds(10, 216, 82, 18);
+		createBorrow.add(lblBorrowerName);
+		
+		txtBrwReturnByDate = new JTextField();
+		txtBrwReturnByDate.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwReturnByDate.setBounds(171, 285, 113, 20);
+		createBorrow.add(txtBrwReturnByDate);
+		txtBrwReturnByDate.setColumns(10);
+		
+		txtDateBorrowed = new JTextField();
+		txtDateBorrowed.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtDateBorrowed.setText("2000-12-19");
+		txtDateBorrowed.setEditable(false);
+		txtDateBorrowed.setColumns(10);
+		txtDateBorrowed.setBounds(10, 284, 113, 20);
+		createBorrow.add(txtDateBorrowed);
+		
+		JLabel lblDateBorrowed = new JLabel("Date Borrowed:");
+		lblDateBorrowed.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblDateBorrowed.setBounds(10, 269, 96, 15);
+		createBorrow.add(lblDateBorrowed);
+		
+		JLabel lblRetunByDate = new JLabel("Return by Date:*");
+		lblRetunByDate.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblRetunByDate.setBounds(171, 270, 96, 15);
+		createBorrow.add(lblRetunByDate);
+		
+		txtBrwEquipCondition = new JTextField();
+		txtBrwEquipCondition.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwEquipCondition.setEditable(false);
+		txtBrwEquipCondition.setColumns(10);
+		txtBrwEquipCondition.setBounds(10, 157, 85, 24);
+		createBorrow.add(txtBrwEquipCondition);
+		
+		JLabel lblBrwEquipCondition = new JLabel("Condition");
+		lblBrwEquipCondition.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBrwEquipCondition.setBounds(10, 139, 82, 12);
+		createBorrow.add(lblBrwEquipCondition);
+		
+		// Custom Button #2
+		JButton btnBrwSubmit = new JButton("Create Record");
+		btnBrwSubmit.addActionListener(e -> { createBorrowRecord(); });
+		btnBrwSubmit.setBounds(10, 510, 151, 23);
+		createBorrow.add(btnBrwSubmit);
+		
+		// Custom Button #3
+		JButton btnCancel = new JButton("Cancel");
+		btnCancel.addActionListener(e -> { displayDashboard(); });
+		btnCancel.setBounds(171, 510, 113, 23);
+		createBorrow.add(btnCancel);
+		
+		JLabel lblyyyymmdd = new JLabel("(YYYY-MM-DD)");
+		lblyyyymmdd.setHorizontalAlignment(SwingConstants.CENTER);
+		lblyyyymmdd.setForeground(new Color(192, 192, 192));
+		lblyyyymmdd.setBounds(171, 307, 113, 14);
+		createBorrow.add(lblyyyymmdd);
+		
+		JPanel createMaintenance = new JPanel();
+		createMaintenance.setLayout(null);
+		
+		JLabel lblMaintenanceForm = new JLabel("New Maintenance Report");
+		lblMaintenanceForm.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMaintenanceForm.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblMaintenanceForm.setBounds(10, 11, 274, 30);
+		createMaintenance.add(lblMaintenanceForm);
+		
+		JSeparator sprtrBrwTop_2 = new JSeparator();
+		sprtrBrwTop_2.setBounds(10, 38, 274, 6);
+		createMaintenance.add(sprtrBrwTop_2);
+		
+		JLabel lblEquipDetails_1 = new JLabel("Equipment Details");
+		lblEquipDetails_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblEquipDetails_1.setBounds(10, 39, 113, 18);
+		createMaintenance.add(lblEquipDetails_1);
+		
+		JLabel lblMntEquipID = new JLabel("Equipment ID");
+		lblMntEquipID.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMntEquipID.setBounds(10, 63, 96, 12);
+		createMaintenance.add(lblMntEquipID);
+		
+		txtMntEquipID = new JTextField();
+		txtMntEquipID.addKeyListener(numericalOnly);
+		txtMntEquipID.setColumns(10);
+		txtMntEquipID.setBounds(132, 60, 60, 18);
+		createMaintenance.add(txtMntEquipID);
+		
+		JLabel lblBrwEquipName_1 = new JLabel("Equipment Name");
+		lblBrwEquipName_1.setBounds(10, 88, 101, 12);
+		createMaintenance.add(lblBrwEquipName_1);
+		
+		txtMntEquipName = new JTextField();
+		txtMntEquipName.setEditable(false);
+		txtMntEquipName.setColumns(10);
+		txtMntEquipName.setBounds(10, 106, 182, 18);
+		createMaintenance.add(txtMntEquipName);
+		
+		JLabel lblBrwEquipCondition_1 = new JLabel("Condition");
+		lblBrwEquipCondition_1.setBounds(10, 135, 82, 12);
+		createMaintenance.add(lblBrwEquipCondition_1);
+		
+		txtMntEquipCondition = new JTextField();
+		txtMntEquipCondition.setEditable(false);
+		txtMntEquipCondition.setColumns(10);
+		txtMntEquipCondition.setBounds(10, 153, 82, 18);
+		createMaintenance.add(txtMntEquipCondition);
+		
+		JLabel lblBrwEquipTag_1 = new JLabel("Property Tag");
+		lblBrwEquipTag_1.setBounds(202, 88, 82, 12);
+		createMaintenance.add(lblBrwEquipTag_1);
+		
+		txtMntEquipTag = new JTextField();
+		txtMntEquipTag.setEditable(false);
+		txtMntEquipTag.setColumns(10);
+		txtMntEquipTag.setBounds(202, 106, 82, 18);
+		createMaintenance.add(txtMntEquipTag);
+		
+		JButton btnMntLoadID = new JButton("Select");
+		btnMntLoadID.addActionListener(e -> { loadItem(1); });
+		btnMntLoadID.setBounds(200, 59, 84, 20);
+		createMaintenance.add(btnMntLoadID);
+		
+		JSeparator sprtrBrwTop_1_1 = new JSeparator();
+		sprtrBrwTop_1_1.setBounds(10, 182, 274, 6);
+		createMaintenance.add(sprtrBrwTop_1_1);
+		
+		JLabel lblMaintenanceDetails = new JLabel("Maintenance Details");
+		lblMaintenanceDetails.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblMaintenanceDetails.setBounds(10, 182, 113, 18);
+		createMaintenance.add(lblMaintenanceDetails);
+		
+		JLabel lblDateReported = new JLabel("Date Reported:");
+		lblDateReported.setBounds(171, 135, 113, 14);
+		createMaintenance.add(lblDateReported);
+		
+		txtMntDateReported = new JTextField();
+		txtMntDateReported.setEditable(false);
+		txtMntDateReported.setColumns(10);
+		txtMntDateReported.setBounds(171, 149, 113, 20);
+		createMaintenance.add(txtMntDateReported);
+		
+		JLabel lblMntIssue = new JLabel("Reported Issue:");
+		lblMntIssue.setBounds(10, 205, 113, 14);
+		createMaintenance.add(lblMntIssue);
+		
+		JScrollPane txtMntIssueViewport = new JScrollPane();
+		txtMntIssueViewport.setBounds(10, 224, 274, 95);
+		createMaintenance.add(txtMntIssueViewport);
+		
+		txtAMntIssue = new JTextArea();
+		txtMntIssueViewport.setViewportView(txtAMntIssue);
+		
+		
+		JButton btnMntSubmit = new JButton("Create Report");
+		btnMntSubmit.addActionListener(e -> { createMaintenanceReport(); });
+		btnMntSubmit.setBounds(10, 510, 151, 23);
+		createMaintenance.add(btnMntSubmit);
+		
+		JButton btnMntCancel = new JButton("Cancel");
+		btnMntCancel.addActionListener(e -> { displayDashboard(); });
+		btnMntCancel.setBounds(171, 510, 113, 23);
+		createMaintenance.add(btnMntCancel);
+		
+		JPanel main = new JPanel();
+		main.setBackground(new Color(255, 255, 255));
+		
+		main.setLayout(null);
+		
+		JPanel borrowTablePreview = new JPanel();
+		borrowTablePreview.setBounds(293, 11, 344, 544);
+		main.add(borrowTablePreview);
+		borrowTablePreview.setLayout(null);
+		
+		JScrollPane brwPreviewViewport = new JScrollPane();
+		brwPreviewViewport.setBounds(10, 10, 324, 523);
+		borrowTablePreview.add(brwPreviewViewport);
+		
+		tblBorrowPreview = new JTable();
+		tblBorrowPreview.setFillsViewportHeight(true);
+		brwPreviewViewport.setViewportView(tblBorrowPreview);
+		
+		JPanel sideBar = new JPanel();
+		sideBar.setBackground(new Color(240, 255, 240));
+		sideBar.setForeground(new Color(0, 0, 255));
+		sideBar.setBounds(0, 0, 283, 566);
+		main.add(sideBar);
+		sideBar.setLayout(null);
+		
+		ImageIcon originalIcon = new ImageIcon(LoginScreen.class.getResource("/ui/spearKen.png"));
+		Image resizedImage = originalIcon.getImage().getScaledInstance(80, 80, Image.SCALE_SMOOTH);
+		
+		JLabel spearLogo = new JLabel("S.P.E.A.R");
+		spearLogo.setForeground(new Color(30, 144, 255));
+		spearLogo.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		spearLogo.setIcon(new ImageIcon(resizedImage));
+		spearLogo.setBounds(10, 10, 249, 64);
+		sideBar.add(spearLogo);
+		
+		ButtonOne btnRegister = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnRegister.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				displayBorrowerRegistration();
+			
+			}
+		});
+		btnRegister.setBounds(27, 114, 225, 55);
+		sideBar.add(btnRegister);
+		btnRegister.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnRegister.setText("Register Borrowers");
+		
+		ButtonOne btnNewBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnNewBorrowRecord.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				displayNewBorrow();
+				
+			}
+		});
+		btnNewBorrowRecord.setText("New Borrow Record");
+		btnNewBorrowRecord.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnNewBorrowRecord.setBounds(27, 246, 225, 55);
+		sideBar.add(btnNewBorrowRecord);
+		
+		ButtonOne btnUpdateBorrowRecord = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnUpdateBorrowRecord.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayUpdateBorrow();
+				
+			}
+		});
+		btnUpdateBorrowRecord.setText("Update Borrow Record");
+		btnUpdateBorrowRecord.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnUpdateBorrowRecord.setBounds(27, 317, 225, 55);
+		sideBar.add(btnUpdateBorrowRecord);
+		
+		ButtonOne btnNewMaintenanceReport = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnNewMaintenanceReport.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayNewMaintenance();
+			}
+		});
+		btnNewMaintenanceReport.setText("New Maintenance Report");
+		btnNewMaintenanceReport.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnNewMaintenanceReport.setBounds(27, 382, 225, 55);
+		sideBar.add(btnNewMaintenanceReport);
+		
+		ButtonOne btnUpdateMaintenanceReport_1 = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnUpdateMaintenanceReport_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayUpdateMaintenance();
+			}
+		});
+		btnUpdateMaintenanceReport_1.setText("Update Maintenance Report");
+		btnUpdateMaintenanceReport_1.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnUpdateMaintenanceReport_1.setBounds(27, 447, 225, 55);
+		sideBar.add(btnUpdateMaintenanceReport_1);
+		
+		ButtonOne btnManage = new ButtonOne(new Color(46, 204, 113), new Color(39, 174, 96));
+		btnManage.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				displayManageBorrower();
+			
+			}
+		});
+		btnManage.setText("Manage Borrowers");
+		btnManage.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnManage.setBounds(27, 180, 225, 55);
+		sideBar.add(btnManage);
+		
+		JSeparator separator = new JSeparator();
+		separator.setBounds(10, 41, 1380, 2);
+		custodianDashboard.add(separator);
+		
+		cardContainer.add(main, "dashboard");
+		
+		JPanel borrowTablePreview_1 = new JPanel();
+		borrowTablePreview_1.setLayout(null);
+		borrowTablePreview_1.setBounds(656, 11, 344, 544);
+		main.add(borrowTablePreview_1);
+		
+		JScrollPane brwPreviewViewport_1 = new JScrollPane();
+		brwPreviewViewport_1.setBounds(10, 10, 324, 523);
+		borrowTablePreview_1.add(brwPreviewViewport_1);
+		
+		tblMaintenancePreview = new JTable();
+		brwPreviewViewport_1.setViewportView(tblMaintenancePreview);
+		tblMaintenancePreview.setFillsViewportHeight(true);
+		
+		JPanel borrowTablePreview_1_1 = new JPanel();
+		borrowTablePreview_1_1.setLayout(null);
+		borrowTablePreview_1_1.setBounds(1017, 11, 344, 544);
+		main.add(borrowTablePreview_1_1);
+		
+		JScrollPane brwPreviewViewport_1_1 = new JScrollPane();
+		brwPreviewViewport_1_1.setBounds(10, 10, 324, 523);
+		borrowTablePreview_1_1.add(brwPreviewViewport_1_1);
+		cardContainer.add(borrowFormCreation, "creation");
+		
+		formCreator.add(createBorrow, "borrowForm");
+		
+		JLabel lblNote = new JLabel("* : If applicable");
+		lblNote.setForeground(new Color(128, 128, 128));
+		lblNote.setBounds(10, 485, 257, 14);
+		createBorrow.add(lblNote);
+		
+		JLabel lblBorrowStatus = new JLabel("Availability");
+		lblBorrowStatus.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 10));
+		lblBorrowStatus.setBounds(105, 139, 85, 14);
+		createBorrow.add(lblBorrowStatus);
+		
+		txtBrwEquipAvail = new JTextField();
+		txtBrwEquipAvail.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 12));
+		txtBrwEquipAvail.setEditable(false);
+		txtBrwEquipAvail.setColumns(10);
+		txtBrwEquipAvail.setBounds(105, 157, 85, 24);
+		createBorrow.add(txtBrwEquipAvail);
+		formCreator.add(createMaintenance, "maintenanceForm");
+		
+		card.show(cardContainer, "dashboard");
+		
+		JPanel updateBorrow = new JPanel();
+		cardContainer.add(updateBorrow, "updateBorrow");
+		updateBorrow.setLayout(null);
+		
+		JScrollPane updtBorrowViewport = new JScrollPane();
+		updtBorrowViewport.setBounds(314, 44, 1076, 511);
+		updateBorrow.add(updtBorrowViewport);
+		
+		borrowList = new DefaultTableModel();
+		
+		tblborrowRecord = new JTable();
+		tblborrowRecord.setFillsViewportHeight(true);
+		updtBorrowViewport.setViewportView(tblborrowRecord);
+		
+		JButton btnRefresh_1 = new JButton("⟳");
+		btnRefresh_1.addActionListener(e -> { displayBorrowRecords(); });
+		btnRefresh_1.setBounds(1328, 11, 62, 23);
+		updateBorrow.add(btnRefresh_1);
+		
+		JButton btnClearFilter_1 = new JButton("Clear");
+		btnClearFilter_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				borrowRecordSorter.setRowFilter(null);
+			
+			}
+		});
+		btnClearFilter_1.setBounds(921, 11, 75, 23);
+		updateBorrow.add(btnClearFilter_1);
+		
+		JButton btnBrwUpdFilter = new JButton("⌕");
+		btnBrwUpdFilter.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				borrowRecordSorter.setRowFilter(borrowRecordRF);
+			}
+		});
+		btnBrwUpdFilter.setBounds(849, 11, 62, 23);
+		updateBorrow.add(btnBrwUpdFilter);
+		
+		cmbStatus = new JComboBox<String>();
+		cmbStatus.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
+		cmbStatus.setBounds(742, 11, 97, 22);
+		updateBorrow.add(cmbStatus);
+		
+		txtbrwSearchBar = new JTextField();
+		txtbrwSearchBar.setColumns(10);
+		txtbrwSearchBar.setBounds(314, 12, 125, 20);
+		updateBorrow.add(txtbrwSearchBar);
+		
+		JSeparator sprtrBrwTop_3 = new JSeparator();
+		sprtrBrwTop_3.setBounds(20, 41, 274, 6);
+		updateBorrow.add(sprtrBrwTop_3);
+		
+		JLabel lblUpdateBorrow = new JLabel("Update Borrow Form");
+		lblUpdateBorrow.setHorizontalAlignment(SwingConstants.CENTER);
+		lblUpdateBorrow.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblUpdateBorrow.setBounds(20, 11, 274, 30);
+		updateBorrow.add(lblUpdateBorrow);
+		
+		JLabel lblTransactionID = new JLabel("Transaction ID");
+		lblTransactionID.setBounds(53, 44, 97, 14);
+		updateBorrow.add(lblTransactionID);
+		
+		txtTransactionID = new JTextField();
+		txtTransactionID.setBounds(53, 57, 97, 20);
+		updateBorrow.add(txtTransactionID);
+		txtTransactionID.setColumns(10);
+		
+		JLabel lblBorrowID = new JLabel("Borrower ID");
+		lblBorrowID.setBounds(53, 88, 97, 14);
+		updateBorrow.add(lblBorrowID);
+		
+		txtUpdBorrowerID = new JTextField();
+		txtUpdBorrowerID.setEditable(false);
+		txtUpdBorrowerID.setColumns(10);
+		txtUpdBorrowerID.setBounds(53, 100, 97, 20);
+		updateBorrow.add(txtUpdBorrowerID);
+		
+		JLabel lblBorrowedEquipID = new JLabel("Equipment ID");
+		lblBorrowedEquipID.setBounds(160, 88, 97, 14);
+		updateBorrow.add(lblBorrowedEquipID);
+		
+		txtUpdBorrowedEquip = new JTextField();
+		txtUpdBorrowedEquip.setEditable(false);
+		txtUpdBorrowedEquip.setColumns(10);
+		txtUpdBorrowedEquip.setBounds(160, 100, 97, 20);
+		updateBorrow.add(txtUpdBorrowedEquip);
+		
+		JLabel lblUpdDateBorrowed = new JLabel("Date Borrowed");
+		lblUpdDateBorrowed.setBounds(53, 126, 97, 14);
+		updateBorrow.add(lblUpdDateBorrowed);
+		
+		txtBorrowDate = new JTextField();
+		txtBorrowDate.setEditable(false);
+		txtBorrowDate.setColumns(10);
+		txtBorrowDate.setBounds(53, 138, 97, 20);
+		updateBorrow.add(txtBorrowDate);
+		
+		JLabel lblUpdCustodian = new JLabel("Received By");
+		lblUpdCustodian.setBounds(160, 45, 97, 14);
+		updateBorrow.add(lblUpdCustodian);
+		
+		txtUpdCustodian = new JTextField();
+		txtUpdCustodian.setEditable(false);
+		txtUpdCustodian.setColumns(10);
+		txtUpdCustodian.setBounds(160, 57, 97, 20);
+		updateBorrow.add(txtUpdCustodian);
+		
+		JLabel lblUpdConditionOnBorrow = new JLabel("Condition on Borrow");
+		lblUpdConditionOnBorrow.setBounds(160, 126, 97, 14);
+		updateBorrow.add(lblUpdConditionOnBorrow);
+		
+		txtUpdCondOnBorrow = new JTextField();
+		txtUpdCondOnBorrow.setEditable(false);
+		txtUpdCondOnBorrow.setColumns(10);
+		txtUpdCondOnBorrow.setBounds(160, 138, 97, 20);
+		updateBorrow.add(txtUpdCondOnBorrow);
+		
+		JSeparator separator_1 = new JSeparator();
+		separator_1.setBounds(20, 220, 284, 6);
+		updateBorrow.add(separator_1);
+		
+		JButton btnUpdSelect = new JButton("Selecct");
+		btnUpdSelect.addActionListener( e -> { LoadRecord(); });
+		btnUpdSelect.setBounds(111, 190, 89, 23);
+		updateBorrow.add(btnUpdSelect);
+		
+		txtExpectedReturnDate = new JTextField();
+		txtExpectedReturnDate.setEditable(false);
+		txtExpectedReturnDate.setBounds(20, 262, 274, 20);
+		updateBorrow.add(txtExpectedReturnDate);
+		txtExpectedReturnDate.setColumns(10);
+		
+		JLabel lblUpdReturnDateBy = new JLabel("Return by Date:");
+		lblUpdReturnDateBy.setBounds(20, 247, 130, 14);
+		updateBorrow.add(lblUpdReturnDateBy);
+		
+		txtDateReturned = new JTextField();
+		txtDateReturned.setEditable(false);
+		txtDateReturned.setColumns(10);
+		txtDateReturned.setBounds(20, 308, 274, 20);
+		updateBorrow.add(txtDateReturned);
+		
+		JLabel lblUpdDateReturned = new JLabel("Date Returned");
+		lblUpdDateReturned.setBounds(20, 293, 130, 14);
+		updateBorrow.add(lblUpdDateReturned);
+		
+		JLabel lblUpdConditionOnReturn = new JLabel("Condition On Return");
+		lblUpdConditionOnReturn.setBounds(20, 339, 130, 14);
+		updateBorrow.add(lblUpdConditionOnReturn);
+		
+		cmbCondOnReturn = new JComboBox<>();
+		cmbCondOnReturn.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
+		cmbCondOnReturn.setBounds(20, 353, 274, 22);
+		updateBorrow.add(cmbCondOnReturn);
+		
+		JLabel lbldateformat = new JLabel("(YYYY-MM-DD)");
+		lbldateformat.setHorizontalAlignment(SwingConstants.CENTER);
+		lbldateformat.setForeground(new Color(128, 128, 128));
+		lbldateformat.setBounds(20, 283, 274, 14);
+		updateBorrow.add(lbldateformat);
+		
+		JLabel lbldateformat_1 = new JLabel("(YYYY-MM-DD)");
+		lbldateformat_1.setFont(new Font("Tahoma", Font.PLAIN, 8));
+		lbldateformat_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lbldateformat_1.setForeground(Color.GRAY);
+		lbldateformat_1.setBounds(20, 328, 138, 14);
+		updateBorrow.add(lbldateformat_1);
+		
+		JButton btnBrwUpdCancel = new JButton("Cancel");
+		btnBrwUpdCancel.addActionListener(e -> {displayDashboard();});
+		btnBrwUpdCancel.setBounds(20, 503, 274, 23);
+		updateBorrow.add(btnBrwUpdCancel);
+		
+		JButton btnBrwUpdate = new JButton("Update Record");
+		btnBrwUpdate.addActionListener(e -> { updateBorrowRecord(); });
+		btnBrwUpdate.setBounds(20, 478, 274, 23);
+		updateBorrow.add(btnBrwUpdate);
+		
+		JPanel updateMaintenance = new JPanel();
+		cardContainer.add(updateMaintenance, "updateMaintenance");
+		updateMaintenance.setLayout(null);
+		
+		txtUpdMntSearch = new JTextField();
+		txtUpdMntSearch.setColumns(10);
+		txtUpdMntSearch.setBounds(324, 12, 115, 20);
+		updateMaintenance.add(txtUpdMntSearch);
+		
+		cmbStatusMnt = new JComboBox<String>();
+		cmbStatusMnt.setModel(new DefaultComboBoxModel<>(RECORDSTATUS));
+		cmbStatusMnt.setBounds(742, 11, 97, 22);
+		updateMaintenance.add(cmbStatusMnt);
+		
+		JButton btnFilter_1_1 = new JButton("⌕");
+		btnFilter_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				maintenanceSorter.setRowFilter(maintenanceRF);
+			}
+		});
+		btnFilter_1_1.setBounds(849, 11, 62, 23);
+		updateMaintenance.add(btnFilter_1_1);
+		
+		JButton btnClearFilter_1_1 = new JButton("Clear");
+		btnClearFilter_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				maintenanceSorter.setRowFilter(null);
+				
+			}
+		});
+		btnClearFilter_1_1.setBounds(921, 11, 75, 23);
+		updateMaintenance.add(btnClearFilter_1_1);
+		
+		JButton btnUpdMntRefresh = new JButton("⟳");
+		btnUpdMntRefresh.addActionListener(e -> { displayMaintenanceReports(); });
+		btnUpdMntRefresh.setBounds(1328, 11, 62, 23);
+		updateMaintenance.add(btnUpdMntRefresh);
+		
+		JLabel lblMntAction = new JLabel("Actions Taken:");
+		lblMntAction.setBounds(10, 319, 89, 14);
+		updateMaintenance.add(lblMntAction);
+		
+		JLabel lblRepairCost = new JLabel("Maintenance Cost          ₱");
+		lblRepairCost.setBounds(10, 439, 141, 14);
+		updateMaintenance.add(lblRepairCost);
+		
+		txtMntCost = new JTextField();
+		txtMntCost.setColumns(10);
+		txtMntCost.setBounds(151, 436, 133, 20);
+		AbstractDocument mntCostdoc = (AbstractDocument) txtMntCost.getDocument();
+		mntCostdoc.setDocumentFilter(moneyInput);
+		updateMaintenance.add(txtMntCost);
+		
+		JLabel lblMaintenanceForm_1 = new JLabel("Update Maintenance Report");
+		lblMaintenanceForm_1.setHorizontalAlignment(SwingConstants.CENTER);
+		lblMaintenanceForm_1.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblMaintenanceForm_1.setBounds(10, 11, 274, 30);
+		updateMaintenance.add(lblMaintenanceForm_1);
+		
+		JSeparator sprtrBrwTop_2_1 = new JSeparator();
+		sprtrBrwTop_2_1.setBounds(10, 38, 274, 6);
+		updateMaintenance.add(sprtrBrwTop_2_1);
+		
+		JLabel lblEquipDetails_1_1 = new JLabel("Equipment Details");
+		lblEquipDetails_1_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblEquipDetails_1_1.setBounds(10, 39, 113, 18);
+		updateMaintenance.add(lblEquipDetails_1_1);
+		
+		JLabel lblMntTransaction = new JLabel("Transaction ID");
+		lblMntTransaction.setHorizontalAlignment(SwingConstants.LEFT);
+		lblMntTransaction.setBounds(10, 63, 96, 12);
+		updateMaintenance.add(lblMntTransaction);
+		
+		txtMntUpdTransactionID = new JTextField();
+		txtMntUpdTransactionID.setColumns(10);
+		txtMntUpdTransactionID.setBounds(132, 60, 60, 18);
+		updateMaintenance.add(txtMntUpdTransactionID);
+		
+		JLabel lblMntUpdReportedBy = new JLabel("Reported By");
+		lblMntUpdReportedBy.setBounds(36, 132, 82, 12);
+		updateMaintenance.add(lblMntUpdReportedBy);
+		
+		txtMntUpdReport = new JTextField();
+		txtMntUpdReport.setEditable(false);
+		txtMntUpdReport.setColumns(10);
+		txtMntUpdReport.setBounds(36, 150, 97, 18);
+		updateMaintenance.add(txtMntUpdReport);
+		
+		JButton btnMntUpdSelect = new JButton("Select");
+		btnMntUpdSelect.addActionListener(e -> { LoadReport(); });
+		btnMntUpdSelect.setBounds(200, 59, 84, 20);
+		updateMaintenance.add(btnMntUpdSelect);
+		
+		JLabel lblDateReported_1 = new JLabel("Date Reported:");
+		lblDateReported_1.setBounds(142, 89, 113, 14);
+		updateMaintenance.add(lblDateReported_1);
+		
+		txtMntUpdDate = new JTextField();
+		txtMntUpdDate.setEditable(false);
+		txtMntUpdDate.setColumns(10);
+		txtMntUpdDate.setBounds(142, 103, 113, 20);
+		updateMaintenance.add(txtMntUpdDate);
+		
+		JLabel lblBorrowedEquipID_1 = new JLabel("Equipment ID");
+		lblBorrowedEquipID_1.setBounds(36, 89, 97, 14);
+		updateMaintenance.add(lblBorrowedEquipID_1);
+		
+		txtMntUpdEquipID = new JTextField();
+		txtMntUpdEquipID.setEditable(false);
+		txtMntUpdEquipID.setColumns(10);
+		txtMntUpdEquipID.setBounds(36, 101, 97, 20);
+		updateMaintenance.add(txtMntUpdEquipID);
+		
+		JSeparator sprtrBrwTop_1_1_1 = new JSeparator();
+		sprtrBrwTop_1_1_1.setBounds(10, 177, 274, 6);
+		updateMaintenance.add(sprtrBrwTop_1_1_1);
+		
+		JLabel lblMaintenanceDetails_1 = new JLabel("Maintenance Details");
+		lblMaintenanceDetails_1.setFont(new Font("Tahoma", Font.PLAIN, 12));
+		lblMaintenanceDetails_1.setBounds(10, 177, 113, 18);
+		updateMaintenance.add(lblMaintenanceDetails_1);
+		
+		JScrollPane srllPaneATViewport = new JScrollPane();
+		srllPaneATViewport.setBounds(10, 335, 272, 93);
+		updateMaintenance.add(srllPaneATViewport);
+		
+		
+		JScrollPane srllPaneIssueViewport = new JScrollPane();
+		srllPaneIssueViewport.setBounds(10, 215, 272, 93);
+		updateMaintenance.add(srllPaneIssueViewport);
+
+		txtAMntUpdIssueReported = new JTextArea();
+		txtAMntUpdIssueReported.setEditable(false);
+		srllPaneIssueViewport.setViewportView(txtAMntUpdIssueReported);
+		
+		txtAMntUpdActionTaken = new JTextArea();
+		srllPaneATViewport.setViewportView(txtAMntUpdActionTaken);
+	
+		
+		
+		JLabel lblMntUpdIssue = new JLabel("Reported Issue");
+		lblMntUpdIssue.setBounds(10, 199, 89, 14);
+		updateMaintenance.add(lblMntUpdIssue);
+		
+		JButton btnMntUpdate = new JButton("Update Record");
+		btnMntUpdate.addActionListener(e -> { updateMaintenanceReport();  });
+		btnMntUpdate.setBounds(10, 506, 274, 23);
+		updateMaintenance.add(btnMntUpdate);
+		
+		JButton btnMntUpdateCancel = new JButton("Cancel");
+		btnMntUpdateCancel.addActionListener(e -> { displayDashboard(); });
+		btnMntUpdateCancel.setBounds(10, 531, 274, 23);
+		updateMaintenance.add(btnMntUpdateCancel);
+		
+		JScrollPane updtMaintenanceViewport = new JScrollPane();
+		updtMaintenanceViewport.setBounds(314, 44, 1076, 511);
+		updateMaintenance.add(updtMaintenanceViewport);
+		
+		tblUpdReport = new JTable();
+		updtMaintenanceViewport.setViewportView(tblUpdReport);
+		tblUpdReport.setFillsViewportHeight(true);
+		
+		JPanel addBorrower = new JPanel();
+		cardContainer.add(addBorrower, "borrowerRegistration");
+		addBorrower.setLayout(null);
+		
+		JButton btnUpdMntRefresh_1 = new JButton("⟳");
+		btnUpdMntRefresh_1.setBounds(1328, 10, 62, 23);
+		addBorrower.add(btnUpdMntRefresh_1);
+		
+		textField = new JTextField();
+		textField.setColumns(10);
+		textField.setBounds(316, 11, 123, 20);
+		addBorrower.add(textField);
+		
+		cmbBorrowType = new JComboBox<String>();
+		cmbBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbBorrowType.setBounds(714, 10, 97, 22);
+		addBorrower.add(cmbBorrowType);
+		
+		JButton btnFilter_1_1_1 = new JButton("⌕");
+		btnFilter_1_1_1.setBounds(821, 10, 62, 23);
+		addBorrower.add(btnFilter_1_1_1);
+		
+		JButton btnClearFilter_1_1_1 = new JButton("Clear");
+		btnClearFilter_1_1_1.setBounds(893, 10, 75, 23);
+		addBorrower.add(btnClearFilter_1_1_1);
+		
+		borrowerManager = new JPanel();
+		borrowerManager.setBounds(10, 10, 292, 546);
+		addBorrower.add(borrowerManager);
+		borrowerManager.setLayout(borrowManagingCard);
+		
+		JPanel register = new JPanel();
+		borrowerManager.add(register, "registerBorrower");
+		register.setLayout(null);
+		
+		JSeparator sprtrBrwTop_2_1_1 = new JSeparator();
+		sprtrBrwTop_2_1_1.setBounds(10, 31, 264, 2);
+		register.add(sprtrBrwTop_2_1_1);
+		
+		JLabel lblBorrowerRegistration = new JLabel("Register New Borrower");
+		lblBorrowerRegistration.setBounds(0, 0, 274, 30);
+		register.add(lblBorrowerRegistration);
+		lblBorrowerRegistration.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorrowerRegistration.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		
+		JLabel lblBrwrFirstName = new JLabel("First Name");
+		lblBrwrFirstName.setBounds(10, 43, 67, 12);
+		register.add(lblBrwrFirstName);
+		
+		txtNewBorrowNameF = new JTextField();
+		txtNewBorrowNameF.setBounds(124, 40, 150, 18);
+		register.add(txtNewBorrowNameF);
+		txtNewBorrowNameF.setColumns(10);
+		
+		JLabel lblBrwrLastName = new JLabel("Last Name");
+		lblBrwrLastName.setBounds(10, 68, 67, 12);
+		register.add(lblBrwrLastName);
+		
+		txtNewBorrowNameL = new JTextField();
+		txtNewBorrowNameL.setBounds(124, 65, 150, 18);
+		register.add(txtNewBorrowNameL);
+		txtNewBorrowNameL.setColumns(10);
+		
+		JLabel lblBrwrIDNumber = new JLabel("ID Number");
+		lblBrwrIDNumber.setBounds(10, 121, 67, 12);
+		register.add(lblBrwrIDNumber);
+		
+		txtNewBorrowID = new JTextField();
+		txtNewBorrowID.setBounds(124, 118, 150, 18);
+		register.add(txtNewBorrowID);
+		txtNewBorrowID.setColumns(10);
+		
+		JLabel lblBrwrDepartment = new JLabel("Department / Grade");
+		lblBrwrDepartment.setBounds(10, 149, 114, 12);
+		register.add(lblBrwrDepartment);
+		
+		txtNewBorrowDept = new JTextField();
+		txtNewBorrowDept.setBounds(124, 146, 150, 18);
+		register.add(txtNewBorrowDept);
+		txtNewBorrowDept.setColumns(10);
+		
+		JLabel lblContactNo = new JLabel("Contact No.");
+		lblContactNo.setBounds(10, 174, 67, 12);
+		register.add(lblContactNo);
+		
+		txtNewBorrowContact = new JTextField();
+		txtNewBorrowContact.setBounds(124, 171, 150, 18);
+		register.add(txtNewBorrowContact);
+		txtNewBorrowContact.setColumns(10);
+		
+		JLabel lblEmail = new JLabel("Email");
+		lblEmail.setBounds(10, 199, 67, 12);
+		register.add(lblEmail);
+		
+		txtNewBorrowEmail = new JTextField();
+		txtNewBorrowEmail.setBounds(124, 196, 150, 18);
+		register.add(txtNewBorrowEmail);
+		txtNewBorrowEmail.setColumns(10);
+		
+		JButton btnMntUpdateCancel_1 = new JButton("Cancel");
+		btnMntUpdateCancel_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				displayDashboard();
+				
+			}
+		});
+		btnMntUpdateCancel_1.setBounds(0, 520, 274, 23);
+		register.add(btnMntUpdateCancel_1);
+		
+		JButton btnRegisterBorrower = new JButton("Register Borrower");
+		btnRegisterBorrower.setBounds(0, 495, 274, 23);
+		register.add(btnRegisterBorrower);
+		
+		JLabel lblBrwrType = new JLabel("Borrower Type");
+		lblBrwrType.setBounds(10, 93, 114, 12);
+		register.add(lblBrwrType);
+		
+		cmbNewBorrowType = new JComboBox<>();
+		cmbNewBorrowType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbNewBorrowType.setBounds(124, 89, 150, 20);
+		register.add(cmbNewBorrowType);
+		
+		JPanel delete = new JPanel();
+		borrowerManager.add(delete, "manageBorrower");
+		delete.setLayout(null);
+		
+		JSeparator sprtrBrwTop_2_1_1_1 = new JSeparator();
+		sprtrBrwTop_2_1_1_1.setBounds(20, 41, 264, 2);
+		delete.add(sprtrBrwTop_2_1_1_1);
+		
+		JLabel lblBorrowerManage = new JLabel("Manage Borrowers");
+		lblBorrowerManage.setHorizontalAlignment(SwingConstants.CENTER);
+		lblBorrowerManage.setFont(new Font("Trebuchet MS", Font.BOLD, 21));
+		lblBorrowerManage.setBounds(10, 10, 264, 30);
+		delete.add(lblBorrowerManage);
+		
+		JLabel lblBrwrFirstName_1 = new JLabel("First Name");
+		lblBrwrFirstName_1.setBounds(10, 85, 67, 12);
+		delete.add(lblBrwrFirstName_1);
+		
+		JLabel lblBrwrLastName_1 = new JLabel("Last Name");
+		lblBrwrLastName_1.setBounds(10, 110, 67, 12);
+		delete.add(lblBrwrLastName_1);
+		
+		JLabel lblBrwrType_1 = new JLabel("Borrower Type");
+		lblBrwrType_1.setBounds(10, 135, 114, 12);
+		delete.add(lblBrwrType_1);
+		
+		JLabel lblBrwrIDNumber_1 = new JLabel("ID Number");
+		lblBrwrIDNumber_1.setBounds(10, 163, 67, 12);
+		delete.add(lblBrwrIDNumber_1);
+		
+		JLabel lblBrwrDepartment_1 = new JLabel("Department / Grade");
+		lblBrwrDepartment_1.setBounds(10, 191, 114, 12);
+		delete.add(lblBrwrDepartment_1);
+		
+		JLabel lblContactNo_1 = new JLabel("Contact No.");
+		lblContactNo_1.setBounds(10, 216, 67, 12);
+		delete.add(lblContactNo_1);
+		
+		JLabel lblEmail_1 = new JLabel("Email");
+		lblEmail_1.setBounds(10, 241, 67, 12);
+		delete.add(lblEmail_1);
+		
+		txtMngBorrowerEmail = new JTextField();
+		txtMngBorrowerEmail.setColumns(10);
+		txtMngBorrowerEmail.setBounds(124, 238, 150, 18);
+		delete.add(txtMngBorrowerEmail);
+		
+		txtMngBorrowerContactNo = new JTextField();
+		txtMngBorrowerContactNo.setColumns(10);
+		txtMngBorrowerContactNo.setBounds(124, 213, 150, 18);
+		delete.add(txtMngBorrowerContactNo);
+		
+		txtMngBorrowerDept = new JTextField();
+		txtMngBorrowerDept.setColumns(10);
+		txtMngBorrowerDept.setBounds(124, 188, 150, 18);
+		delete.add(txtMngBorrowerDept);
+		
+		txtMngBorrowerID = new JTextField();
+		txtMngBorrowerID.setEditable(false);
+		txtMngBorrowerID.setColumns(10);
+		txtMngBorrowerID.setBounds(124, 160, 150, 18);
+		delete.add(txtMngBorrowerID);
+		
+		cmbMngBorrowerType = new JComboBox<String>();
+		cmbMngBorrowerType.setModel(new DefaultComboBoxModel<>(BORROWERTYPES));
+		cmbMngBorrowerType.setBounds(124, 131, 150, 20);
+		delete.add(cmbMngBorrowerType);
+		
+		txtMngBorrowerNameL = new JTextField();
+		txtMngBorrowerNameL.setEditable(false);
+		txtMngBorrowerNameL.setColumns(10);
+		txtMngBorrowerNameL.setBounds(124, 107, 150, 18);
+		delete.add(txtMngBorrowerNameL);
+		
+		txtMngBorrowerNameF = new JTextField();
+		txtMngBorrowerNameF.setEditable(false);
+		txtMngBorrowerNameF.setColumns(10);
+		txtMngBorrowerNameF.setBounds(124, 82, 150, 18);
+		delete.add(txtMngBorrowerNameF);
+		
+		JButton btnMntUpdateCancel_1_1 = new JButton("Cancel");
+		btnMntUpdateCancel_1_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				displayDashboard();
+				
+			}
+		});
+		btnMntUpdateCancel_1_1.setBounds(10, 513, 264, 23);
+		delete.add(btnMntUpdateCancel_1_1);
+		
+		JButton btnPublishEdit = new JButton("Publish Update");
+		btnPublishEdit.setBounds(10, 464, 264, 23);
+		delete.add(btnPublishEdit);
+		
+		JButton btnDeleteProfile = new JButton("Delete");
+		btnDeleteProfile.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				deleteBorrower();
+			}
+		});
+		btnDeleteProfile.setBounds(10, 487, 264, 23);
+		delete.add(btnDeleteProfile);
+		
+		txtMngBorrowerTransaction = new JTextField();
+		txtMngBorrowerTransaction.setColumns(10);
+		txtMngBorrowerTransaction.setBounds(124, 57, 75, 18);
+		delete.add(txtMngBorrowerTransaction);
+		
+		JLabel lblBrwrID = new JLabel("Borrower ID");
+		lblBrwrID.setBounds(10, 60, 67, 12);
+		delete.add(lblBrwrID);
+		
+		JButton btnNewButton = new JButton("Select");
+		btnNewButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				loadBorrower();
+			
+			}
+		});
+		btnNewButton.setBounds(209, 56, 67, 20);
+		delete.add(btnNewButton);
+		
+		JScrollPane scrlPaneBorrowerViewport = new JScrollPane();
+		scrlPaneBorrowerViewport.setBounds(315, 44, 1074, 509);
+		addBorrower.add(scrlPaneBorrowerViewport);
+		
+		tblBorrowers = new JTable();
+		scrlPaneBorrowerViewport.setViewportView(tblBorrowers);
+		tblBorrowers.setFillsViewportHeight(true);
+		btnRegisterBorrower.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+			
+				registerBorrower();
+			
+			}
+		});
+		
+		//frame.setVisible(true);
+		
+	}
+	
+
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// UNIVERSAL HELPER METHODS
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	
+	JPanel getPanel() {
+		return custodianDashboard;
+	}
+	
+	void setCurrentDate(int target) {
+		if(target == 0) txtDateBorrowed.setText(String.valueOf(LocalDate.now()));
+		else if (target == 1) txtMntDateReported.setText(String.valueOf(LocalDate.now()));
+		
+	}
+
+	public void initialiseDisplays() {
+		
+		loadPreviews();
+		displayInventoryValues();
+		displayBorrowRecords();
+		displayMaintenanceReports();
+		displayBorrowerList();
+	}
+	
+	void displayDashboard() {
+		card.show(cardContainer, "dashboard");
+		clearAllFields();
+		initialiseDisplays();
+	}
+	
+	void displayNewBorrow() {
+		card.show(cardContainer, "creation");
+		formCard.show(formCreator, "borrowForm");
+		refreshBorrowCreator();
+	}
+	
+	void displayUpdateBorrow() {
+		card.show(cardContainer, "updateBorrow");
+		
+	}
+	
+	void displayNewMaintenance() {
+		card.show(cardContainer, "creation");
+		formCard.show(formCreator, "maintenanceForm");
+		refreshMaintenanceCreator();
+	}
+	
+	void displayUpdateMaintenance() {
+		card.show(cardContainer, "updateMaintenance");
+		
+	}
+	
+	void displayBorrowerRegistration() {
+		card.show(cardContainer, "borrowerRegistration");
+		borrowManagingCard.show(borrowerManager, "registerBorrower");
+	}
+	
+	void displayManageBorrower() {
+		card.show(cardContainer, "borrowerRegistration");
+		borrowManagingCard.show(borrowerManager, "manageBorrower");
+	}
+	
+	void clearAllFields() {
+		/*
+			Clean this up tomorrow, future me - Paz
+		*/
+		txtAMntIssue.setText("");
+		txtAMntUpdIssueReported.setText("");
+		txtAMntUpdActionTaken.setText("");
+		txtBrwEquipID.setText("");
+		txtBrwEquipName.setText("");
+		txtBrwEquipTag.setText("");
+		txtBrwReturnByDate.setText("");
+		txtDateBorrowed.setText("");
+		txtBrwEquipCondition.setText("");
+
+		txtMntEquipID.setText("");
+		txtMntEquipName.setText("");
+		txtMntEquipCondition.setText("");
+		txtMntEquipTag.setText("");
+		txtMntDateReported.setText("");
+		txtbrwSearchBar.setText("");
+		
+		txtTransactionID.setText("");;
+		txtUpdBorrowerID.setText("");
+		txtUpdBorrowedEquip.setText("");
+		txtBorrowDate.setText("");
+		txtUpdCustodian.setText("");
+		txtUpdCondOnBorrow.setText("");
+		txtExpectedReturnDate.setText("");
+		txtDateReturned.setText("");
+		txtBrwEquipAvail.setText("");
+		
+		txtUpdMntSearch.setText("");
+		txtMntCost.setText("");
+		txtMntUpdTransactionID.setText("");
+		txtMntUpdReport.setText("");
+		txtMntUpdDate.setText("");
+		txtMntUpdEquipID.setText("");
+	}
+	
+	void loadPreviews() {
+		
+		BorrowPreview();
+		MaintenancePreview();
+		
+	}
+	
+	
+	void BorrowPreview() {
+
+		String[][] list;
+		
+		try {
+			list = backend.getBorrowPreview();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		borrowPreview = new DefaultTableModel(list.length, 3) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		borrowPreview.setColumnIdentifiers(new String[] {
+				"ID", "Equipment ID", "Status"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				borrowPreview.setValueAt(list[r][c], r, c);
+		
+		tblBorrowPreview.setModel(borrowPreview);
+		tblBorrowPreview.getTableHeader().setReorderingAllowed(false);
+		
+	}
+	
+	void MaintenancePreview() {
+
+		String[][] list;
+		
+		try {
+			list = backend.getMaintenancePreview();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		maintenancePreview = new DefaultTableModel(list.length, 3) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		maintenancePreview.setColumnIdentifiers(new String[] {
+				"ID", "Equipment ID", "Status"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				maintenancePreview.setValueAt(list[r][c], r, c);
+		
+		tblMaintenancePreview.setModel(maintenancePreview);
+		tblMaintenancePreview.getTableHeader().setReorderingAllowed(false);
+		
+	}
+	
+	
+	// ----------------------------------------------------------------------------------------------------------------------
+	
+	
+	void displayBorrowRecords() {
+		
+		parent.log(true, "Fetching Records from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getBorrowedRecordsList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		borrowList = new DefaultTableModel(list.length, 11) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       return false;
+			    }	
+		};
+		borrowList.setColumnIdentifiers(new String[] {
+				"ID", "Borrower", "Equipment", "Borrow Date", "Return By", "Date Returned", "Processed By", "Cond. On Borrow", "Cond. On Return", "Status", "Remarks"
+			});
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				borrowList.setValueAt(list[r][c], r, c);
+		
+		tblborrowRecord.setModel(borrowList);
+		borrowRecordSorter.setModel(borrowList);
+		tblborrowRecord.setRowSorter(borrowRecordSorter);
+		tblborrowRecord.getTableHeader().setReorderingAllowed(false);
+		tblborrowRecord.getTableHeader().setResizingAllowed(false);
+		
+		parent.log(true, "Record fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Borrow Record View Update completed successfully.");
+		
+		
+	}
+	
+	void displayInventoryValues() {
+		
+		parent.log(true, "Fetching Inventory from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getEquipmentList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		query = new DefaultTableModel(list.length, 13) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		query.setColumnIdentifiers(new String[] {
+				"ID", "Property Tag", "Name", "Category", "Brand Model", "Serial Number", "Description", "RoomID", "Purchase Date", "Purchase Cost", "Condition", "Availability", "Date Added"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				query.setValueAt(list[r][c], r, c);
+		
+		searchResult.setModel(query);
+		inventorySorter.setModel(query);
+		searchResult.setRowSorter(inventorySorter);
+		searchResult.getTableHeader().setReorderingAllowed(false);
+		searchResult.getTableHeader().setResizingAllowed(false);
+		
+		parent.log(true, "Inventory fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Inventory View Update completed successfully.");
+		
+	}
+	
+	
+	void displayMaintenanceReports() {
+		
+		parent.log(true, "Fetching Reports from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getMaintenanceReportsList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		reportList = new DefaultTableModel(list.length, 8) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		reportList.setColumnIdentifiers(new String[] {
+				"ID", "Equipment ID", "Reported Date", "Custodian ID", "Issue Description", "Action Taken", "Cost", "Status"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				reportList.setValueAt(list[r][c], r, c);
+		
+		tblUpdReport.setModel(reportList);
+		maintenanceSorter.setModel(reportList);
+		tblUpdReport.setRowSorter(maintenanceSorter);
+		tblUpdReport.getTableHeader().setReorderingAllowed(false);
+		tblUpdReport.getTableHeader().setResizingAllowed(false);
+		parent.log(true, "Inventory fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Inventory View Update completed successfully.");
+		
+	}
+	
+	void displayBorrowerList( ) {
+		
+		parent.log(true, "Fetching Borrower List from Database...");
+		
+		String[][] list;
+			
+		try {
+			list = backend.getRegisteredBorrowersList();
+			}
+		catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+			
+		registeredUserList = new DefaultTableModel(list.length, 8) {
+			  @Override
+			    public boolean isCellEditable(int row, int column) {
+			       //all cells false
+			       return false;
+			    }	
+		};
+		registeredUserList.setColumnIdentifiers(new String[] {
+				"ID", "First Name", "Last Name	", "Borrower Type", "ID Number", "Department/Grade", "Contact No.", "Email"
+			});
+		
+		for(int r = 0; r < list.length; r++)
+			for (int c = 0; c < list[r].length; c++)
+				registeredUserList.setValueAt(list[r][c], r, c);
+		
+		tblBorrowers.setModel(registeredUserList);
+		//inventorySorter.setModel(query);
+		//tblBorrowers.setRowSorter(inventorySorter);
+		tblBorrowers.getTableHeader().setReorderingAllowed(false);
+		tblBorrowers.getTableHeader().setResizingAllowed(false);
+		
+		parent.log(true, "Borrower List fetch successful. Now Displaying Inventory.");
+		parent.log(true, "Borrower List View Update completed successfully.");
+		
+	}
+	
+	void refreshBorrowCreator() {
+		
+		displayInventoryValues();
+		UpdateFilterBox();
+		loadBorrowers();
+		setCurrentDate(0);
+		
+	}
+	
+	void refreshMaintenanceCreator() {
+		displayInventoryValues();
+		UpdateFilterBox();
+		setCurrentDate(1);
+	}
+	
+	void UpdateFilterBox() {
+		parent.log(true, "Updating Inventory Categories...");
+		String[] values;
+		
+		try {
+			values = backend.getInventoryFilters();
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		cmbCategoryModel.removeAllElements();
+		cmbCategoryModel.addElement("[Category]");
+		for (int i = 0; i < values.length; i++)
+		{
+			cmbCategoryModel.addElement(values[i]);
+
+			System.out.print(values[i] + " ");
+		}
+		
+		parent.log(true, "Categories Updated successfully.");
+		
+	}
+	
+	boolean LoadRecord() {
+		int id;
+		
+		try {
+			id = Integer.parseInt(txtTransactionID.getText().trim());
+		} catch (NumberFormatException e) {
+			
+			parent.log(false, "ID field is empty.");
+			return false;
+		}
+		try {
+			loadedRecord = backend.fetchBorrowRecord(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return false;
+		}
+		
+		
+		
+		borrowUpdateLoadValues(String.valueOf(loadedRecord.custodian()), String.valueOf(loadedRecord.borrowerID()),
+				String.valueOf(loadedRecord.equipmentID()), String.valueOf(loadedRecord.dateBorrowed()), String.valueOf(loadedRecord.returbByDate()), String.valueOf(loadedRecord.dateReturned()), 
+				String.valueOf(loadedRecord.conditionOnBorrow()), String.valueOf(loadedRecord.conditionOnReturn()), String.valueOf(loadedRecord.status()));
+		return true;
+	}
+	
+	void borrowUpdateLoadValues(String custodianID, String borrowerID, String equipmentID, String dateBorrowed, String returnByDate, String dateReturned, String conditionOnBorrow, String conditonOnReturn, String status) {
+		txtUpdCustodian.setText(custodianID);
+		txtUpdBorrowerID.setText(borrowerID);
+		txtUpdBorrowedEquip.setText(equipmentID);
+		txtBorrowDate.setText(dateBorrowed);
+		txtUpdCondOnBorrow.setText(conditionOnBorrow);
+		if(returnByDate != null && !returnByDate.equals("null")) txtExpectedReturnDate.setText(returnByDate);
+		if(dateReturned != null && !dateReturned.equals("null")) txtDateReturned.setText(dateReturned);
+		cmbCondOnReturn.setSelectedItem(conditonOnReturn);
+		
+		if(status.equals("Returned")) {
+			txtDateReturned.setEditable(false);
+			cmbCondOnReturn.setEnabled(false);
+		} else {
+			txtDateReturned.setEditable(true);
+			cmbCondOnReturn.setEnabled(true);
+			
+		}
+		
+		
+	}
+	
+
+	
+	boolean loadItem(int target) {
+		int id;
+		JTextField targetField;
+		if(target == 0) targetField = txtBrwEquipID;
+		else targetField = txtMntEquipID;
+		
+		try {
+		id = Integer.parseInt(targetField.getText().trim());
+		} catch(NumberFormatException e) {
+			
+			parent.log(false, "Equipment field is empty.");
+			return false;
+		}
+		
+		try {
+			loadedEquip = backend.fetchEquipmentDetails(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return false;
+		}
+		
+		boolean isAvailable;
+		
+		switch(target) {
+		default:
+		case 0: isAvailable = backend.isItemAvailable(id);  break;
+		case 1: isAvailable = backend.isItemAvailable(id);  break;
+		
+		}
+		if(!isAvailable) {
+			parent.log(false, "Equipment is Under Maintenance and thus cannot accessed at the moment.");
+			return false;
+		}
+		
+		switch(target) {
+		case 0: borrowLoadValues(loadedEquip.equipmentName(), loadedEquip.propertyTag(), loadedEquip.condition(), loadedEquip.availability()); break;
+		case 1: maintenanceLoadValues(loadedEquip.equipmentName(), loadedEquip.propertyTag(), loadedEquip.condition(), loadedEquip.availability()); break;
+		}
+		parent.log(true, "Target Equipment Loaded successfully.");
+		return true;
+	}
+	
+	void maintenanceLoadValues(String name, String tag, String condition, String availability) {
+		txtMntEquipName.setText(name);
+		txtMntEquipTag.setText(tag);
+		txtMntEquipCondition.setText(condition);
+		
+		
+		
+	}
+	
+	void borrowLoadValues(String name, String tag, String condition, String availability) {
+		txtBrwEquipName.setText(name);
+		txtBrwEquipTag.setText(tag);
+		txtBrwEquipCondition.setText(condition);
+		txtBrwEquipAvail.setText(availability);
+		
+	}
+	
+	boolean loadBorrower() {
+		int id;
+		
+		try {
+			id = Integer.parseInt(txtMngBorrowerTransaction.getText().trim());
+		} catch (NumberFormatException e) {
+			
+			parent.log(false, "ID field is empty.");
+			return false;
+		}
+		try {
+			loadedProfile = backend.fetchBorrowerProfile(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return false;
+		}
+		
+		BorrowerLoadValues(String.valueOf(loadedProfile.borrowerID()), loadedProfile.firstName(), loadedProfile.lastName(), loadedProfile.BorrowType(),
+				loadedProfile.idNumber(), loadedProfile.deptOrGrade(), loadedProfile.contactNo(), loadedProfile.email());
+		
+		return true;
+	}
+	
+	void BorrowerLoadValues(String borrowerID,
+							String firstName, String lastName, String borrowType, String id, String dept, String contact, String email) {
+		txtMngBorrowerNameF.setText(firstName);
+		txtMngBorrowerNameL.setText(lastName);
+		cmbMngBorrowerType.setSelectedItem(borrowType);
+		txtMngBorrowerID.setText(id);
+		txtMngBorrowerDept.setText(dept);
+		txtMngBorrowerContactNo.setText(contact);
+		txtMngBorrowerEmail.setText(email);
+	}
+	
+	void loadBorrowers() {
+		parent.log(true, "Updating Borrower List...");
+		BorrowerList list;
+		try { 
+			list = backend.fetchBorrowers();
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		String[] values = list.borrower();
+		borrowerIDs = list.borrowerID();
+		
+		cmbBorrowerModel.removeAllElements();
+		cmbBorrowerModel.addElement("[Borrower]");
+		for (int i = 0; i < values.length; i++)
+		{
+			cmbBorrowerModel.addElement(values[i]);
+
+			System.out.print(values[i] + " ");
+		}
+		
+		parent.log(true, "Borrower List Updated successfully.");
+	}
+	
+	
+	boolean LoadReport() {
+	int id;
+		
+		try {
+			id = Integer.parseInt(txtMntUpdTransactionID.getText().trim());
+		} catch (NumberFormatException e) {
+			
+			parent.log(false, "ID field is empty.");
+			return false;
+		}
+		try {
+			loadedReport = backend.fetchMaintenanceReport(id);
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return false;
+		}
+		
+		
+		
+		maintenanceUpdateLoadValues(String.valueOf(loadedReport.equipmentID()), String.valueOf(loadedReport.reportedDate()), String.valueOf(loadedReport.custodian()), loadedReport.issueReport(), loadedReport.status());
+		return true;
+		
+		
+	}
+	
+	void maintenanceUpdateLoadValues(String equipID, String reportDay, String custodian, String issue, String status) {
+		
+		txtMntUpdEquipID.setText(equipID);
+		txtMntUpdDate.setText(reportDay);
+		txtMntUpdReport.setText(custodian);
+		txtAMntUpdIssueReported.setText(issue);
+	}
+	
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// CREATE, UPDATE AND DELETE
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	void deleteBorrower() {
+		int id;
+		try { id = Integer.parseInt(txtMngBorrowerTransaction.getText().trim()); } catch(NumberFormatException e) {
+			parent.log(false, "Invalid ID format for ID field.");
+			return;
+		}
+		
+		// TODO : ADD USER CONFIRMATION
+		boolean result;
+		
+		try {
+		result = backend.deleteBorrowerProfile(id);
+		} catch(SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "Borrower Profile successfully deleted.");
+	}
+	
+	
+	void updateBorrower() {
+		boolean loadBorrower = loadBorrower();
+		
+		if(!loadBorrower) {
+			parent.log(false, "No Borrower Selected.");
+			return;
+		}
+		
+		String[] rawProfile = new String[] {
+				txtMngBorrowerNameF.getText().trim(),
+				txtMngBorrowerNameL.getText().trim(),
+				cmbMngBorrowerType.getSelectedItem().toString().trim(),
+				txtMngBorrowerID.getText().trim(),
+				txtMngBorrowerDept.getText().trim(),
+				txtMngBorrowerContactNo.getText().trim(),
+				txtMngBorrowerEmail.getText().trim()
+				};
+		
+		if (!mailValidator.validate(rawProfile[6])) {
+			parent.log(false, "Invalid Email Format.");
+			return;
+		}
+		
+		if((rawProfile[6].length() < 9 || rawProfile[6].length() > 11)) {
+			parent.log(false, "Invalid Contanct Number Format.");
+			return;
+		}
+		
+		boolean result;
+		
+		try {
+			
+			result = backend.RegisterBorrower(rawProfile);
+			
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "New Borrower successfully registered.");
+		
+	}
+	
+	void registerBorrower() {
+		String[] rawProfile = new String[] {
+		txtNewBorrowNameF.getText().trim(),
+		txtNewBorrowNameL.getText().trim(),
+		cmbNewBorrowType.getSelectedItem().toString().trim(),
+		txtNewBorrowID.getText().trim(),
+		txtNewBorrowDept.getText().trim(),
+		txtNewBorrowContact.getText().trim(),
+		txtNewBorrowEmail.getText().trim()
+		};
+		
+		if (!mailValidator.validate(rawProfile[6])) {
+			parent.log(false, "Invalid Email Format.");
+			return;
+		}
+		
+		if((rawProfile[6].length() < 9 || rawProfile[6].length() > 11)) {
+			parent.log(false, "Invalid Contanct Number Format.");
+			return;
+		}
+		
+		boolean result;
+		
+		try {
+			
+			result = backend.RegisterBorrower(rawProfile);
+			
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "New Borrower successfully registered.");
+	}
+	
+	
+	void updateBorrowRecord() {
+		boolean loadRecord = LoadRecord();
+		
+		if(!loadRecord) {
+			parent.log(false, "No Equipment selected.");
+			return;
+		}
+		
+		boolean verify;
+		try { verify = verifyRecordIntegrity(loadedRecord.equipmentID()); } catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(!verify) {
+			parent.log(false, "The equipment related to this transaction has already been returned.");
+			return;
+		}
+		
+		if(loadedRecord.status().equals("Returned")) {
+			parent.log(false, "Returned Equipment transactions cannot be edited.");
+			return;
+		}
+		
+		String
+		custodian = txtUpdCustodian.getText().trim(),
+		borrowerID = txtUpdBorrowerID.getText().trim(),
+		equipID = txtUpdBorrowedEquip.getText().trim(),
+		dateBorrowed = txtBorrowDate.getText().trim(),
+		condOnBorrow = txtUpdCondOnBorrow.getText().trim(),
+		returnByDate = txtExpectedReturnDate.getText().trim(),
+		dateReturned = txtDateReturned.getText().trim(),
+		conditionOnReturn = cmbCondOnReturn.getSelectedItem().toString();
+		
+		
+		
+		boolean result;
+		try {
+			result = backend.UpdateRecord(borrowerID, equipID, dateBorrowed, returnByDate, dateReturned, custodian, condOnBorrow, conditionOnReturn, "Returned", loadedRecord.transactionID());
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(true, "Borrow Record sucessfully updated.");
+		initialiseDisplays();
+	}
+	
+	boolean verifyRecordIntegrity(int ID) throws SPEARException {
+		EquipmentDetails equip = backend.fetchEquipmentDetails(ID);
+		System.out.println(equip.availability());
+		if(equip.availability().equals("Borrowed")) return true;
+		
+		return false;
+	}
+	
+	
+	/* Record Constructor Paremetres:
+	 * int borrowerID,
+		int equipmentID,
+		String dateBorrowed,
+		String returbByDate,
+		String dateReturned,
+		int custodian,
+		String conditionOnBorrow,
+		String conditionOnReturn
+	 */
+	void createBorrowRecord() {
+		boolean loadItem = loadItem(0);
+		
+		if(!loadItem)
+			return;
+		
+		
+		String
+		borrowerID = String.valueOf(getSelectedBorrower()),
+		equipID = txtBrwEquipID.getText(),
+		dateBorrowed = txtDateBorrowed.getText().trim(),
+		returnByDate = txtBrwReturnByDate.getText().trim(),
+		custodian = String.valueOf(parent.getSessionID()),
+		conditionOnBorrow = txtBrwEquipCondition.getText().trim();
+		
+		boolean result;
+		
+		try {
+			result = backend.CreateRecord(borrowerID, equipID, dateBorrowed, returnByDate, null, custodian, conditionOnBorrow, null, "Borrowed");
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(result, "Borrow Record successfully published to Database.");
+		initialiseDisplays();
+	}
+	
+	Integer getSelectedBorrower() {
+		int val = cmbBorrowerName.getSelectedIndex() - 1;
+		if(val < 0) return -1;
+		else return borrowerIDs[val];
+	}
+	
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// MAINTENANCE CREATION METHODS
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	void updateMaintenanceReport() {
+		boolean loadReport = LoadReport();
+		
+		if(!loadReport)
+			return;
+		
+		
+		boolean verify;
+		try { verify = verifyReportIntegrity(loadedReport.equipmentID()); } catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(verify) {
+			parent.log(false, "The equipment related to this report is no longer under maintenance.");
+			return;
+		}
+		
+		String
+		equipID = txtMntUpdEquipID.getText(),
+		dateReported = txtMntUpdDate.getText().trim(),
+		custodian = String.valueOf(parent.getSessionID()),
+		issue = txtAMntUpdIssueReported.getText(),
+		action = txtAMntUpdActionTaken.getText(),
+		cost = txtMntCost.getText();
+		
+		boolean result;
+		try {
+			result = backend.UpdateReport(equipID, dateReported, custodian, issue, action, cost, "Resolved", loadedReport.maintenanceID());
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
+		initialiseDisplays();
+	}
+	
+	
+	
+	/* Report Constructor Parametres:
+	 		int equipmentID,
+			Date reportedDate,
+			int custodian,
+			String issueReport,
+			String actionsTaken,
+			double cost,
+			String status
+	 * */
+	 
+	void createMaintenanceReport() {
+		boolean loadItem = loadItem(1);
+		
+		if(!loadItem) {
+			parent.log(false, "No Equipment selected.");
+			return;
+		}
+		String
+		equipID = txtMntEquipID.getText(),
+		dateReported = txtMntDateReported.getText().trim(),
+		custodian = String.valueOf(parent.getSessionID()),
+		issue = txtAMntIssue.getText() ;
+//		action = txtAMntActionTaken.getText(),
+//		cost = txtMntCost.getText();
+		
+		boolean result;
+		try {
+			result = backend.CreateReport(equipID, dateReported, custodian, issue, null, null, "In Progress");
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+			return;
+		}
+		
+		if(result) parent.log(result, "Maintenance Report successfully published to Database.");
+		initialiseDisplays();
+	}
+	
+	boolean verifyReportIntegrity(int ID) throws SPEARException {
+		EquipmentDetails equip = backend.fetchEquipmentDetails(ID);
+		System.out.println(equip.availability());
+		if(!equip.availability().equals("Maintenance")) return true;
+		
+		return false;
+	
+	}
+}
