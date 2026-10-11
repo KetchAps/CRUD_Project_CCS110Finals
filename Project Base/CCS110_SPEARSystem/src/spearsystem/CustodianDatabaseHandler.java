@@ -934,4 +934,88 @@ public class CustodianDatabaseHandler {
 		
 	}
 
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// DASHBOARD
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	/* returns { active borrowing, pending returns, maintenance reports, overdue items }
+	 * active borrowing = every transaction still marked 'Borrowed'
+	 * pending returns  = borrowed and not yet past its expected return date
+	 * overdue items    = borrowed and past its expected return date
+	 * maintenance      = reports that are still 'In Progress'
+	 */
+	public int[] getDashboardCounts() {
+		
+		try(Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("SELECT COALESCE(SUM(status = 'Borrowed'), 0), "
+					+ "COALESCE(SUM(status = 'Borrowed' AND expectedReturnDate >= CURDATE()), 0), "
+					+ "COALESCE(SUM(status = 'Borrowed' AND expectedReturnDate < CURDATE()), 0) FROM borrow_transaction");
+			PreparedStatement mnt = conn.prepareStatement("SELECT COUNT(*) FROM maintenance_records WHERE maintenanceStatus = 'In Progress'")) {
+			int[] counts = new int[4];
+			
+			try
+			(ResultSet rs = st.executeQuery())
+					{
+				if(rs.next()) {
+					counts[0] = rs.getInt(1);
+					counts[1] = rs.getInt(2);
+					counts[3] = rs.getInt(3);
+				}
+			}
+			
+			try
+			(ResultSet rs = mnt.executeQuery())
+					{
+				if(rs.next()) counts[2] = rs.getInt(1);
+			}
+			
+			return counts;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			
+			return null;
+		}
+	}
+	
+	// username of the logged in custodian / admin, null if the ID does not exist
+	public String fetchUsername(int id) {
+		
+		try (Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("select username from userAccounts WHERE userID = ?")) {
+			
+			st.setInt(1, id);
+			
+			try (ResultSet rs = st.executeQuery();) {
+				if(rs.next()) return rs.getString(1);
+				else return null;
+			}
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	// true only if the account is flagged as an administrator
+	public boolean checkAdminAccount(int id) {
+		
+		try (Connection conn = ConnectionHandler.tryConnect();
+			PreparedStatement st = conn.prepareStatement("select userID from userAccounts WHERE userID = ? AND isAdmin = true")) {
+			
+			st.setInt(1, id);
+			
+			try (ResultSet rs = st.executeQuery();) {
+				if(rs.next()) return true;
+				else return false;
+			}
+			
+		} catch (SQLException e) {
+			
+			e.printStackTrace();
+			return false;
+		}
+	}
+
 }

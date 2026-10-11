@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.ImageIcon;
@@ -157,6 +158,14 @@ public class CustodianDashboard {
 	
 	private JLabel lblCreationTitle;
 	private JLabel lblBorrowerTitle;
+	
+	// main dashboard (live values)
+	private JLabel lblUsernameDashboard;
+	private JLabel lblActiveBorrowingCounter;
+	private JLabel lblPendingReturnsCounter;
+	private JLabel lblMaintenanceReportsCounter;
+	private JLabel lblOverdueItemsCounter;
+	private ButtonOne btnDashGoBack; // only usable by administrators
 	
 	private TableRowSorter<DefaultTableModel> inventorySorter = new TableRowSorter<>(query);
 	private RowFilter<DefaultTableModel, Integer> inventoryRF = new RowFilter<>() {
@@ -675,22 +684,28 @@ public class CustodianDashboard {
 		main.setLayout(null);
 		
 		JPanel borrowTablePreview = new JPanel();
-		borrowTablePreview.setBounds(293, 11, 344, 544);
+		borrowTablePreview.setBounds(293, 275, 478, 342);
 		main.add(borrowTablePreview);
 		borrowTablePreview.setLayout(null);
 		
 		JScrollPane brwPreviewViewport = new JScrollPane();
-		brwPreviewViewport.setBounds(10, 10, 324, 523);
+		brwPreviewViewport.setBounds(10, 49, 458, 484);
 		borrowTablePreview.add(brwPreviewViewport);
 		
 		tblBorrowPreview = new JTable();
 		tblBorrowPreview.setFillsViewportHeight(true);
 		brwPreviewViewport.setViewportView(tblBorrowPreview);
 		
+		JLabel lblRecentBorrowRecords = new JLabel("Recent Borrow Records");
+		lblRecentBorrowRecords.setForeground(new Color(30, 144, 255));
+		lblRecentBorrowRecords.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblRecentBorrowRecords.setBounds(95, 11, 287, 27);
+		borrowTablePreview.add(lblRecentBorrowRecords);
+		
 		JPanel sideBar = new JPanel();
 		sideBar.setBackground(new Color(240, 255, 240));
 		sideBar.setForeground(new Color(0, 0, 255));
-		sideBar.setBounds(0, 0, 283, 566);
+		sideBar.setBounds(0, 0, 283, 628);
 		main.add(sideBar);
 		sideBar.setLayout(null);
 		
@@ -782,6 +797,13 @@ public class CustodianDashboard {
 		separator_2.setBounds(27, 85, 225, 2);
 		sideBar.add(separator_2);
 		
+		btnDashGoBack = new ButtonOne(new Color(255, 127, 80), new Color(230, 100, 60));
+		btnDashGoBack.setText("Go Back");
+		btnDashGoBack.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
+		btnDashGoBack.addActionListener(e -> { goBackToAdmin(); });
+		btnDashGoBack.setBounds(28, 513, 224, 45);
+		sideBar.add(btnDashGoBack);
+		
 		JSeparator separator = new JSeparator();
 		separator.setBounds(10, 54, 1380, 2);
 		custodianDashboard.add(separator);
@@ -790,25 +812,107 @@ public class CustodianDashboard {
 		
 		JPanel borrowTablePreview_1 = new JPanel();
 		borrowTablePreview_1.setLayout(null);
-		borrowTablePreview_1.setBounds(656, 11, 344, 544);
+		borrowTablePreview_1.setBounds(781, 275, 482, 342);
 		main.add(borrowTablePreview_1);
 		
 		JScrollPane brwPreviewViewport_1 = new JScrollPane();
-		brwPreviewViewport_1.setBounds(10, 10, 324, 523);
+		brwPreviewViewport_1.setBounds(10, 49, 475, 484);
 		borrowTablePreview_1.add(brwPreviewViewport_1);
 		
 		tblMaintenancePreview = new JTable();
 		brwPreviewViewport_1.setViewportView(tblMaintenancePreview);
 		tblMaintenancePreview.setFillsViewportHeight(true);
 		
-		JPanel borrowTablePreview_1_1 = new JPanel();
-		borrowTablePreview_1_1.setLayout(null);
-		borrowTablePreview_1_1.setBounds(1017, 11, 344, 544);
-		main.add(borrowTablePreview_1_1);
+		JLabel lblMaintenance = new JLabel("Maintenance");
+		lblMaintenance.setForeground(new Color(30, 144, 255));
+		lblMaintenance.setFont(new Font("Segoe UI Black", Font.PLAIN, 25));
+		lblMaintenance.setBounds(161, 11, 159, 27);
+		borrowTablePreview_1.add(lblMaintenance);
 		
-		JScrollPane brwPreviewViewport_1_1 = new JScrollPane();
-		brwPreviewViewport_1_1.setBounds(10, 10, 324, 523);
-		borrowTablePreview_1_1.add(brwPreviewViewport_1_1);
+		JPanel activeBorrowedPanel = new JPanel();
+		activeBorrowedPanel.setLayout(null);
+		activeBorrowedPanel.setBounds(293, 123, 234, 141);
+		main.add(activeBorrowedPanel);
+		
+		JLabel lblActiveBorrowing = new JLabel("Active Borrowing");
+		lblActiveBorrowing.setForeground(new Color(30, 144, 255));
+		lblActiveBorrowing.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblActiveBorrowing.setBounds(43, 11, 131, 27);
+		activeBorrowedPanel.add(lblActiveBorrowing);
+		
+		lblActiveBorrowingCounter = new JLabel("00");
+		lblActiveBorrowingCounter.setForeground(new Color(30, 144, 255));
+		lblActiveBorrowingCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblActiveBorrowingCounter.setBounds(81, 49, 72, 62);
+		activeBorrowedPanel.add(lblActiveBorrowingCounter);
+		
+		JPanel pendingReturnPanel = new JPanel();
+		pendingReturnPanel.setLayout(null);
+		pendingReturnPanel.setBounds(537, 123, 234, 141);
+		main.add(pendingReturnPanel);
+		
+		JLabel lblPendingReturns = new JLabel("Pending Returns");
+		lblPendingReturns.setForeground(new Color(30, 144, 255));
+		lblPendingReturns.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblPendingReturns.setBounds(56, 11, 121, 27);
+		pendingReturnPanel.add(lblPendingReturns);
+		
+		lblPendingReturnsCounter = new JLabel("00");
+		lblPendingReturnsCounter.setForeground(new Color(30, 144, 255));
+		lblPendingReturnsCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblPendingReturnsCounter.setBounds(81, 49, 72, 62);
+		pendingReturnPanel.add(lblPendingReturnsCounter);
+		
+		JPanel maintenanceReportPanel = new JPanel();
+		maintenanceReportPanel.setLayout(null);
+		maintenanceReportPanel.setBounds(781, 123, 234, 141);
+		main.add(maintenanceReportPanel);
+		
+		JLabel lblMaintenanceReports = new JLabel("Maintenance Reports");
+		lblMaintenanceReports.setForeground(new Color(30, 144, 255));
+		lblMaintenanceReports.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblMaintenanceReports.setBounds(40, 11, 154, 27);
+		maintenanceReportPanel.add(lblMaintenanceReports);
+		
+		lblMaintenanceReportsCounter = new JLabel("00");
+		lblMaintenanceReportsCounter.setForeground(new Color(30, 144, 255));
+		lblMaintenanceReportsCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblMaintenanceReportsCounter.setBounds(81, 49, 72, 62);
+		maintenanceReportPanel.add(lblMaintenanceReportsCounter);
+		
+		JPanel overdueItemsPanel = new JPanel();
+		overdueItemsPanel.setLayout(null);
+		overdueItemsPanel.setBounds(1029, 123, 234, 141);
+		main.add(overdueItemsPanel);
+		
+		JLabel lblOverdueItems = new JLabel("Overdue Items");
+		lblOverdueItems.setForeground(new Color(30, 144, 255));
+		lblOverdueItems.setFont(new Font("Segoe UI Black", Font.PLAIN, 15));
+		lblOverdueItems.setBounds(62, 11, 110, 27);
+		overdueItemsPanel.add(lblOverdueItems);
+		
+		lblOverdueItemsCounter = new JLabel("00");
+		lblOverdueItemsCounter.setForeground(new Color(30, 144, 255));
+		lblOverdueItemsCounter.setFont(new Font("Segoe UI Black", Font.PLAIN, 60));
+		lblOverdueItemsCounter.setBounds(81, 49, 72, 62);
+		overdueItemsPanel.add(lblOverdueItemsCounter);
+		
+		JPanel greet = new JPanel();
+		greet.setLayout(null);
+		greet.setBounds(293, 0, 987, 112);
+		main.add(greet);
+		
+		lblUsernameDashboard = new JLabel("Good Evening!");
+		lblUsernameDashboard.setForeground(new Color(30, 144, 255));
+		lblUsernameDashboard.setFont(new Font("Segoe UI Black", Font.PLAIN, 35));
+		lblUsernameDashboard.setBounds(10, 11, 554, 62);
+		greet.add(lblUsernameDashboard);
+		
+		JLabel lblDescription = new JLabel("Here's an overview of the school's property and equipment.");
+		lblDescription.setForeground(new Color(30, 144, 255));
+		lblDescription.setFont(new Font("Segoe UI Semibold", Font.PLAIN, 20));
+		lblDescription.setBounds(10, 65, 554, 27);
+		greet.add(lblDescription);
 		cardContainer.add(borrowFormCreation, "creation");
 		
 		formCreator.add(createBorrow, "borrowForm");
@@ -1635,11 +1739,62 @@ public class CustodianDashboard {
 
 	public void initialiseDisplays() {
 		
+		loadDashboardStats();
 		loadPreviews();
 		displayInventoryValues();
 		displayBorrowRecords();
 		displayMaintenanceReports();
 		displayBorrowerList();
+	}
+	
+	//---------------------------------------------------------------------------------------------------------------------------------
+	// MAIN DASHBOARD (greeting, counters, Go Back)
+	//---------------------------------------------------------------------------------------------------------------------------------
+	
+	void loadDashboardStats() {
+		
+		int session = parent.getSessionID();
+		
+		// Greeting
+		String greeting;
+		int hour = LocalTime.now().getHour();
+		if(hour < 12) greeting = "Good Morning";
+		else if(hour < 18) greeting = "Good Afternoon";
+		else greeting = "Good Evening";
+		
+		try {
+			lblUsernameDashboard.setText(greeting + ", " + backend.getUsername(session) + "!");
+		} catch (SPEARException e) {
+			lblUsernameDashboard.setText(greeting + "!");
+			parent.log(false, e.getMessage());
+		}
+		
+		// Counters
+		try {
+			int[] counts = backend.getDashboardCounts();
+			
+			lblActiveBorrowingCounter.setText(String.format("%02d", counts[0]));
+			lblPendingReturnsCounter.setText(String.format("%02d", counts[1]));
+			lblMaintenanceReportsCounter.setText(String.format("%02d", counts[2]));
+			lblOverdueItemsCounter.setText(String.format("%02d", counts[3]));
+		} catch (SPEARException e) {
+			parent.log(false, e.getMessage());
+		}
+		
+		// Go Back is only for administrators, it stays disabled for custodians
+		btnDashGoBack.setVisible(true);
+		btnDashGoBack.setEnabled(backend.isAdmin(session));
+	}
+	
+	void goBackToAdmin() {
+		
+		// checked again here so a custodian can never trigger it
+		if(!backend.isAdmin(parent.getSessionID())) {
+			parent.log(false, "Only administrators can go back to the Admin Dashboard.");
+			return;
+		}
+		
+		parent.displayAdmin();
 	}
 	
 	void displayDashboard() {

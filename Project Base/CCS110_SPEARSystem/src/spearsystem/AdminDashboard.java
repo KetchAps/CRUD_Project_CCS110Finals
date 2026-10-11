@@ -198,6 +198,9 @@ public class AdminDashboard {
 		btnBorrowManager.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnBorrowManager.setBounds(24, 389, 225, 55);
 		sidebarMain.add(btnBorrowManager);
+		btnBorrowManager.addActionListener(e -> {
+			parent.displayCustodian();
+		});
 
 		JLabel lblBorrowManagement = new JLabel("Borrow Manager");
 		lblBorrowManagement.setForeground(new Color(30, 144, 255));
@@ -215,6 +218,9 @@ public class AdminDashboard {
 		btnMaintenanceManager.setFont(new Font("Segoe UI Semibold", Font.BOLD, 15));
 		btnMaintenanceManager.setBounds(24, 510, 225, 55);
 		sidebarMain.add(btnMaintenanceManager);
+		btnMaintenanceManager.addActionListener(e -> {
+			parent.displayCustodian();
+		});
 
 		JLabel lblMaintenanceManagement = new JLabel("Maintenance Manager");
 		lblMaintenanceManagement.setForeground(new Color(30, 144, 255));
