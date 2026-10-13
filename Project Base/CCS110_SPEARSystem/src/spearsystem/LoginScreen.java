@@ -81,7 +81,6 @@ public class LoginScreen {
 	}
 
 	private void initialize() {
-
 		Color topColor = new Color(212, 255, 253);
 		Color bottomColor = new Color(247, 214, 190);
 
@@ -176,7 +175,6 @@ public class LoginScreen {
 	}
 
 	void tryAuthenticate() {
-
 		String user = authUsername.getText();
 		Reader pass = new CharArrayReader(authPassword.getPassword());
 		AuthStatus result;

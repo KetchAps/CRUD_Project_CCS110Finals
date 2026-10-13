@@ -2,6 +2,15 @@ drop database if exists spearDatabase;
 CREATE DATABASE IF NOT EXISTS spearDatabase;
 USE spearDatabase;
 -- ---------------------------------------------------------------------
+-- 0. USER ACCOUNTS
+-- ---------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS userAccounts(
+username varchar(100),
+password varchar(255),
+isAdmin bool
+);
+
+-- ---------------------------------------------------------------------
 -- 1. ROOMS / OFFICES
 -- ---------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS rooms_offices(
@@ -25,16 +34,6 @@ CREATE TABLE IF NOT EXISTS custodians(
     contactNumber VARCHAR(20)
 );
 
-CREATE TABLE IF NOT EXISTS userAccounts(
-userID int,
-username varchar(100) unique,
-password varchar(255),
-isAdmin bool,
-foreign key (userID) references custodians(custodianID)
-ON DELETE SET NULL ON UPDATE CASCADE
-);
-
-select * from userAccounts;
 -- ---------------------------------------------------------------------
 -- 3. CATEGORIES
 -- ---------------------------------------------------------------------
@@ -54,7 +53,7 @@ CREATE TABLE IF NOT EXISTS inventory(
     brandModel VARCHAR(150),
     serialNumber VARCHAR(100),
     description VARCHAR(255) NOT NULL,
-    roomID INT,
+    roomID INT NOT NULL,
     purchaseDate DATE,
     purchaseCost DECIMAL(12, 2),
     condition_status VARCHAR(50) DEFAULT 'Good',
@@ -88,9 +87,10 @@ CREATE TABLE IF NOT EXISTS borrow_transaction(
     transactionID INT AUTO_INCREMENT PRIMARY KEY,
     borrowerID INT NOT NULL,
     equipmentID INT NOT NULL,
+    approvedBy INT,
     borrowDate DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    expectedReturnDate DATE,
-    actualReturnDate DATE,
+    expectedReturnDate DATE NOT NULL,
+    actualReturnDate DATETIME,
     receivedBy INT,
     itemConditionUponBorrow VARCHAR(50) DEFAULT 'Good',
     itemConditionUponReturn VARCHAR(50),   -- NULL = not yet returned
@@ -100,6 +100,8 @@ CREATE TABLE IF NOT EXISTS borrow_transaction(
         ON DELETE RESTRICT ON UPDATE CASCADE,
     FOREIGN KEY (equipmentID) REFERENCES inventory(equipmentID)
         ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (approvedBy) REFERENCES custodians(custodianID)
+        ON DELETE SET NULL ON UPDATE CASCADE,
     FOREIGN KEY (receivedBy) REFERENCES custodians(custodianID)
         ON DELETE SET NULL ON UPDATE CASCADE,
     CHECK (actualReturnDate IS NULL OR actualReturnDate >= borrowDate),
@@ -107,7 +109,6 @@ CREATE TABLE IF NOT EXISTS borrow_transaction(
     INDEX idxExpectedReturn (expectedReturnDate)
 );
 
-select * from borrow_transaction;
 -- ---------------------------------------------------------------------
 -- 7. MAINTENANCE RECORDS
 -- ---------------------------------------------------------------------
@@ -126,26 +127,25 @@ CREATE TABLE IF NOT EXISTS maintenance_records(
         ON DELETE SET NULL ON UPDATE CASCADE
 );
 
-select * from maintenance_records;
 -- ---------------------------------------------------------------------
 -- 8. USER INITIALISATION
 -- ---------------------------------------------------------------------
 create user if not exists 'authenticator'@'localhost' identified by 'userAuthProfile';
-grant select, update, insert, delete on userAccounts to 'authenticator'@'localhost';
-grant select, update, insert, delete on inventory to 'authenticator'@'localhost';
-grant select, update, insert, delete on custodians to 'authenticator'@'localhost';
-grant select, update, insert, delete on borrowers to 'authenticator'@'localhost';
-grant select, update, insert, delete on borrow_transaction to 'authenticator'@'localhost';
-grant select, update, insert, delete on maintenance_records to 'authenticator'@'localhost';
+grant select, insert, delete on userAccounts to 'authenticator'@'localhost';
+grant select, insert, delete on inventory to 'authenticator'@'localhost';
+grant select, insert, delete on custodians to 'authenticator'@'localhost';
+grant select, insert, delete on borrowers to 'authenticator'@'localhost';
+grant select, insert, delete on borrow_transaction to 'authenticator'@'localhost';
+grant select, insert, delete on maintenance_records to 'authenticator'@'localhost';
 
 flush privileges;
 
 -- ---------------------------------------------------------------------
 -- 9. VALUE INITIALISATION
 -- ---------------------------------------------------------------------
+insert into userAccounts values ('admin', password('admin'), true), ('user', password('user'), false);
 
-
-insert into equipment_categories values ('Furniture', ''), ('Electronics', '');
+insert into equipment_categories values ('Furniture', 'Electronics');
 
 insert into rooms_offices values
 (roomID, 'BCH 101', 'Bagong Cabuyao Hall', '1', 'Classroom'),
@@ -162,51 +162,3 @@ insert into rooms_offices values
 (roomID, 'Computer Laboratory 1', 'Main Building', '1', 'Laboratory'),
 (roomID, 'Computer Laboratory 4', 'Main Building', '2', 'Laboratory');
 
-select * from borrowers;
-
-insert into borrowers values
-(borrowerID, 'Ian Daniel', 'Felonia', 'Student', '3205541', 'College of Computing Studies', '123456789', 'iandanielfelonia@gmail.com'),
-(borrowerID, 'Khynan', 'Delmonte', 'Student', '3522422', 'College of Computing Studies', '975318642', 'khynandelmonte@gmail.com'),
-(borrowerID, 'Kenneth Ruther', 'Sobrepena', 'Student', '4225541', 'College of Computing Studies', '96661234', 'sobrepenakenneth@gmail.com');
-
-/*
-CREATE TABLE IF NOT EXISTS inventory(
-    equipmentID INT AUTO_INCREMENT PRIMARY KEY,
-    propertyTag VARCHAR(30) NOT NULL UNIQUE,
-    equipmentName VARCHAR(150) NOT NULL,
-    categoryName VARCHAR(100) NOT NULL,
-    brandModel VARCHAR(150),
-    serialNumber VARCHAR(100),
-    description VARCHAR(255) NOT NULL,
-    roomID INT NOT NULL,
-    purchaseDate DATE,
-    purchaseCost DECIMAL(12, 2),
-    condition_status VARCHAR(50) DEFAULT 'Good',
-    availability VARCHAR(50) DEFAULT 'Available',
-    date_added DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (categoryName) REFERENCES equipment_categories(categoryName)
-        ON DELETE RESTRICT ON UPDATE CASCADE,
-    FOREIGN KEY (roomID) REFERENCES rooms_offices(roomID)
-        ON DELETE RESTRICT ON UPDATE CASCADE,
-    INDEX idxAvailability (availability)
-);
-*/
-insert into inventory values 
-(equipmentID, '99103', 'Widescreen TV', 'Electronics', 'LG', '019993912', 'A widescren TV', null, '2023-05-12', '15000', 'Good', availability, '2023-05-14'),
-(equipmentID, '9912103', 'Class Chair', 'Furniture', 'Denha', '1122331', 'A chair', null, '2023-05-12', '15000', 'Damaged', availability, '2023-05-14');
-
-select * from inventory;
-/* custodianID INT AUTO_INCREMENT PRIMARY KEY,
-    firstName VARCHAR(50) NOT NULL,
-    lastName VARCHAR(50) NOT NULL,
-    position VARCHAR(100),
-    department VARCHAR(100),
-    contactNumber VARCHAR(20)
-    */
-insert into custodians values (custodianID, 'Ad', 'Min', 'Admin', 'IT', 'du'), (custodianID, 'Cas', 'Todian', 'Custodian', 'IT', 'e');
-insert into userAccounts values (1, 'admin', password('admin'), true), (2, 'user', password('user'), false);
-
-select * from custodians;
-
-select * from borrow_transaction;
-select * from maintenance_records;

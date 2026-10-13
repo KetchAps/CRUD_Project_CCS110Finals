@@ -1105,7 +1105,7 @@ public class AdminDashboard {
 		// ===========================================
 		// CUSTODIAN MANAGER (talks to AdminHandler)
 		// ===========================================
-		refreshCustodianTable();
+//		refreshCustodianTable();
 
 		// click a row -> fill the form
 		table.getSelectionModel().addListSelectionListener(e -> {
@@ -1128,7 +1128,7 @@ public class AdminDashboard {
 				txtUsername.setEnabled(false); // updateCustodian does not change these
 				txtPassword.setEnabled(false);
 			} catch (SQLException ex) {
-				showError(ex);
+//				showError(ex);
 			}
 		});
 
@@ -1140,11 +1140,11 @@ public class AdminDashboard {
 						txtContactNumber.getText(), txtUsername.getText(), new CharArrayReader(pw));
 				showResult(result);
 				if (result.equals(AdminHandler.SUCCESS)) {
-					refreshCustodianTable();
+//					refreshCustodianTable();
 					clearForm();
 				}
 			} catch (SQLException ex) {
-				showError(ex);
+//				showError(ex);
 			} finally {
 				Arrays.fill(pw, ' ');
 			}
@@ -1162,11 +1162,11 @@ public class AdminDashboard {
 						txtContactNumber.getText());
 				showResult(result);
 				if (result.equals(AdminHandler.SUCCESS)) {
-					refreshCustodianTable();
+//					refreshCustodianTable();
 					clearForm();
 				}
 			} catch (SQLException ex) {
-				showError(ex);
+//				showError(ex);
 			}
 		});
 
@@ -1184,11 +1184,12 @@ public class AdminDashboard {
 				String result = AdminHandler.deleteCustodian(id, sessionID);
 				showResult(result);
 				if (result.equals(AdminHandler.SUCCESS)) {
-					refreshCustodianTable();
+//					refreshCustodianTable();
 					clearForm();
 				}
 			} catch (SQLException ex) {
-				showError(ex);
+//				showError(ex);
+				
 			}
 		});
 
@@ -1233,7 +1234,6 @@ public class AdminDashboard {
 		// DASHBOARD (talks to AdminDashboardHandler)
 		// ===========================================
 		refreshDashboard();
-
 		// frame.setVisible(true);
 
 	}
@@ -1267,7 +1267,7 @@ public class AdminDashboard {
 			fillModel(recentEquipmentModel, AdminDashboardHandler.getRecentEquipment(RECENT_ROWS));
 			fillModel(recentBorrowingsModel, AdminDashboardHandler.getRecentBorrowings(RECENT_ROWS));
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 		refreshGreeting();
 	}
@@ -1290,19 +1290,16 @@ public class AdminDashboard {
 			model.addRow(row);
 	}
 
-	// ===========================================
-	// CUSTODIAN HELPERS
-	// ===========================================
-	private void refreshCustodianTable() {
-		try {
-			String[][] rows = AdminHandler.getCustodianList();
-			custodianModel.setRowCount(0);
-			for (String[] row : rows)
-				custodianModel.addRow(row);
-		} catch (SQLException ex) {
-			showError(ex);
-		}
-	}
+//	private void refreshCustodianTable() {
+//		try {
+//			String[][] rows = AdminHandler.getCustodianList();
+//			custodianModel.setRowCount(0);
+//			for (String[] row : rows)
+//				custodianModel.addRow(row);
+//		} catch (SQLException ex) {
+//			showError(ex);
+//		}
+//	}
 
 	// returns -1 when no row is selected
 	private int selectedCustodianID() {
@@ -1340,11 +1337,11 @@ public class AdminDashboard {
 		JOptionPane.showMessageDialog(adminDashboard, msg, "Custodian Manager", type);
 	}
 
-	private void showError(SQLException ex) {
-		ex.printStackTrace();
-		JOptionPane.showMessageDialog(adminDashboard, "Database error: " + ex.getMessage(), "Error",
-				JOptionPane.ERROR_MESSAGE);
-	}
+//	private void showError(SQLException ex) {
+//		ex.printStackTrace();
+//		JOptionPane.showMessageDialog(adminDashboard, "Database error: " + ex.getMessage(), "Error",
+//				JOptionPane.ERROR_MESSAGE);
+//	}
 
 	// ===========================================
 	// INVENTORY HELPERS
@@ -1361,7 +1358,7 @@ public class AdminDashboard {
 				rooms.addElement(r);
 			cboRoomLocation.setModel(rooms);
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 
 		cboCondition.setModel(new DefaultComboBoxModel<>(EQUIPCONDITIONS));
@@ -1397,7 +1394,7 @@ public class AdminDashboard {
 			for (String[] row : rows)
 				equipmentModel.addRow(row);
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 	}
 
@@ -1409,7 +1406,7 @@ public class AdminDashboard {
 			lblUnderMaintenanceCounter.setText(String.format("%02d", c[2]));
 			lblBorrowedCounter.setText(String.format("%02d", c[3]));
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 	}
 
@@ -1450,7 +1447,7 @@ public class AdminDashboard {
 			}
 			editingEquipmentID = id;
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 	}
 
@@ -1477,7 +1474,7 @@ public class AdminDashboard {
 				resetEquipmentForm();
 			}
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 	}
 
@@ -1502,7 +1499,7 @@ public class AdminDashboard {
 					+ "\n" + "Description: " + nz(item.description());
 			JOptionPane.showMessageDialog(adminDashboard, text, "Equipment Details", JOptionPane.INFORMATION_MESSAGE);
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 	}
 
@@ -1524,7 +1521,7 @@ public class AdminDashboard {
 				resetEquipmentForm();
 			}
 		} catch (SQLException ex) {
-			showError(ex);
+//			showError(ex);
 		}
 	}
 

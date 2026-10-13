@@ -63,17 +63,17 @@ public class MainClient {
 		custodianHandler = new CustodianHandler();
 
 		frame = new JFrame();
-		frame.setBounds(100, 100, 1290, 752);
+		frame.setBounds(100, 100, 1290, 910); 
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.getContentPane().setLayout(null);
 
 		JPanel mainPane = new JPanel();
-		mainPane.setBounds(0, 21, 1283, 700);
+		mainPane.setBounds(0, 21, 1283, 850); 
 		frame.getContentPane().add(mainPane);
 		mainPane.setLayout(null);
 
 		userArea = new JPanel();
-		userArea.setBounds(0, 0, 1290, 700);
+		userArea.setBounds(0, 0, 1290, 700); 
 		mainPane.add(userArea);
 		userArea.setLayout(card);
 
@@ -101,42 +101,46 @@ public class MainClient {
 		userArea.add(adminScreen.getPanel(), "admin");
 
 		lblFeedback = new JLabel("-");
-		lblFeedback.setBounds(20, 623, 1004, 14);
+		lblFeedback.setBounds(22, 711, 1004, 14); // Adjusted positioning to sit cleanly below userArea
 		mainPane.add(lblFeedback);
 
 		JScrollPane scrllLogViewport = new JScrollPane();
-		scrllLogViewport.setBounds(0, 699, 1284, 139);
+		scrllLogViewport.setBounds(20, 736, 1240, 103); // Changed y from 699 to 635 so it's visible inside mainPane
 		mainPane.add(scrllLogViewport);
 
 		areaLog = new JTextArea();
+		areaLog.setEditable(false); // Recommended to make logs read-only
 		scrllLogViewport.setViewportView(areaLog);
 
 		card.show(userArea, "login");
 	}
 
 	void testConnection() {
-
-		SwingWorker<?, ?> w = new SwingWorker<>() {
+		SwingWorker<Boolean, Void> w = new SwingWorker<>() {
+			private String connStatMsg;
 
 			@Override
-			protected Object doInBackground() throws Exception {
-				startupProcess();
-				return null;
+			protected Boolean doInBackground() throws Exception {
+				boolean result = authHandler.checkConnection();
+				connStatMsg = authHandler.getConnStatus();
+				return result;
+			}
+
+			@Override
+			protected void done() {
+				try {
+					boolean result = get();
+					log(result, connStatMsg);
+				} catch (Exception e) {
+					log(false, "Connection check failed: " + e.getMessage());
+				}
 			}
 		};
 		w.execute();
 	}
 
-	void startupProcess() {
-
-		boolean result = authHandler.checkConnection();
-		String connStatMsg = authHandler.getConnStatus();
-
-		log(result, connStatMsg);
-	}
-
 	public void setSessionCredentials(String user, int id) {
-		if (!(user.isBlank() || user.isEmpty())) sessionUser = user;
+		if (user != null && !user.isBlank()) sessionUser = user;
 		if (id > 0) sessionID = id;
 	}
 
@@ -149,7 +153,6 @@ public class MainClient {
 	}
 
 	public void log(boolean isGood, String msg) {
-
 		if (isGood)
 			lblFeedback.setForeground(GOOD);
 		else
